@@ -1,0 +1,21 @@
+
+
+### OPERATION
+ Product ID = wisescope
+ Use Simulator = false
+ #Patch = { 1251 }
+
+### MALS
+ MALS Device = { Auto , simul , 0 , 0 }
+ Camera TPSU Trigger Delay = 30000
+
+### CAMERA
+ Camera Model(V2) = { pylon-usb , -1 }
+ Camera Trigger Method = External # tpsu #software
+ Camera Reverse X = false
+ Camera Reverse Y = false
+ Pylon USB Line Number = Line2
+
+### LIGHTING
+ Lighting Device (V3) 1 = { TPSU , L , simul ,  103 ,  1 , -2 , -1 , 1000000 }
+ Lighting Device (V3) 1 attributes = { strobe = off }
