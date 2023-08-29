@@ -1,20 +1,25 @@
 # SDOAQ_samples
 
-Several sample programs using SDOAQ dll are posted. There are not only programs the simply use APIs to execute one action, but also programs that use multiple APIs in various ways.
+These are sample programs that use the SDOAQ dll to acquire images and WSIO dll to display the results.
 
 ---
-### [cpp folder]
-  * sample projects implemented in c++.
+#### [cpp folder]
+  * Sample projects implemented in c++.
 ---
-### [cs folder]
- * sample projects implemented in c#.
+#### [cs folder]
+ * Sample projects implemented in c#.
 ---
-### [Include folder]
+#### [Include folder]
   * SDOAQ: SDO acqusition dlls and header files.
   * WSIO: ImageViewer dlls and header files.
 ---
-### [vs solution files]
-  * SdcAllSample_CPP.sIn: all sample projects implemented in c++.
+#### [vs solution files]
+  * SdoaqAllSample_CPP.sIn: All sample projects implemented in c++.
+  * SdoaqAllSample_CS.sIn: All sample projects implemented in c#. (to-be)
 ---
-### [updll.bat]
+#### [project files]
+  * SdoaqApiTester\SDOAQ_App.vcxproj: A sample program to check the operation of SDOAQ dll API. An examples of visualizing the EDoF result image in 3D is included.
+  * SdoaqCameraFrameCallback\SdoaqCameraFrameCallback.vcxproj: A sample program that receives only the camera frame.
+---
+#### [updll.bat]
   * Update required dlls to system dlls.
