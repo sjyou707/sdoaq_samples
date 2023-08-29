@@ -4,17 +4,17 @@ Several sample programs using SDOAQ dll are posted. There are not only programs 
 
 ---
 ### [cpp folder]
-  sample projects implemented in c++.
+  * sample projects implemented in c++.
 ---
 ### [cs folder]
-  sample projects implemented in c#.
+ * sample projects implemented in c#.
 ---
 ### [Include folder]
   * SDOAQ: SDO acqusition dlls and header files.
   * WSIO: ImageViewer dlls and header files.
 ---
 ### [vs solution files]
-  SdcAllSample_CPP.sIn: all sample projects implemented in c++.
+  * SdcAllSample_CPP.sIn: all sample projects implemented in c++.
 ---
 ### [updll.bat]
-  Update required dlls to system dlls.
+  * Update required dlls to system dlls.
