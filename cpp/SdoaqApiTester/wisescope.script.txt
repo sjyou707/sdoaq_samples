@@ -1,0 +1,45 @@
+
+### OPERATION
+ Product ID = wisescope
+
+
+### MALS
+ MALS Device = { Auto , Simul , 0 , 0 }
+
+
+### CAMERA
+ # if_name(string)   : Simul / Simul-width-height-(color|bw)
+ #                   : GigE: Basler(Pylon-GigE) / Vieworks(Vis-GigE) / HIK(Mvs) / IMI(Neptune) / Flir(Spinnaker) / Others(EBUS)
+ #                   : USB: Basler(Pylon-USB) / HIK(Mvs) / IMI(Neptune) / Raytrix(Raycam) / PCO(Pco)
+ #                   : CLink+Euresys: Basler(Multicam-ACA) / Sentech(Multicam-STC) / CIS(Multicam-CIS) / VIEWORKS(Multicam-VW) / HIKROBOT(Multicam-HIK)
+ #                   : CLink+Matrox: Basler(Milx-ACA) / Sentech(Milx-STC) / CIS(Milx-CIS) / VIEWORKS(Milx-VW) / HIKROBOT(Milx-HIK)
+ #                   : CoaXPress: Euresys(Coaxlink) / Matrox(Milx)
+
+ Camera Model (V2) = { Simul-2040-1086-color , -1 }
+ Camera Trigger Method = Software
+ Camera Reverse X = false
+ Camera Reverse Y = false
+ Pylon USB Line Number = Line2
+ Full Focus Simul Image = C:\\Simul.Zstack
+
+
+### LIGHTING
+ # Lighting (V3) record format SINGLE  : {model, name, device, source, intensity, lighting_cam_exposure, lighting_cam_gain, max_exposure_time}
+ # Lighting (V3) record format GROUP   : {GROUP, name, group-algo, item-nums}
+ # Lighting (V3) record format GR.ITEM : {model, item-name, device, source, intensity, lighting_cam_exposure, lighting_cam_gain, max_exposure_time}
+ # model(string)                       : Null(External controlled)
+ #                                     : SDZEISS / SDZEISS-NOSTROBE
+ #                                     : LCBPWM / TPSU
+
+ #Lighting Device (V3) 1 = { TPSU , L , Auto ,  103 ,  1 , -2 , -1 , 1000000 }
+ #Lighting Device (V3) 1 attributes = { strobe = on }
+
+ #Lighting Device (V3) 1 = { GROUP , SDZEISS , UI , 8 }
+ #Lighting Device (V3) 1-1 = { SDZEISS-NOSTROBE , Sub^m , Auto  , 0 , 0 , -2 , -1 , 1000000 }
+ 
+ #Lighting Device (V3) 1 = { LCBPWM , L , Auto ,  0 ,  0 , -2 , -1 , 1000000 }
+ #Lighting Device (V3) 1 attributes = { strobe = on }
+
+ Lighting Device (V3) 1 = { Null , External , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
+
+
