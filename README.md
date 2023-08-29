@@ -15,7 +15,7 @@ These are sample programs that use the SDOAQ dll to acquire images and WSIO dll 
 ---
 #### [vs solution files]
   * SdoaqAllSample_CPP.sIn: All sample projects implemented in c++.
-  * SdoaqAllSample_CS.sIn: All sample projects implemented in c#. (to-be)
+  * SdoaqAllSample_CS.sIn: All sample projects implemented in c#.
 ---
 #### [project files]
   * SdoaqApiTester\SDOAQ_App.vcxproj: A sample program to check the operation of SDOAQ dll API. An examples of visualizing the EDoF result image in 3D is included.
