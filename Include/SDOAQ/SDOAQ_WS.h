@@ -81,6 +81,8 @@
 										- Fix an issue that camera registry was not updated after running auto whitebalance
 										- Do hard stop when acquisition is stopped
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.2.1  2023.08.30  YoungJu Lee		- Fix an issue that light could not be turned off when hard stop go too fast
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
