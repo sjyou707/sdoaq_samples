@@ -247,7 +247,7 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 		//----------------------------------------------------------------------------
 		// !!! CURRENTLY, REGISTRY SETTINGS ARE ONLY VALID FOR BASLER CAMERA !!!!
 		//----------------------------------------------------------------------------
-		g_LogLine(_T("check the camera grabbing status before making some registry changes"));
+		g_LogLine(_T("check the camera grabbing status before making some register changes"));
 		eCameraGrabbingStatus cgs;
 		eErrorCode rv_sdoaq = ::SDOAQ_GetCameraGrabbingStatus(&cgs);
 		if (ecNoError == rv_sdoaq)
