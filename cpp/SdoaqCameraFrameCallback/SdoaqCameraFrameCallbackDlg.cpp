@@ -243,6 +243,26 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 			((CButton*)theApp.m_pMainWnd->GetDlgItem(IDC_TRIGGER_SOFTWARE))->SetCheck(TRUE);
 			g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
 		}
+
+		//----------------------------------------------------------------------------
+		// !!! CURRENTLY, REGISTRY SETTINGS ARE ONLY VALID FOR BASLER CAMERA !!!!
+		//----------------------------------------------------------------------------
+		g_LogLine(_T("check the camera grabbing status before making some registry changes"));
+		eCameraGrabbingStatus cgs;
+		eErrorCode rv_sdoaq = ::SDOAQ_GetCameraGrabbingStatus(&cgs);
+		if (ecNoError == rv_sdoaq)
+		{
+			if (cgsOnGrabbing == cgs)
+			{
+				rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgsOffGrabbing);
+			}
+			rv_sdoaq = ::SDOAQ_SetCameraParameterInteger("Width", 1024);
+			rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgs);
+		}
+		else
+		{
+			g_LogLine(_T("SDOAQ_GetCameraGrabbingStatus() returns error(%d)."), rv_sdoaq);
+		}
 	}
 	else
 	{

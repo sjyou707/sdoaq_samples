@@ -72,6 +72,18 @@ namespace SDOAQ
 		public static extern eErrorCode SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm);
 
 
+		public enum eCameraGrabbingStatus
+		{
+			cgsOffGrabbing = 0,
+			cgsOnGrabbing = 1,
+		};
+		// 카메라 그랩 상태를 설정한다.
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_SetCameraGrabbingStatus(eCameraGrabbingStatus cgs);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_GetCameraGrabbingStatus(eCameraGrabbingStatus[] cgs_ptr);
+
+
 		// 아래 API들은 일부 카메라에서만 적용된다.
 		public enum eCameraParameterType
 		{

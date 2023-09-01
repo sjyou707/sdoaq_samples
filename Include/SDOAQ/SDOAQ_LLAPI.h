@@ -65,6 +65,16 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm);
 
 
+	enum eCameraGrabbingStatus
+	{
+		cgsOffGrabbing = 0,
+		cgsOnGrabbing = 1,
+	};
+	// 카메라 그랩 상태를 설정한다.
+	__declspec(dllexport) eErrorCode SDOAQ_SetCameraGrabbingStatus(eCameraGrabbingStatus cgs);
+	__declspec(dllexport) eErrorCode SDOAQ_GetCameraGrabbingStatus(eCameraGrabbingStatus* cgs_ptr);
+
+
 	// 아래 API들은 일부 카메라에서만 적용된다.
 	enum eCameraParameterType
 	{
