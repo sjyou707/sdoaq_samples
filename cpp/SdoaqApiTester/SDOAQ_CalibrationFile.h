@@ -74,5 +74,5 @@ public:
 	std::vector<CalibV2> calibData;
 
 	bool GetCalibList(const CString& sDirPath, std::vector<CString>& vsFileList);
-	bool BuildCalibData(const CString& sFileName, std::vector<CalibV2>& calib);
+	bool BuildCalibData(const CString& sFileName);
 };

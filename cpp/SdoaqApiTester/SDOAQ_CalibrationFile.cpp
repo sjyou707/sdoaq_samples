@@ -43,7 +43,7 @@ bool SDOAQ_CalibrationFile::GetCalibList(const CString& sDirPath, std::vector<CS
 }
 
 //------------------------------------------------------------------------------------------------
-bool SDOAQ_CalibrationFile::BuildCalibData(const CString& sFileName, std::vector<CalibV2>& vCalib)
+bool SDOAQ_CalibrationFile::BuildCalibData(const CString& sFileName)
 {
 	std::ifstream calib_file_stream;
 	calib_file_stream.open(sFileName);
@@ -177,7 +177,7 @@ bool SDOAQ_CalibrationFile::BuildCalibData(const CString& sFileName, std::vector
 			}
 		}
 
-		vCalib.push_back(calib);
+		calibData.push_back(calib);
 
 		calib_file_stream.close();
 	}

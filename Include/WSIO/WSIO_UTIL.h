@@ -1,3 +1,14 @@
+/*	WSIO_UTIL.h
+
+	Copyright (c) SD Optics,Inc. All rights reserved.
+
+	========================================================================================================================================================
+	Revision history
+	========================================================================================================================================================
+	Version     date      Author         Descriptions
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+
 #pragma once
 
 #include "WSIO.h"
@@ -62,21 +73,28 @@ enum WSUTIVRESOURCE_Enum
 	WSUTIVRESOURCE_MRDSLOP				= 14,
 	WSUTIVRESOURCE_MRMULTIFOCUS			= 13,
 	WSUTIVRESOURCE_MRMULTILINE			= 15,
-	WSUTIVRESOURCE_GUISHAPE				= 16,
+	WSUTIVRESOURCE_MRMULTIRECT			= 18,
+	WSUTIVRESOURCE_MRMULTIELLIPSE		= 19,
+	WSUTIVRESOURCE_MRMULTIMEASURE		= 20, // MULTILINE, MULTIRECT, MUTIELLIPSE
+	WSUTIVRESOURCE_GUIEFFECT			= 16,
 	WSUTIVRESOURCE_OSDTYPE				= 17,
 };
 
 enum WSUTIVGUISHAPE_Enum
 {
-	WSUTIVGUISHAPE_FORK3 = (1 << 11),
+	WSUTIVGUISHAPE_4D = (1 << 9),
+	WSUTIVGUISHAPE_8D = (1 << 10),
+	WSUTIVGUISHAPE_PERPENDICULAR = (1 << 11),
 	WSUTIVGUISHAPE_BOUNDARY4 = (1 << 12),
 	WSUTIVGUISHAPE_LINECROSS = (1 << 13),
+	WSUTIVGUISHAPE_DRAW_ASSISTANT = (1 << 14),
 };
 
 enum WSUTIVOSDTYPE_Enum
 {
 	WSUTIVOSDTYPE_TEXT_ID = (1 << 1),
 	WSUTIVOSDTYPE_TEXT_TYPE = (1 << 2),
+	WSUTIVOSDTYPE_TEXT_VALUE = (1 << 3),
 };
 
 typedef WSIOUINT16 WSUTIVOBJFUNC;
@@ -91,6 +109,17 @@ enum WSUTIVOBJFUNC_Enum
 	WSUTIVOBJFUNC_UPDATELINES			= (1 << 5),
 	WSUTIVOBJFUNC_BIT_ONDRAWING			= (1 << 15),
 	WSUTIVOBJFUNC_ALL					= (WSUTIVOBJFUNC)-1
+};
+
+enum WSUTIVOBJTYPE_Enum
+{
+	WSUTIVOBJTPYE_NULL = NULL,
+	WSUTIVOBJTPYE_AUTO_FOCUS = 1,
+	WSUTIVOBJTPYE_FIXED_FOCUS = 2,
+	WSUTIVOBJTPYE_EDOF = 3,
+	WSUTIVOBJTPYE_MEASURE_LINE = 4,
+	WSUTIVOBJTPYE_MEASURE_RECT = 5,
+	WSUTIVOBJTPYE_MEASURE_ELLIPSE = 6,
 };
 
 typedef int WSUTIVIMAGEMODE;
@@ -375,7 +404,7 @@ WSIODLL_API	WSIORV			WSUT_IV_AttachRawImgData(
 			WSIOVOID				viewer_hwnd,
 			WSIOUINT				width,
 			WSIOUINT				height,
-			WSIOUINT				line_size,
+			WSIOUINT				line_bytes,
 			WSIOUINT				pixel_bytes,
 			WSIOVOID				data,
 			WSIOUINT				data_size
@@ -386,12 +415,26 @@ WSIODLL_API	WSIORV			WSUT_IV_AttachRawImgData_V2(
 			WSIOVOID				viewer_hwnd,
 			WSIOUINT				width,
 			WSIOUINT				height,
-			WSIOUINT				line_size,
+			WSIOUINT				line_bytes,
 			WSIOUINT				pixel_bytes,
 			WSIOVOID				data,
 			WSIOUINT				data_size,
 			WSIOCSTR				path_name_str
 			);
+
+//----------------------------------------------------------------------------
+WSIODLL_API	WSIORV			WSUT_IV_AttachRawImgData_F3(
+	WSIOVOID				viewer_hwnd,
+	WSIOUINT				width,
+	WSIOUINT				height,
+	WSIOUINT				line_bytes,
+	WSIOUINT				pixel_bytes,
+	WSIOVOID				data_surface,
+	WSIOUINT				data_surface_size,
+	WSIOCSTR				path_name_str,
+	WSIOVOID				data_f3,
+	WSIOUINT				data_f3_size
+	);
 
 //----------------------------------------------------------------------------
 WSIODLL_API	WSIORV			WSUT_IV_SetPixelWidth(

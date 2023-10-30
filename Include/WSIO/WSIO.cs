@@ -1,13 +1,24 @@
-﻿//====================================================================================================================================
-// WSIO (WiseScope integrated Objects) Common Definitioin & API
-//------------------------------------------------------------------------------------------------------------------------------------
+﻿/*	WSIO_.cs
 
-//#define X86
+	Copyright (c) SD Optics,Inc. All rights reserved.
+
+	========================================================================================================================================================
+	Revision history
+	========================================================================================================================================================
+	Version     date      Author         Descriptions
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
 
 using SDOAQ_App_CS;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+
+//====================================================================================================================================
+// WSIO (WiseScope integrated Objects) Common Definitioin & API
+//------------------------------------------------------------------------------------------------------------------------------------
+
+//#define X86
 
 namespace SDOWSIO
 {
@@ -63,21 +74,24 @@ namespace SDOWSIO
 			WSIORV_ERROR_BEGIN					= -2000,
 			//------------------------------------------
 			WSIORV_FAIL							= -2001,
-			WSIORV_WSIFCLASS_INVALID			= -2002,	// WSIFCLASS is invalid.
-			WSIORV_WSIHANDLE_NOTEXIST			= -2003,	// WSIHANDLE does not exist.
-			WSIORV_WSIHANDLE_NOTOPENED			= -2004,	// WSIHANDLE is not opened.
-			WSIORV_WSIHANDLE_NOTESTABLISHED		= -2020,	// WSIHANDLE is not established.
-			WSIORV_WSINETTYPE_INVALID			= -2005,	// WSIFNETTYPE is invalid.
-			WSIORV_WSIO_OPENFAILED				= -2006,	// 
-			WSIORV_WSIOLOGTYPE_INVALID			= -2007,	// 
-			WSIORV_USERRECORDID_INVALID			= -2008,	// USER RECORD ID is invalid.
-			WSIORV_USERSTRINGID_INVALID			= -2009,	// USER STRING ID is invalid.
+			WSIORV_NODLL						= -2038,		// Failed to load dll module
+			WSIORV_DEPRECATED_API				= -2037,		// This api is deprecated.
+
+			WSIORV_WSIFCLASS_INVALID			= -2002,		// WSIFCLASS is invalid.
+			WSIORV_WSIHANDLE_NOTEXIST			= -2003,		// WSIHANDLE does not exist.
+			WSIORV_WSIHANDLE_NOTOPENED			= -2004,		// WSIHANDLE is not opened.
+			WSIORV_WSIHANDLE_NOTESTABLISHED		= -2020,		// WSIHANDLE is not established.
+			WSIORV_WSINETTYPE_INVALID			= -2005,		// WSIFNETTYPE is invalid.
+			WSIORV_WSIO_OPENFAILED				= -2006,		// 
+			WSIORV_WSIOLOGTYPE_INVALID			= -2007,		// 
+			WSIORV_USERRECORDID_INVALID			= -2008,		// USER RECORD ID is invalid.
+			WSIORV_USERSTRINGID_INVALID			= -2009,		// USER STRING ID is invalid.
 			WSIORV_INTERNAL_ERROR				= -2010,
-			//WSIORV_WSIFTIDSTR_TOOLONG			= -2011,	// WSIOTIDSTR is too long
-			WSIORV_ARG_STRISTOOLONG				= -2012,	// String argument is too long
-			WSIORV_ARG_BLOCKISTOOLONG			= -2021,	// Block argument is too long
-			WSIORV_ARG_BUFISNOTSUFFICIENT		= -2013,	// String buffer argument is not sufficent.
-			WSIORV_ARG_NULLPOINTER				= -2035,	// There is one or more null pointer arguments.
+			//WSIORV_WSIFTIDSTR_TOOLONG			= -2011,		// WSIOTIDSTR is too long
+			WSIORV_ARG_STRISTOOLONG				= -2012,		// String argument is too long
+			WSIORV_ARG_BLOCKISTOOLONG			= -2021,		// Block argument is too long
+			WSIORV_ARG_BUFISNOTSUFFICIENT		= -2013,		// String buffer argument is not sufficent.
+			WSIORV_ARG_NULLPOINTER				= -2035,		// There is one or more null pointer arguments.
 			WSIORV_TIMEOUT						= -2014,
 			//WSIORV_NOWINDOWENVIRONMENT		= -2015,
 			WSIORV_MAINHWNDALREADYASSIGNED		= -2016,
@@ -88,7 +102,7 @@ namespace SDOWSIO
 			WSIORV_FAILEDTOSETWINDOWPOS			= -2023,
 			WSIORV_FAILEDTOATTACHFILE			= -2024,
 			WSIORV_FAILEDTOATTACHIMAGEDATA		= -2029,
-			WSIORV_NOIMGVIEWRESOURCE			= -2025,	// The resource ID is not applicable.
+			WSIORV_NOIMGVIEWRESOURCE			= -2025,		// The resource ID is not applicable.
 			WSIORV_NOIMGVIEWIMAGEMODE			= -2026,
 			WSIORV_NOTYETIMPLEMENTED			= -2027,
 			WSIORV_ARG_INVALIDALGORITHMID		= -2028,
@@ -97,10 +111,9 @@ namespace SDOWSIO
 			WSIORV_CAMERA_BUSY					= -2032,
 			WSIORV_FAILTOOPENSHAREDMEMORY		= -2033,
 			WSIORV_NOTIMPLEMENTED				= -2034,
-			WSIORV_FAILEDTOWRITEFILE			= -2036,	// File writing error
-			WSIORV_DEPRECATED_API				= -2037,	// This api is deprecated.
+			WSIORV_FAILEDTOWRITEFILE			= -2036,		// File writing error
 			//------------------------------------------
-			WSIORV_ERROR_NEXT					= -2038,
+			WSIORV_ERROR_NEXT					= -2039,
 			//------------------------------------------
 			WSIORV_ERROR_END					= -4999
 			//==========================================
@@ -150,6 +163,7 @@ namespace SDOWSIO
 			WSIOIMGFORMAT_CZI			= 6,
 			WSIOIMGFORMAT_TIFF			= 7,
 			WSIOIMGFORMAT_ZIP			= 8,
+			WSIOIMGFORMAT_TXT			= 9,
 		};
 
 		//============================================================================

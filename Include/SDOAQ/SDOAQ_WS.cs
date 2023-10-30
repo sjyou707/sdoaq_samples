@@ -81,12 +81,20 @@ using System.Text;
 										- Add TPSU light
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.2.0  2023.08.04  YoungJu Lee		- Add string type parameter
-										- Add EDoF algorithm selection (support 3rd party algorithm)
+										- Add EDoF algorithm method selection (support 3rd party algorithm)
 										- Add Nikon motorized nosepiece controller
-										- Fix an issue that camera registry was not updated after running auto whitebalance
+										- Fix an issue that camera register was not updated after running auto whitebalance
 										- Do hard stop when acquisition is stopped
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.2.1  2023.08.30  YoungJu Lee		- Fix an issue that light could not be turned off when hard stop go too fast
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.2.2  2023.09.22  YoungJu Lee		- Set critical section for image buffer
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.3.0  2023.10.04  YoungJu Lee		- Update sdedof library v0.82
+										- Add SDOAQ_SetCalibrationFile
+										- Add edof scale correction parameters (pi_edof_is_scale_correction_enabled, pi_edof_scale_correction_dst_step)
+										- Add API to get algorithm version
+										- Add SDOAQ_PlayAfCallbackEx API with an matched focus step as a parameter
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
  */
 
@@ -256,6 +264,12 @@ namespace SDOAQ
 		public static extern eErrorCode SDOAQ_RegisterObjectiveChangedCallback(SDOAQ_ObjectiveChanged cbf);
 
 		/// <summary>
+		/// The calibration data is read from an external file.
+		/// </summary>
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_SetCalibrationFile([MarshalAs(UnmanagedType.LPStr)] string sFilename);
+
+		/// <summary>
 		/// This function sets the calibration data for objetive that are not defined inside the dll.
 		/// The calibration data is read from an external file.
 		/// </summary>
@@ -373,6 +387,12 @@ namespace SDOAQ
 		/// </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int SDOAQ_GetPatchVersion();
+
+		/// <summary>
+		/// This function returns the algorithm version number of the API.
+		/// </summary>
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int SDOAQ_GetAlgorithmVersion();
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//
@@ -505,6 +525,19 @@ namespace SDOAQ
 			pi_edof_num_thread = 26,            // I - R/W
 
 			/// <summary>
+			/// Enables image scale correctionDe.
+			/// more computation needed
+			/// edof image has a constant pixel pitch which refer to scale_correction_dst_step
+			/// </summary>
+			pi_edof_is_scale_correction_enabled = 68,// I - R/W
+
+			/// <summary>
+			/// reference MALS step for image scale correction
+			/// range = {MALS_MIN_STEP ~ MALS_MAX_STEP}
+			/// </summary>
+			pi_edof_scale_correction_dst_step = 69, // I - R/W
+			
+			/// <summary>
 			/// Specifies parameters to pass to the HeliconFocus executable when using the HeliconFocus edof algorithm.
 			/// </summary>
 			piAlgoParamHeliconFocus = 66,       // S - R/W
@@ -543,6 +576,8 @@ namespace SDOAQ
 			piIntensityGeneralChannel_6 = 39,   // D - R/W	 (%)
 			piIntensityGeneralChannel_7 = 40,   // D - R/W	 (%)
 			piIntensityGeneralChannel_8 = 41,   // D - R/W	 (%)
+
+			//piNextParameterValue = 70,
 
 			/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 			piInvalidParameter = 100
@@ -1058,6 +1093,14 @@ namespace SDOAQ
 			  double dbBestFocusStep,
 			  double dbBestScore);
 
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		unsafe public delegate void SDOAQ_PlayAfCallbackEx(
+			  eErrorCode errorCode,
+			  int lastFilledRingBufferEntry,
+			  double dbBestFocusStep,
+			  double dbBestScore,
+			  double dbMatchedFocusStep);
+
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		/* deprecated. Instead, use SDOAQ_SingleShotAF */unsafe public static extern eErrorCode SDOAQ_AcquireAF(AcquisitionFixedParameters_V2[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, int[] pPositions, int positionsCount, byte[] pAFImageBuffer, ulong AFImageBufferSize, double[] pBestFocusStep, double[] pBestScore);
 
@@ -1069,12 +1112,28 @@ namespace SDOAQ
 			double[] pBestFocusStep, double[] pBestScore);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		unsafe public static extern eErrorCode SDOAQ_SingleShotAF_Ex(
+			AcquisitionFixedParameters[] pAcquisitionParams,
+			int[] pPositions, int positionsCount,
+			byte[] pAFImageBuffer, ulong AFImageBufferSize,
+			double[] pBestFocusStep, double[] pBestScore, double[] pMatchedSFocusStep);
+
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		/* deprecated. Instead, use SDOAQ_PlayAF */unsafe public static extern eErrorCode SDOAQ_StartContinuousAF(AcquisitionFixedParameters_V2[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, SDOAQ_ContinuousAfCallback afFinishedCallback, int[] pPositions, int positionsCount, int ringBufferSize, byte*[] ppRingBufferImages, ulong[] pRingBufferSizes);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		unsafe public static extern eErrorCode SDOAQ_PlayAF(
 			AcquisitionFixedParameters[] pAcquisitionParams,
 			SDOAQ_PlayAfCallback afFinishedCallback,
+			int[] pPositions, int positionsCount,
+			int ringBufferSize,
+			byte*[] ppRingBufferImages,    // array of (ringBufferSize * AF) unsigned char* entries
+			ulong[] pRingBufferSizes);     // size of each image buffer => size of array == (ringBufferSize * 1);
+
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		unsafe public static extern eErrorCode SDOAQ_PlayAF_Ex(
+			AcquisitionFixedParameters[] pAcquisitionParams,
+			SDOAQ_PlayAfCallbackEx afFinishedCallback,
 			int[] pPositions, int positionsCount,
 			int ringBufferSize,
 			byte*[] ppRingBufferImages,    // array of (ringBufferSize * AF) unsigned char* entries

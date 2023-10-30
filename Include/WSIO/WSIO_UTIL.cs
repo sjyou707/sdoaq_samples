@@ -1,4 +1,15 @@
-﻿using System;
+﻿/*	WSIO_UTIL.cs
+
+	Copyright (c) Optics,Inc. All rights reserved.
+
+	========================================================================================================================================================
+	Revision history
+	========================================================================================================================================================
+	Version     date      Author         Descriptions
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -12,7 +23,7 @@ namespace SDOWSIO
 			//====================================================================================================================================
 			// WSIO UTILities API
 			//------------------------------------------------------------------------------------------------------------------------------------
-			//	이 파일(WSIO_UTIL.h)에는 서비스로 제공되는 유틸리티 성격의 기능을 추가한다.
+			//	이 파일(WSIO_UTIL.cs)에는 서비스로 제공되는 유틸리티 성격의 기능을 추가한다.
 			//	여기에 추가되는 내용은 WSIO 본연의 기능은 아니다.
 			//
 			//	1. 샘플 코드에서 사용되는 기능
@@ -63,18 +74,53 @@ namespace SDOWSIO
 				WSUTIVRESOURCE_MRAUTOFOCUS			= 12,
 				WSUTIVRESOURCE_MRDSLOP				= 14,
 				WSUTIVRESOURCE_MRMULTIFOCUS			= 13,
+				WSUTIVRESOURCE_MRMULTILINE			= 15,
+				WSUTIVRESOURCE_MRMULTIRECT			= 18,
+				WSUTIVRESOURCE_MRMULTIELLIPSE		= 19,
+				WSUTIVRESOURCE_MRMULTIMEASURE		= 20, // MULTILINE, MULTIRECT, MUTIELLIPSE
+				WSUTIVRESOURCE_GUIEFFECT			= 16,
+				WSUTIVRESOURCE_OSDTYPE				= 17,
+			};
+
+			public enum WSUTIVGUISHAPE
+			{
+				WSUTIVGUISHAPE_4D					= (1 << 9),
+				WSUTIVGUISHAPE_8D					= (1 << 10),
+				WSUTIVGUISHAPE_PERPENDICULAR		= (1 << 11),
+				WSUTIVGUISHAPE_BOUNDARY4			= (1 << 12),
+				WSUTIVGUISHAPE_LINECROSS			= (1 << 13),
+				WSUTIVGUISHAPE_DRAW_ASSISTANT		= (1 << 14),
+			};
+
+			public enum WSUTIVOSDTYPE
+			{
+				WSUTIVOSDTYPE_TEXT_ID				= (1 << 1),
+				WSUTIVOSDTYPE_TEXT_TYPE				= (1 << 2),
+				WSUTIVOSDTYPE_TEXT_VALUE			= (1 << 3),
 			};
 
 			public enum WSUTIVOBJFUNC
 			{
-				WSUTIVOBJFUNC_NULL					= 0,
+				WSUTIVOBJFUNC_NULL					= NULL,
 				WSUTIVOBJFUNC_SELF					= (1 << 0),
 				WSUTIVOBJFUNC_SCRIPT				= (1 << 1),
 				WSUTIVOBJFUNC_UPDATERECT			= (1 << 2),
 				WSUTIVOBJFUNC_UPDATELINE			= (1 << 3),
 				WSUTIVOBJFUNC_SPOT					= (1 << 4),
 				WSUTIVOBJFUNC_UPDATELINES			= (1 << 5),
-				//WSUTIVOBJFUNC_ALL					= (ushort) - 1
+				WSUTIVOBJFUNC_BIT_ONDRAWING			= (1 << 15),
+				WSUTIVOBJFUNC_ALL					= (ushort) - 1
+			};
+
+			public enum WSUTIVOBJTYPE
+			{
+				WSUTIVOBJTPYE_NULL					= NULL,
+				WSUTIVOBJTPYE_AUTO_FOCUS			= 1,
+				WSUTIVOBJTPYE_FIXED_FOCUS			= 2,
+				WSUTIVOBJTPYE_EDOF					= 3,
+				WSUTIVOBJTPYE_MEASURE_LINE			= 4,
+				WSUTIVOBJTPYE_MEASURE_RECT			= 5,
+				WSUTIVOBJTPYE_MEASURE_ELLIPSE		= 6,
 			};
 
 			public enum WSUTIVIMAGEMODE
@@ -213,6 +259,10 @@ namespace SDOWSIO
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+			public static extern WSIORV WSUT_IV_SetResource(IntPtr viewer_hwnd, WSUTIVRESOURCE resource_id, uint value);
+
+			//----------------------------------------------------------------------------
+			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_SetColor(IntPtr viewer_hwnd, WSUTIVRESOURCE resource_id, uint rgb_color);
 
 			//----------------------------------------------------------------------------
@@ -229,11 +279,15 @@ namespace SDOWSIO
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-            unsafe public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_size, uint pixel_bytes, void* data, uint data_size);
+            unsafe public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data, uint data_size);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData_V2(IntPtr viewer_hwnd, uint width, uint height, uint line_size, uint pixel_bytes, void* data, uint data_size, string path_name_str);
+			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData_V2(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data, uint data_size, string path_name_str);
+
+			//----------------------------------------------------------------------------
+			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData_V3(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data_surface, uint data_surface_size, string path_name_str, void* data_f3, uint data_f3_size);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]

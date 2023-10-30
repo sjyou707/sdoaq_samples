@@ -1,3 +1,14 @@
+/*	WSIO.h
+
+	Copyright (c) SD Optics,Inc. All rights reserved.
+
+	========================================================================================================================================================
+	Revision history
+	========================================================================================================================================================
+	Version     date      Author         Descriptions
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+
 #pragma once
 
 //====================================================================================================================================
@@ -11,7 +22,12 @@
 #if defined(Vyymmdd_wsio)
 	#define WSIO_VERSION	_T("Ver.3.x.x + "  __DATE__ "") //
 #else
-	#define WSIO_VERSION	_T("Ver.3.25.0") // 2023-08-11 , ADD WSIF_(RegiCbf|SetItem|ReqItem)_AlgorithmParam
+	#define WSIO_VERSION	_T("Ver.3.25.5") // 2023-10-13 , FIX NO-TYPE_BUG@MULTI-FOCUS@IVIEWER
+	//#define WSIO_VERSION	_T("Ver.3.25.4") // 2023-10-11 , send notify alert befor init.
+	//#define WSIO_VERSION	_T("Ver.3.25.3.R1") // 2023-10-13 , FIX NO-TYPE_BUG@MULTI-FOCUS@IVIEWER
+	//#define WSIO_VERSION	_T("Ver.3.25.3") // 2023-09-22 , UPGRADE IV OBJ FUNCTION
+	//#define WSIO_VERSION	_T("Ver.3.25.2") // 2023-09-06 , ADD WSIOIMGFORMAT_TXT, WSUTIVOSDTYPE_TEXT_VALUE, WSUTIVGUISHAPE_DRAW_ASSISTANT, WSUTIVGUISHAPE_PERPENDICULAR,WSUTIVGUISHAPE_8D,WSUTIVGUISHAPE_4D
+	//#define WSIO_VERSION	_T("Ver.3.25.0") // 2023-08-11 , ADD WSIF_(RegiCbf|SetItem|ReqItem)_AlgorithmParam
 	//#define WSIO_VERSION	_T("Ver.3.24.0") // 2023-08-04 , ADD WSUT_IV_SetResource, WSUTIVRESOURCE, WSUTIVGUISHAPE, WSUTIVOSDTYPE, WSUTIVOBJFUNC_BIT_ONDRAWING
 	//#define WSIO_VERSION	_T("Ver.3.23.0") // 2023-06-26 , ADD 43 WSGL_xxxx APIs.
 	//#define WSIO_VERSION	_T("Ver.3.22.0") // 2023-04-13 , ADD WSIF_Set_DefectResultName, WSUT_IV_SetPixelWidth, WSUT_IV_ActivateFunction, WSUT_IV_(En|De)code(Wparam|Rect|Point|Point2), WSUT_IV_SetFunctionLineData
@@ -161,6 +177,7 @@ enum WSIOIMGFORMAT_Enum
 	WSIOIMGFORMAT_CZI = 6,
 	WSIOIMGFORMAT_TIFF = 7,
 	WSIOIMGFORMAT_ZIP = 8,
+	WSIOIMGFORMAT_TXT = 9,
 };
 
 

@@ -80,6 +80,7 @@ public:
 	afx_msg void OnSdoaqPlayAF();
 	afx_msg void OnSdoaqStopAF();
 	afx_msg void OnSdoaqSnap();
+	afx_msg void OnSdoaqSetCalibrationFile();
 	afx_msg void OnSdoaqComboObjective();
 
 	void ReadySdoaqDll(void);

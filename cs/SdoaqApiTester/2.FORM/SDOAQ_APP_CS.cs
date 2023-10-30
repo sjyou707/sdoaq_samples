@@ -2315,9 +2315,19 @@ namespace SDOAQ_App_CS
 			}
 		}
 
-		private void btnSelectedCalibObject(object sender, EventArgs e)
+		//----------------------------------------------------------------------------
+		private void btnSetCalibrationFile(object sender, EventArgs e)
 		{
-			// read calibration file and set calibaration data to sdoaq dll through SDOAQ_SetExternalCalibrationTable() api
+			OpenFileDialog dlg = new OpenFileDialog();
+
+			dlg.Filter = "calibration file (*.csv)|*.csv|.AllFiles(*.*)|*.*";
+			dlg.InitialDirectory = Directory.GetCurrentDirectory();
+
+			if (dlg.ShowDialog() == DialogResult.OK)
+			{
+				SDOAQ_SetCalibrationFile(dlg.FileName);
+				ShowLog(string.Format(">> calibration data of file [{0}] is set.", dlg.FileName));
+			}
 		}
 	}
 }

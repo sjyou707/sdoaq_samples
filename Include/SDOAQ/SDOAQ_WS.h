@@ -76,12 +76,20 @@
 										- Add TPSU light
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.2.0  2023.08.04  YoungJu Lee		- Add string type parameter
-										- Add EDoF algorithm selection (support 3rd party algorithm)
+										- Add EDoF algorithm method selection (support 3rd party algorithm)
 										- Add Nikon motorized nosepiece controller
-										- Fix an issue that camera registry was not updated after running auto whitebalance
+										- Fix an issue that camera register was not updated after running auto whitebalance
 										- Do hard stop when acquisition is stopped
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.2.1  2023.08.30  YoungJu Lee		- Fix an issue that light could not be turned off when hard stop go too fast
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.2.2  2023.09.22  YoungJu Lee		- Set critical section for image buffer
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.3.0  2023.10.04  YoungJu Lee		- Update sdedof library v0.82
+										- Add SDOAQ_SetCalibrationFile
+										- Add edof scale correction parameters (pi_edof_is_scale_correction_enabled, pi_edof_scale_correction_dst_step)
+										- Add API to get algorithm version
+										- Add SDOAQ_PlayAfCallbackEx API with an matched focus step as a parameter
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -242,6 +250,11 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_RegisterObjectiveChangedCallback(SDOAQ_ObjectiveChanged cbf);
 
 	/// <summary>
+	/// The calibration data is read from an external file.
+	/// </summary>
+	__declspec(dllexport) eErrorCode SDOAQ_SetCalibrationFile(const char* sFilename);
+
+	/// <summary>
 	/// This function sets the calibration data for objetive that are not defined inside the dll.
 	/// The calibration data is read from an external file.
 	/// </summary>
@@ -339,6 +352,11 @@ extern "C"
 	/// </summary>
 	__declspec(dllexport) int SDOAQ_GetPatchVersion();
 	
+	/// <summary>
+	/// This function returns the algorithm version number of the API.
+	/// </summary>
+	__declspec(dllexport) int SDOAQ_GetAlgorithmVersion();
+
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -471,6 +489,19 @@ extern "C"
 		pi_edof_num_thread = 26,				// I - R/W
 
 		/// <summary>
+		/// Enables image scale correctionDe.
+		/// more computation needed
+		/// edof image has a constant pixel pitch which refer to scale_correction_dst_step
+		/// </summary>
+		pi_edof_is_scale_correction_enabled = 68,// I - R/W
+
+		/// <summary>
+		/// reference MALS step for image scale correction
+		/// range = {MALS_MIN_STEP ~ MALS_MAX_STEP}
+		/// </summary>
+		pi_edof_scale_correction_dst_step = 69,	// I - R/W
+
+		/// <summary>
 		/// Specifies parameters to pass to the HeliconFocus executable when using the HeliconFocus edof algorithm.
 		/// </summary>
 		piAlgoParamHeliconFocus = 66,			// S - R/W
@@ -513,8 +544,7 @@ extern "C"
 		piIntensityGeneralChannel_8 = 41,		// D - R/W	 (%)
 		//piIntensityGeneralChannel_32 = 65,	// D - R/W	 (%)
 
-
-		//piNextParameterValue = 68,
+		//piNextParameterValue = 70,
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -980,7 +1010,8 @@ extern "C"
 	/// after every complete auto focus data and image by the SDO acquisition engine.
 	/// </summary>
 	/* deprecated. Instead, use SDOAQ_PlayAfCallback */typedef void(__stdcall* SDOAQ_ContinuousAfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
-	typedef void(__stdcall* SDOAQ_PlayAfCallback)(eErrorCode errorCode,	int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
+	typedef void(__stdcall* SDOAQ_PlayAfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
+	typedef void(__stdcall* SDOAQ_PlayAfCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
 
 	/* deprecated. Instead, use SDOAQ_SingleShotAF */__declspec(dllexport) eErrorCode SDOAQ_AcquireAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams,
 		int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore);
@@ -991,12 +1022,26 @@ extern "C"
 		unsigned char* pAFImageBuffer, size_t AFImageBufferSize,
 		double* pBestFocusStep, double* pBestScore);
 
+	__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF_Ex(
+		sAcquisitionFixedParameters* pAcquisitionParams,
+		int* pPositions, int positionsCount,
+		unsigned char* pAFImageBuffer, size_t AFImageBufferSize,
+		double* pBestFocusStep, double* pBestScore, double* pMatchedSFocusStep);
+
 	/* deprecated. Instead, use SDOAQ_PlayAF */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAfCallback afFinishedCb,
 		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages,	size_t* pRingBufferSizes);
 
 	__declspec(dllexport) eErrorCode SDOAQ_PlayAF(
 		sAcquisitionFixedParameters* pAcquisitionParams,
 		SDOAQ_PlayAfCallback afFinishedCb,
+		int* pPositions, int positionsCount,
+		int ringBufferSize,
+		void** ppRingBufferImages,		// array of (ringBufferSize * AF) unsigned char* entries
+		size_t* pRingBufferSizes);		// size of each image buffer => size of array == (ringBufferSize * 1);
+
+	__declspec(dllexport) eErrorCode SDOAQ_PlayAF_Ex(
+		sAcquisitionFixedParameters* pAcquisitionParams,
+		SDOAQ_PlayAfCallbackEx afFinishedCb,
 		int* pPositions, int positionsCount,
 		int ringBufferSize,
 		void** ppRingBufferImages,		// array of (ringBufferSize * AF) unsigned char* entries

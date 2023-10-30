@@ -59,6 +59,7 @@ BEGIN_MESSAGE_MAP(CSDOAQ_Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CONTI_AF, OnSdoaqPlayAF)
 	ON_BN_CLICKED(IDC_STOP_AF, OnSdoaqStopAF)
 	ON_BN_CLICKED(IDC_SNAP, OnSdoaqSnap)
+	ON_BN_CLICKED(IDC_SET_CALIBRATION, OnSdoaqSetCalibrationFile)
 	ON_CBN_SELENDOK(IDC_COMBO_OBJECTIVE, OnSdoaqComboObjective)
 END_MESSAGE_MAP()
 
@@ -248,7 +249,7 @@ void CSDOAQ_Dlg::BuildCalibrationFile_Combobox()
 	m_calFile.calibData.clear();
 	for (auto& file : vsCalibList)
 	{
-		m_calFile.BuildCalibData(file, m_calFile.calibData);
+		m_calFile.BuildCalibData(file);
 	}
 
 	auto p_combo = (CComboBox*)GetDlgItem(IDC_COMBO_OBJECTIVE);
@@ -1550,6 +1551,19 @@ LRESULT CSDOAQ_Dlg::OnReceiveSnap(WPARAM wErrorCode, LPARAM lLastFilledRingBuffe
 	}
 
 	return 0;
+}
+
+//----------------------------------------------------------------------------
+void CSDOAQ_Dlg::OnSdoaqSetCalibrationFile(void)
+{
+	CString sFilter = _T("calibration file (*.csv)|*.csv|");
+	CFileDialog dlg(TRUE, _T("cvs"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, sFilter);
+	dlg.m_ofn.lpstrInitialDir = GetCurrentDir();
+	if (dlg.DoModal() == IDOK)
+	{
+		(void)::SDOAQ_SetCalibrationFile(CT2A(dlg.GetPathName().GetBuffer()));
+		Log(FString(_T("Calibration file [%s] is set."), dlg.GetPathName()));
+	}
 }
 
 //----------------------------------------------------------------------------

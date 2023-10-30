@@ -1,4 +1,15 @@
-﻿using System;
+﻿/*	WSIO_GL.cs
+
+	Copyright (c) SD Optics,Inc. All rights reserved.
+
+	========================================================================================================================================================
+	Revision history
+	========================================================================================================================================================
+	Version     date      Author         Descriptions
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -11,7 +22,7 @@ namespace SDOWSIO
 			//====================================================================================================================================
 			// WSIO Graphic Library Definition & API
 			//------------------------------------------------------------------------------------------------------------------------------------
-			//	이 파일(WSIO_GL.h)에는 서비스로 제공되는 3D 그래픽 라이브러리 기능을 추가한다.
+			//	이 파일(WSIO_GL.cs)에는 서비스로 제공되는 3D 그래픽 라이브러리 기능을 추가한다.
 			//
 			//------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +36,7 @@ namespace SDOWSIO
 			public enum WSGLKEY
 			{
 				EKEY_QUERY				= -1,
-				EKEY_NULL				= 0,
+				EKEY_NULL				= NULL,
 
 				/////////////////////////////////////
 				//DO NOT CHANGE ESFM_xxxx VALUE
@@ -214,6 +225,14 @@ namespace SDOWSIO
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSGL_ResetDisplay(IntPtr hd3v);
+
+			//----------------------------------------------------------------------------
+			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+			public static extern WSIORV WSGL_StopDisplay(IntPtr hd3v);
+
+			//----------------------------------------------------------------------------
+			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+			public static extern WSIORV WSGL_Display_Welcome(IntPtr hd3v);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]

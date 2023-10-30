@@ -49,8 +49,7 @@ namespace SDOAQ_App_CS
 			this.lbViewer1 = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.gb_calibration = new System.Windows.Forms.GroupBox();
-			this.label11 = new System.Windows.Forms.Label();
-			this.comboCalObj = new System.Windows.Forms.ComboBox();
+			this.btnSetCalFile = new System.Windows.Forms.Button();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.tbAFROI = new System.Windows.Forms.TextBox();
@@ -337,33 +336,27 @@ namespace SDOAQ_App_CS
 			// 
 			// gb_calibration
 			// 
-			this.gb_calibration.Controls.Add(this.label11);
-			this.gb_calibration.Controls.Add(this.comboCalObj);
+			this.gb_calibration.Controls.Add(this.btnSetCalFile);
 			this.gb_calibration.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.gb_calibration.Font = new System.Drawing.Font("Verdana", 8F);
 			this.gb_calibration.Location = new System.Drawing.Point(10, 679);
 			this.gb_calibration.Name = "gb_calibration";
-			this.gb_calibration.Size = new System.Drawing.Size(371, 62);
+			this.gb_calibration.Size = new System.Drawing.Size(371, 67);
 			this.gb_calibration.TabIndex = 3;
 			this.gb_calibration.TabStop = false;
 			// 
-			// label11
+			// btnSetCalFile
 			// 
-			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(11, 30);
-			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(188, 13);
-			this.label11.TabIndex = 11;
-			this.label11.Text = "Select the objective to calibrate";
-			// 
-			// comboCalObj
-			// 
-			this.comboCalObj.FormattingEnabled = true;
-			this.comboCalObj.Location = new System.Drawing.Point(212, 26);
-			this.comboCalObj.Name = "comboCalObj";
-			this.comboCalObj.Size = new System.Drawing.Size(143, 21);
-			this.comboCalObj.TabIndex = 3;
-			this.comboCalObj.SelectedIndexChanged += new System.EventHandler(this.btnSelectedCalibObject);
+			this.btnSetCalFile.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+			this.btnSetCalFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.btnSetCalFile.Font = new System.Drawing.Font("Verdana", 8F);
+			this.btnSetCalFile.Location = new System.Drawing.Point(12, 23);
+			this.btnSetCalFile.Name = "btnSetCalFile";
+			this.btnSetCalFile.Size = new System.Drawing.Size(346, 29);
+			this.btnSetCalFile.TabIndex = 12;
+			this.btnSetCalFile.Text = "Set calibration file";
+			this.btnSetCalFile.UseVisualStyleBackColor = true;
+			this.btnSetCalFile.Click += new System.EventHandler(this.btnSetCalibrationFile);
 			// 
 			// groupBox3
 			// 
@@ -894,7 +887,6 @@ namespace SDOAQ_App_CS
 			((System.ComponentModel.ISupportInitialize)(this.pbViewer4)).EndInit();
 			this.panel1.ResumeLayout(false);
 			this.gb_calibration.ResumeLayout(false);
-			this.gb_calibration.PerformLayout();
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
@@ -966,8 +958,7 @@ namespace SDOAQ_App_CS
 		private System.Windows.Forms.TextBox tbAFROI;
 		private System.Windows.Forms.Button btnSetAFROI;
 		private System.Windows.Forms.GroupBox gb_calibration;
-		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.ComboBox comboCalObj;
+		private System.Windows.Forms.Button btnSetCalFile;
 	}
 }
 
