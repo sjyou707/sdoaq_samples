@@ -211,6 +211,8 @@ void CSDOAQ_Dlg::BuildParameterID_Combobox(void)
 		ADD_PI(_T("edof_bilateral_sigma_color"), pi_edof_bilateral_sigma_color);
 		ADD_PI(_T("edof_bilateral_sigma_space"), pi_edof_bilateral_sigma_space);
 		ADD_PI(_T("edof_num_thread"), pi_edof_num_thread);
+		ADD_PI(_T("edof_is_scale_correction_enabled"), pi_edof_is_scale_correction_enabled);
+		ADD_PI(_T("edof_scale_correction_dst_step"), pi_edof_scale_correction_dst_step);
 		ADD_PI(_T("SaveFileFormat"), piSaveFileFormat);
 		ADD_PI(_T("SavePixelBits - not supported"), piSavePixelBits);
 		ADD_PI(_T("FocusLeftTop"), piFocusLeftTop);
