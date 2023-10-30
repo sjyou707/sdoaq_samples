@@ -126,6 +126,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h" />
+    <ClInclude Include="..\..\Include\WSIO\WSIO_GL.h" />
+    <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SDOAQ_App.h" />
     <ClInclude Include="SDOAQ_AppDlg.h" />

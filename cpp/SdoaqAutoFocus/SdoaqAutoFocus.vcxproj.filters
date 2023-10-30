@@ -13,6 +13,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Library Header Files">
+      <UniqueIdentifier>{670a2bf0-cabc-472e-9769-8f1c395b8ff2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -35,6 +38,12 @@
     </ClInclude>
     <ClInclude Include="SDOAQ_Lib.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h">
+      <Filter>Library Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

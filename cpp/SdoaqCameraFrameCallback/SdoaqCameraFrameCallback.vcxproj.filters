@@ -13,6 +13,9 @@
       <UniqueIdentifier>{d3a68cf2-0329-4070-a31b-055544fadac6}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Library Header Files">
+      <UniqueIdentifier>{895ec258-2ff5-4dc3-b3c5-24e827836008}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -32,6 +35,15 @@
     </ClInclude>
     <ClInclude Include="SdoaqCameraFrameCallback.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_LLAPI.h">
+      <Filter>Library Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,9 @@
     <Filter Include="Script and Calibration Files">
       <UniqueIdentifier>{457a075f-cef9-43b9-8f44-db7f151e77f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Library Header Files">
+      <UniqueIdentifier>{71a1ad30-edde-4b6c-928f-699a6f45991b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -41,6 +44,15 @@
     </ClInclude>
     <ClInclude Include="SDOAQ_Lib.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\WSIO\WSIO_GL.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h">
+      <Filter>Library Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
