@@ -22,7 +22,9 @@
 #if defined(Vyymmdd_wsio)
 	#define WSIO_VERSION	_T("Ver.3.x.x + "  __DATE__ "") //
 #else
-	#define WSIO_VERSION	_T("Ver.3.25.5") // 2023-10-13 , FIX NO-TYPE_BUG@MULTI-FOCUS@IVIEWER
+	//#define WSIO_VERSION	_T("Ver.3.26.1") // 2023-mm-dd , WSIF speed up, 
+	#define WSIO_VERSION	_T("Ver.3.26.0") // 2023-11-08 , WSIF speed up, ADD WSUT_GetBmpAttributes, WSGL_(S|G)etZscaleRatio, WSUTIVOSDTYPE_TEXT_BOUNDARY, WSUTIVRESOURCE_OBJ(TEXT|BACK|LINE)COLOR
+	//#define WSIO_VERSION	_T("Ver.3.25.5") // 2023-10-13 , FIX NO-TYPE_BUG@MULTI-FOCUS@IVIEWER
 	//#define WSIO_VERSION	_T("Ver.3.25.4") // 2023-10-11 , send notify alert befor init.
 	//#define WSIO_VERSION	_T("Ver.3.25.3.R1") // 2023-10-13 , FIX NO-TYPE_BUG@MULTI-FOCUS@IVIEWER
 	//#define WSIO_VERSION	_T("Ver.3.25.3") // 2023-09-22 , UPGRADE IV OBJ FUNCTION
@@ -136,8 +138,9 @@ enum WSIORV_Enum
 	WSIORV_FAILTOOPENSHAREDMEMORY		= -2033,
 	WSIORV_NOTIMPLEMENTED				= -2034,
 	WSIORV_FAILEDTOWRITEFILE			= -2036,		// File writing error
+	WSIORV_FAILEDTOREADFILE				= -2039,
 	//------------------------------------------
-	WSIORV_ERROR_NEXT					= -2039,
+	WSIORV_ERROR_NEXT					= -2040,
 	//------------------------------------------
 	WSIORV_ERROR_END					= -4999
 	//==========================================
@@ -201,7 +204,7 @@ typedef unsigned short		WSIOUINT16;
 typedef int					WSIOINT;
 typedef unsigned			WSIOUINT;
 typedef unsigned long long	WSIOUINT64;
-typedef unsigned			WSIORGB;
+typedef unsigned long		WSIORGB;
 typedef float				WSIOFLOAT;
 typedef double				WSIODOUBLE;
 

@@ -12,19 +12,6 @@
 #define new DEBUG_NEW
 #endif
 
-//============================================================================
-// SDOAQ , WSIO LIBRARY & HEADER
-//----------------------------------------------------------------------------
-#if defined(_DEBUG)
-#pragma comment(lib, "../../Include/SDOAQ/SDOAQd.lib")
-#pragma comment(lib, "../../Include/WSIO/WSIODLL_D64.lib")
-#else
-#pragma comment(lib, "../../Include/SDOAQ/SDOAQ.lib")
-#pragma comment(lib, "../../Include/WSIO/WSIODLL_R64.lib")
-#endif
-#include "..\..\Include\SDOAQ\SDOAQ_WS.h"
-#include "..\..\Include\SDOAQ\SDOAQ_LLAPI.h"
-#include "..\..\Include\WSIO\WSIO_UTIL.h"
 
 //----------------------------------------------------------------------------
 static WSIOVOID g_hViewer = NULL;
@@ -109,6 +96,21 @@ BOOL CSdoaqAutoFocusDlg::OnInitDialog()
 	SendMessage(WM_SIZE); // invoke WSUT_IV_ShowWindow call with size.
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+//----------------------------------------------------------------------------
+BOOL CSdoaqAutoFocusDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		if (pMsg->wParam == VK_RETURN)
+			return TRUE;
+		else if (pMsg->wParam == VK_ESCAPE)
+			return TRUE;
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 //----------------------------------------------------------------------------

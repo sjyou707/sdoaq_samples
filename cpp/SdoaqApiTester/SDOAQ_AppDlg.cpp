@@ -515,7 +515,9 @@ void CSDOAQ_Dlg::ReadySdoaqDll(void)
 	const int nMajorVersion = ::SDOAQ_GetMajorVersion();
 	const int nMinorVersion = ::SDOAQ_GetMinorVersion();
 	const int nPatchVersion = ::SDOAQ_GetPatchVersion();
-	Log(FString(_T(">> DLL Version = %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
+	const int nAlgoVersion = ::SDOAQ_GetAlgorithmVersion();
+	Log(FString(_T(">> SDOAQ DLL Version = %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
+	Log(FString(_T(">> sdedof dll Version = %d.%d"), nAlgoVersion / 1000, nAlgoVersion % 1000));
 }
 
 //----------------------------------------------------------------------------
@@ -1530,7 +1532,14 @@ void CSDOAQ_Dlg::OnSdoaqSnap()
 		CString sSnapPath;
 		sSnapPath.Format(_T("%s\\Snap\\%s"), currentDir, sCurrentTime);
 
-		::SDOAQ_PlaySnap(g_SnapCallback, pPositions, (int)nFocusNums, (CStringA)sSnapPath);
+		CStringA sSnapPathA = (CStringA)sSnapPath;
+		SnapParameters snap_para;
+		snap_para.version = (void*)2;
+		snap_para.v2.sSnapPath = sSnapPathA;
+		snap_para.v2.sConfigFilename = NULL;
+		snap_para.v2.sConfigData = NULL;
+
+		::SDOAQ_PlaySnap(g_SnapCallback, pPositions, (int)nFocusNums, &snap_para);
 
 		delete[] pPositions;
 	}

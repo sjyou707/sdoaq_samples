@@ -2220,7 +2220,13 @@ namespace SDOAQ_App_CS
 				const string Format = "yyyy.MMM.dd.HHmmss";
 				string sSnapPath = Path.Combine(currentDir, "Snap", DateTime.Now.ToString(Format));
 
-				SDOAQ_PlaySnap(sDOAQ_SnapCallback, pPositions, (int)numsFocus, sSnapPath);
+				SnapParameters[] snap_para = new SnapParameters[1];
+				snap_para[0].version = (IntPtr)2;
+				snap_para[0].v2.sSnapPath = sSnapPath;
+				snap_para[0].v2.sConfigFilename = null;
+				snap_para[0].v2.sConfigData = null;
+
+				SDOAQ_PlaySnap(sDOAQ_SnapCallback, pPositions, (int)numsFocus, snap_para);
 			}
 		}
 		#endregion

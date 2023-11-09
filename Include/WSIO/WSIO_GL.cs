@@ -36,7 +36,7 @@ namespace SDOWSIO
 			public enum WSGLKEY
 			{
 				EKEY_QUERY				= -1,
-				EKEY_NULL				= NULL,
+				EKEY_NULL				= 0,
 
 				/////////////////////////////////////
 				//DO NOT CHANGE ESFM_xxxx VALUE

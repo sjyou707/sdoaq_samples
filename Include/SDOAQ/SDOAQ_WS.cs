@@ -95,6 +95,9 @@ using System.Text;
 										- Add edof scale correction parameters (pi_edof_is_scale_correction_enabled, pi_edof_scale_correction_dst_step)
 										- Add API to get algorithm version
 										- Add SDOAQ_PlayAfCallbackEx API with an matched focus step as a parameter
+			2023.11.03  YoungJu Lee		- Add parameters to measure acquisition performance (piVpsReportCycleSeconds, piVpsReportTimeSeconds)
+										- Add parameter to specify MALS highest steps for simulation (piSimulMalsHighestStep, piSimulMalsLowestStep)
+										- Update the parameter in SNAP API with structure type
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
  */
 
@@ -417,7 +420,7 @@ namespace SDOAQ
 
 			/// <summary>
 			/// Gets current binning of the camera. This parameter is readonly because it must only be set
-			/// with sAcquisitionFixedParameters because it affects image buffer sizes.
+			/// with AcquisitionFixedParameters because it affects image buffer sizes.
 			/// </summary>
 			piCameraBinning = 5,                // I -  R   (matrix size)
 			piCameraGain = 6,                   // D - R/W
@@ -438,7 +441,7 @@ namespace SDOAQ
 			piCoaxIntensity = 13,               // D - R/W	 (%)
 
 			/// <summary>Gets the minimum and maximum focus position of the MALS controller.</summary>
-			piFocusPosition = 14,               // I - R	 (steps)
+			piFocusPosition = 14,               // I - R	 (MALS step)
 
 			/// <summary>
 			/// Defines the reflex correction algorithm which is to be used.
@@ -525,7 +528,7 @@ namespace SDOAQ
 			pi_edof_num_thread = 26,            // I - R/W
 
 			/// <summary>
-			/// Enables image scale correctionDe.
+			/// Enables image scale correction
 			/// more computation needed
 			/// edof image has a constant pixel pitch which refer to scale_correction_dst_step
 			/// </summary>
@@ -536,7 +539,7 @@ namespace SDOAQ
 			/// range = {MALS_MIN_STEP ~ MALS_MAX_STEP}
 			/// </summary>
 			pi_edof_scale_correction_dst_step = 69, // I - R/W
-			
+
 			/// <summary>
 			/// Specifies parameters to pass to the HeliconFocus executable when using the HeliconFocus edof algorithm.
 			/// </summary>
@@ -561,11 +564,11 @@ namespace SDOAQ
 			/// <summary>color type of camera sensor, mono or color</summary>
 			piCameraColor = 31,                 // I - R
 
-			/// <summary></summary>
+			/// <summary>Defines which focus measurement method is used. It has eFocusMeasureMethod value.</summary>
 			piFocusMeasureMethod = 32,          // I - R/W
 
-			/// <summary></summary>
-			piSingleFocus = 33,                 // I - R/W
+			/// <summary>Defines a single focus for continuous focus acqisition.</summary>
+			piSingleFocus = 33,                 // I - R/W	 (MALS step)
 
 			/// <summary>Sets the intensity of general channel 1~8. These values are all consecutive integer values.</summary>
 			piIntensityGeneralChannel_1 = 34,   // D - R/W	 (%)
@@ -576,8 +579,22 @@ namespace SDOAQ
 			piIntensityGeneralChannel_6 = 39,   // D - R/W	 (%)
 			piIntensityGeneralChannel_7 = 40,   // D - R/W	 (%)
 			piIntensityGeneralChannel_8 = 41,   // D - R/W	 (%)
+			/// <summary>Reserved for light channel expansion.</summary>
+			//piIntensityGeneralChannel_32 = 65,// D - R/W	 (%)
 
-			//piNextParameterValue = 70,
+			/// <summary>Defines the cycle, in second, that determines how often vps reports will be logged for debug purposes.</summary>
+			piVpsReportCycleSeconds = 70,       // D - R/W  (seconds)
+
+			/// <summary>Defines the data to be used for statistics at the time of reporting. Specifies how many recent seconds of data to use when calculating vps.</summary>
+			piVpsReportTimeSeconds = 71,        // D - R/W  (seconds)
+
+			/// <summary>Sets MALS highest step for simulation</summary>
+			piSimulMalsHighestStep = 72,        // I - R/W	 (MALS step)
+
+			/// <summary>Sets MALS lowest step for simulation.</summary>
+			piSimulMalsLowestStep = 73,         // I - R/W	 (MALS step)
+
+			//piNextParameterValue = 74,
 
 			/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 			piInvalidParameter = 100
@@ -691,7 +708,7 @@ namespace SDOAQ
 		public static extern eErrorCode SDOAQ_SetCameraParameter(int FovWidth, int FovHeight, int binning);
 
 		/// <summary>
-		/// Parameters of the sAcquisitionFixedParameters-struct must be defined before calling an acquisition function and must
+		/// Parameters of the AcquisitionFixedParameters-struct must be defined before calling an acquisition function and must
 		/// not be changed during a running continuous acquisition (preview) because a change will have an impact on the
 		/// size of the predefined memory blocks allocated for the ring buffer.
 		/// </summary>
@@ -713,7 +730,7 @@ namespace SDOAQ
 			public int cameraBinning;
 		};
 
-		/* deprecated. Instead, use sAcquisitionFixedParameters */
+		/* deprecated. Instead, use AcquisitionFixedParameters */
 		[StructLayout(LayoutKind.Sequential)]
 		public struct AcquisitionFixedParameters_V2
 		{
@@ -815,7 +832,7 @@ namespace SDOAQ
 		/// </summary>
 		/// <param name="pAcquisitionParams">
 		/// This struct holds acquisition parameters.
-		/// Please refer to sAcquisitionFixedParameters.
+		/// Please refer to AcquisitionFixedParameters.
 		/// </param>
 		/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
 		/// <param name="positionsCount">Number of positions in the position list.</param>
@@ -863,7 +880,7 @@ namespace SDOAQ
 		/// <param name="pAcquisitionParams">
 		/// This struct holds acquisition parameters which must not be changed during continuous focus
 		/// stack acquisition because they affect the pre allocated memory in the ring buffer.
-		/// Please refer to sAcquisitionFixedParameters.
+		/// Please refer to AcquisitionFixedParameters.
 		/// </param>
 		/// <param name="stackFinishedCallback">This callback function is called after each stack acquisition.</param>
 		/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
@@ -968,7 +985,7 @@ namespace SDOAQ
 		/// <param name="pAcquisitionParams">
 		/// This struct holds acquisition parameters which must not be changed during continuous EDoF
 		/// acquisition because they affect the pre allocated memory in the ring buffer.
-		/// Please refer to sAcquisitionFixedParameters.
+		/// Please refer to AcquisitionFixedParameters.
 		/// </param>
 		/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
 		/// <param name="positionsCount">Number of positions in the position list.</param>
@@ -1012,7 +1029,7 @@ namespace SDOAQ
 		/// <param name="pAcquisitionParams">
 		/// This struct holds acquisition parameters which must not be changed during continuous EDoF
 		/// acquisition because they affect the pre allocated memory in the ring buffer.
-		/// Please refer to sAcquisitionFixedParameters.
+		/// Please refer to AcquisitionFixedParameters.
 		/// </param>
 		/// <param name="edofFinishedCallback">This callback function is called after each EDoF-Calculation.</param>
 		/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
@@ -1206,16 +1223,35 @@ namespace SDOAQ
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 		public delegate void SDOAQ_SnapCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
 
+		[StructLayout(LayoutKind.Explicit)]
+		public struct SnapParameters
+		{
+			[FieldOffset(0)]
+			public IntPtr version;
+
+			[FieldOffset (8)]
+			public Ver2 v2;
+			public struct Ver2
+			{//version is 2
+				public string sSnapPath;
+				public string sConfigFilename;
+				public string sConfigData;
+			};
+
+			//[FieldOffset(8)]
+			//public Ver3 v3;
+		};
+
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		unsafe public static extern eErrorCode SDOAQ_PlaySnap(
 			SDOAQ_SnapCallback snapCb,
 			int[] pPositions, int positionsCount,
-			[MarshalAs(UnmanagedType.LPStr)] string sSnapPath);
+			SnapParameters[] pSnapParameters);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		unsafe public static extern eErrorCode SDOAQ_PlaySnap_and_Stop(
 			SDOAQ_SnapCallback snapCb,
 			int[] pPositions, int positionsCount,
-			[MarshalAs(UnmanagedType.LPStr)] string sSnapPath);
+			SnapParameters[] pSnapParameters);
 	}
 }

@@ -203,12 +203,27 @@ WSIODLL_API WSIORV			WSGL_GetImageColorRatio(
 			float*			p_image_ratio
 			);
 
+WSIODLL_API bool			WSGL_SetZscaleRatio(
+			WSGLHANDLE		hd3v,
+			float			zscale_ratio
+			);
+
+WSIODLL_API WSIORV			WSGL_GetZscaleRatio(
+			WSGLHANDLE		hd3v,
+			float*			p_zscale_ratio
+			);
+
 WSIODLL_API WSIORV			WSGL_GetMeasureData(
 			WSGLHANDLE		hd3v,
 			char*			p_buf,
 			int				buf_size,
 			const char*		sz_delimiter,
 			int*			p_written_size
+			);
+
+WSIODLL_API WSIORV			WSGL_SetMeasureDataUnit(
+			WSGLHANDLE		hd3v,
+			float			unit_microns
 			);
 
 WSIODLL_API WSIORV			WSGL_ClearAllMeasureData(
@@ -245,6 +260,13 @@ WSIODLL_API WSIORV			WSGL_SetGradient(
 			double			dx,
 			double			dy,
 			double			dz
+			);
+
+//----------------------------------------------------------------------------
+WSIODLL_API WSIORV			WSGL_SetColor(
+			WSGLHANDLE		hd3v,
+			EKey			resource_id,
+			WSIORGB			rgb_color
 			);
 
 //----------------------------------------------------------------------------

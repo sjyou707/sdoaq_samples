@@ -101,7 +101,7 @@ namespace SDOWSIO
 
 			public enum WSUTIVOBJFUNC
 			{
-				WSUTIVOBJFUNC_NULL					= NULL,
+				WSUTIVOBJFUNC_NULL					= 0,
 				WSUTIVOBJFUNC_SELF					= (1 << 0),
 				WSUTIVOBJFUNC_SCRIPT				= (1 << 1),
 				WSUTIVOBJFUNC_UPDATERECT			= (1 << 2),
@@ -109,12 +109,12 @@ namespace SDOWSIO
 				WSUTIVOBJFUNC_SPOT					= (1 << 4),
 				WSUTIVOBJFUNC_UPDATELINES			= (1 << 5),
 				WSUTIVOBJFUNC_BIT_ONDRAWING			= (1 << 15),
-				WSUTIVOBJFUNC_ALL					= (ushort) - 1
+				//WSUTIVOBJFUNC_ALL					= (ushort) - 1
 			};
 
 			public enum WSUTIVOBJTYPE
 			{
-				WSUTIVOBJTPYE_NULL					= NULL,
+				WSUTIVOBJTPYE_NULL					= 0,
 				WSUTIVOBJTPYE_AUTO_FOCUS			= 1,
 				WSUTIVOBJTPYE_FIXED_FOCUS			= 2,
 				WSUTIVOBJTPYE_EDOF					= 3,
@@ -177,12 +177,12 @@ namespace SDOWSIO
 			// IMAGE VIEWER
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-			public static extern WSIORV WSUT_IV_CreateImageViewer(string profile_str, IntPtr parent_hwnd, out IntPtr ptr_viewer_hwnd, uint viewer_control_id, WSUTIVOPMODE operation_mode);			
-			
+			public static extern WSIORV WSUT_IV_CreateImageViewer(string profile_str, IntPtr parent_hwnd, out IntPtr ptr_viewer_hwnd, uint viewer_control_id, WSUTIVOPMODE operation_mode);
+
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_DestroyImageViewer(IntPtr viewer_hwnd);
-			
+
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_SetEventMessage(IntPtr viewer_hwnd, uint event_message_id);
@@ -193,7 +193,7 @@ namespace SDOWSIO
 
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_RegiCbf_OnPaintPost(IntPtr viewer_hwnd, WSUTFUNC_IV_ONPAINT cbf);
-			
+
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_ShowWindow(IntPtr viewer_hwnd, int flag_show, int position_left, int position_top, int position_right, int position_bottom);
@@ -212,7 +212,7 @@ namespace SDOWSIO
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern ulong WSUT_IV_EncodeRect(ushort left, ushort top, ushort right, ushort bottom);
-			
+
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_DecodeRect(ulong u64, out ushort p_left, out ushort p_top, out ushort p_right, out ushort p_bottom);
@@ -279,7 +279,7 @@ namespace SDOWSIO
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-            unsafe public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data, uint data_size);
+			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data, uint data_size);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -312,10 +312,10 @@ namespace SDOWSIO
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IntFromLineScript(string script_str, string token_str, out int ptr_int);
-			
+
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-			public static extern WSIORV WSUT_Uint64FromLineScript(string script_str, string token_str,	out ulong ptr_uint64);
+			public static extern WSIORV WSUT_Uint64FromLineScript(string script_str, string token_str, out ulong ptr_uint64);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]

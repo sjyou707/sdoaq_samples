@@ -10,29 +10,29 @@
 	========================================================================================================================================================
 	Version     date      Author         Descriptions
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 1.00   2020-03-05  YoungJu Lee     - The illumination operates in continuous mode and the maximum intensity is limited to 30											
+	 1.00   2020-03-05  YoungJu Lee     - The illumination operates in continuous mode and the maximum intensity is limited to 30
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 1.10   2020-03-16  YoungJu Lee     - Fix the rotation of the illumination pattern
 										- Add the default calibration setting functions for each calibration element
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 1.20   2020.03.31  YoungJu Lee		- Remove limit on the memory usage
-                                        - Release used memory when FINALIZE
-                                        - Close serial port when FINALIZE
-                                        - Fix error message when FINALIZE while performing algorithm
-                                        - Fix an issue that ObjectiveChangedCallback is called when calibration data is set additionally without changing lens
-                                        - Fix an issue that ObjectiveChangedCallback is called several times when the add-on lens is mounted or unmounted
-                                        - Change the reflex pattern to perform the OFF command for the light if the intensity of the light is 0
-                                        - Remove the intensity limit of ring light
+										- Release used memory when FINALIZE
+										- Close serial port when FINALIZE
+										- Fix error message when FINALIZE while performing algorithm
+										- Fix an issue that ObjectiveChangedCallback is called when calibration data is set additionally without changing lens
+										- Fix an issue that ObjectiveChangedCallback is called several times when the add-on lens is mounted or unmounted
+										- Change the reflex pattern to perform the OFF command for the light if the intensity of the light is 0
+										- Remove the intensity limit of ring light
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 1.30   2020.06.29  YoungJu Lee		- Fix an issue that dll locks up when the USB port is detached after SDOAQ_Initialize
-                                        - Fix an issue that dll locks up when the acquisition starts after the USB port is re-attached
-                                        - Return low-memory error if there is not enough memory to proceed by checking the physical memory
-                                        - Remove unused SW triggering when acquisition fails
-                                        - Change the capture waiting time 3000 to 1000
-                                        - Fix intermittent capture timeout issue
-                                        - Update the latest standard calibration table
-                                        - Update sdedof library (center aligned version) 
-                                          : When using sub ROI, calibration data for the area is applied. Previously, center calibration was applied
+										- Fix an issue that dll locks up when the acquisition starts after the USB port is re-attached
+										- Return low-memory error if there is not enough memory to proceed by checking the physical memory
+										- Remove unused SW triggering when acquisition fails
+										- Change the capture waiting time 3000 to 1000
+										- Fix intermittent capture timeout issue
+										- Update the latest standard calibration table
+										- Update sdedof library (center aligned version)
+										  : When using sub ROI, calibration data for the area is applied. Previously, center calibration was applied
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 1.40   2020.08.10  YoungJu Lee     - Update Basler Pylon SDK 4.1.0.3660 to 6.1.1.19832
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@
 										- Set the pixel format according to the camera reverse situation (Basler acA2040-120uc)
 										- Support both Basler Pylon SDK 4.1.0.3660 and 6.1.1.19832
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-		    2021.03.24  YoungJu Lee     - Remove the right and the bottom black edges from the captured image (Basler acA2040-120uc)
+			2021.03.24  YoungJu Lee     - Remove the right and the bottom black edges from the captured image (Basler acA2040-120uc)
 										  : The second to last pixels are just copied into the last
 										- Fix an issue that the current lighting intensity is set to the maximum intensity when performing auto illumination
 										  with a maximum intensity lower than the current lighting intensity
@@ -57,17 +57,17 @@
 										  (The resize ratio has no effect on the size of the image. It only affects the algorithm execution speed)
 										- Support Basler camera acA2040-55uc
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	        2022.06.20  YoungJu Lee     - Support Basler camera acA2440-75uc, acA2440-75um, acA2040-90uc and acA2040-90um
+			2022.06.20  YoungJu Lee     - Support Basler camera acA2440-75uc, acA2440-75um, acA2040-90uc and acA2040-90um
 										- Support binning (with algorithm sdedof.dll version 0.6.0)
 										- Add API set for camera ROI parameter (SDOAQ_GetCameraParameter and SDOAQ_SetCameraParameter)
-    --------------------------------------------------------------------------------------------------------------------------------------------------------
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 			2022.08.02  YoungJu Lee  	- Add SDOAQ_SetExternalCalibrationTable API and objective id oi_user_defined
 										- Add piSavePixelBits as the depth of the pixel values when saving image
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 			2022.10.25  YoungJu Lee		- Add SDOAQ_StartContinuousSingleFocusStack API and piSingleFocus parameter for continuous acquisition while changing single focus
 										- Add piFocusMeasureMethod parameter for selecting focus measure method
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	        2023.01.25  YoungJu Lee		- Add CSLCB-PWM illumination (piIntensityGeneralChannel_1 ~ 8)
+			2023.01.25  YoungJu Lee		- Add CSLCB-PWM illumination (piIntensityGeneralChannel_1 ~ 8)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.1.0  2023.06.20  YoungJu Lee		- Add SDOAQ_StartContinuousMF, SDOAQ_StopContinuousMF and SDOAQ_UpdateContinuousMF
 										- Add eSaveFormat enum type
@@ -90,6 +90,9 @@
 										- Add edof scale correction parameters (pi_edof_is_scale_correction_enabled, pi_edof_scale_correction_dst_step)
 										- Add API to get algorithm version
 										- Add SDOAQ_PlayAfCallbackEx API with an matched focus step as a parameter
+			2023.11.03  YoungJu Lee		- Add parameters to measure acquisition performance (piVpsReportCycleSeconds, piVpsReportTimeSeconds)
+										- Add parameter to specify MALS highest steps for simulation (piSimulMalsHighestStep, piSimulMalsLowestStep)
+										- Update the parameter in SNAP API with structure type
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -192,7 +195,7 @@ extern "C"
 	/// </summary>
 	typedef void(__stdcall* SDOAQ_LogCallback)(eLogSeverity severity, char* pMessage);
 
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Functions and types needed for calibration
@@ -214,7 +217,7 @@ extern "C"
 		/// <summary>0.35x objective is assembled.</summary>
 		oi00_35x = 1,
 
-		/// <summary>objective 1.3x (main standard) is assembled. objective 1.3x is always mounted</summary>
+		/// <summary>objective 1.3x (main standard) is assembled. objective 1.3x is always mounted.</summary>
 		oi01_30x = 2,
 
 		/// <summary>objective 2.5x is is assembled.</summary>
@@ -235,9 +238,9 @@ extern "C"
 		/// <summary>objective 1.0x is is assembled.</summary>
 		oi01_00x = 8,
 
-		/// <summary>User defined objective</summary>
+		/// <summary>User defined objective.</summary>
 		oi_user_defined = 100
-	};	
+	};
 
 	/// <summary>
 	/// This callback signals the client that a objective has been changed.
@@ -265,45 +268,45 @@ extern "C"
 		double* pShiftX, double* pShiftY,
 		double* pCoefficients);
 
-	/// <summary>This function requests the size (height or rows) of the XYZ calibration map </summary>
+	/// <summary>This function requests the size (height or rows) of the XYZ calibration map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_GetCalibrationDataMapSize(int* size);
 
-	/// <summary>This function requests the XYZ calibration map </summary>
+	/// <summary>This function requests the XYZ calibration map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_GetCalibrationDataMap(eObjectiveId objective, int allocatedSize, double* pCalX, double* pCalY, double* pCalZ);
-	
-	/// <summary>This function requests the XY calibration scale map </summary>
+
+	/// <summary>This function requests the XY calibration scale map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_GetCalibrationScaleDataMap(eObjectiveId objective, int allocatedSize, double* pScaleX, double* pScaleY);
 
-	/// <summary>This function requests the XY calibration shift map </summary>
+	/// <summary>This function requests the XY calibration shift map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_GetCalibrationShiftDataMap(eObjectiveId objective, int allocatedSize, double* pShiftX, double* pShiftY);
 
-	/// <summary>This function requests the curvature coefficients example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06 </summary>
+	/// <summary>This function requests the curvature coefficients. example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_GetCalibrationCurvatureData(eObjectiveId objective, int allocatedSize, double* pCoefficients);
 
-	/// <summary>This function sets the XYZ calibration map </summary>
+	/// <summary>This function sets the XYZ calibration map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetCalibrationDataMap(eObjectiveId objective, int allocatedSize, double* pCalX, double* pCalY, double* pCalZ);
 
-	/// <summary>This function sets the XY calibration scale map </summary>
+	/// <summary>This function sets the XY calibration scale map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetCalibrationScaleDataMap(eObjectiveId objective, int allocatedSize, double* pScaleX, double* pScaleY);
 
-	/// <summary>This function sets the XY calibration shift map </summary>
+	/// <summary>This function sets the XY calibration shift map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetCalibrationShiftDataMap(eObjectiveId objective, int allocatedSize, double* pShiftX, double* pShiftY);
 
-	/// <summary>This function sets the curvature coefficients example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06 </summary>
+	/// <summary>This function sets the curvature coefficients. example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetCalibrationCurvatureData(eObjectiveId objective, int allocatedSize, double* pCoefficients);
 
-	/// <summary>This function sets the default XYZ calibration map </summary>
+	/// <summary>This function sets the default XYZ calibration map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetDefaultCalibrationDataMap(eObjectiveId objective);
 
-	/// <summary>This function sets the default XY calibration scale map </summary>
+	/// <summary>This function sets the default XY calibration scale map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetDefaultCalibrationScaleDataMap(eObjectiveId objective);
 
-	/// <summary>This function sets the default XY calibration shift map </summary>
+	/// <summary>This function sets the default XY calibration shift map.</summary>
 	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetDefaultCalibrationShiftDataMap(eObjectiveId objective);
 
-	/// <summary>This function sets the default curvature coefficients example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06 </summary>
-	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetDefaultCalibrationCurvatureData(eObjectiveId objective);	
-	
+	/// <summary>This function sets the default curvature coefficients. example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06</summary>
+	/* deprecated */__declspec(dllexport) eErrorCode SDOAQ_SetDefaultCalibrationCurvatureData(eObjectiveId objective);
+
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -336,7 +339,7 @@ extern "C"
 	/// ToDo: must be defined ...
 	/// </summary>
 	__declspec(dllexport) eErrorCode SDOAQ_GetStatus(char* statusData);
-	
+
 	/// <summary>
 	/// This function returns the minor version number of the API.
 	/// </summary>
@@ -351,7 +354,7 @@ extern "C"
 	/// This function returns the patch version number of the API.
 	/// </summary>
 	__declspec(dllexport) int SDOAQ_GetPatchVersion();
-	
+
 	/// <summary>
 	/// This function returns the algorithm version number of the API.
 	/// </summary>
@@ -402,7 +405,7 @@ extern "C"
 		piCoaxIntensity = 13,					// D - R/W	 (%)
 
 		/// <summary>Gets the minimum and maximum focus position of the MALS controller.</summary>
-		piFocusPosition = 14,					// I - R	 (steps)
+		piFocusPosition = 14,					// I - R	 (MALS step)
 
 		/// <summary>
 		/// Defines the reflex correction algorithm which is to be used.
@@ -489,7 +492,7 @@ extern "C"
 		pi_edof_num_thread = 26,				// I - R/W
 
 		/// <summary>
-		/// Enables image scale correctionDe.
+		/// Enables image scale correction
 		/// more computation needed
 		/// edof image has a constant pixel pitch which refer to scale_correction_dst_step
 		/// </summary>
@@ -511,7 +514,7 @@ extern "C"
 		/// </summary>
 		piSaveFileFormat = 27,					// I - R/W
 
-		/// <summary>pixel size of camera, 8/10/12 bit. This is defined by the pixel format</summary>
+		/// <summary>pixel size of camera, 8/10/12 bit. This is defined by the pixel format.</summary>
 		piSavePixelBits = 28,					// I - R
 
 		/// <summary>left and top point of focus ROI
@@ -524,16 +527,16 @@ extern "C"
 		/// </summary>
 		piFocusRightBottom = 30,				// I - R/W
 
-		/// <summary>color type of camera sensor, mono or color. Refer to eCameraColor </summary>
+		/// <summary>color type of camera sensor, mono or color. Refer to eCameraColor.</summary>
 		piCameraColor = 31,						// I - R
 
-		/// <summary></summary>
+		/// <summary>Defines which focus measurement method is used. It has eFocusMeasureMethod value.</summary>
 		piFocusMeasureMethod = 32,				// I - R/W
 
-		/// <summary></summary>
-		piSingleFocus = 33,						// I - R/W
+		/// <summary>Defines a single focus for continuous focus acqisition.</summary>
+		piSingleFocus = 33,						// I - R/W	 (MALS step)
 
-		/// <summary>Sets the intensity of general channel 1~8. These values are all consecutive integer values. We reserve a range of values for 32 channels. </summary>
+		/// <summary>Sets the intensity of general channel 1~8. These values are all consecutive integer values. We reserve a range of values for 32 channels.</summary>
 		piIntensityGeneralChannel_1 = 34,		// D - R/W	 (%)
 		piIntensityGeneralChannel_2 = 35,		// D - R/W	 (%)
 		piIntensityGeneralChannel_3 = 36,		// D - R/W	 (%)
@@ -542,9 +545,22 @@ extern "C"
 		piIntensityGeneralChannel_6 = 39,		// D - R/W	 (%)
 		piIntensityGeneralChannel_7 = 40,		// D - R/W	 (%)
 		piIntensityGeneralChannel_8 = 41,		// D - R/W	 (%)
+		/// <summary>Reserved for light channel expansion.</summary>
 		//piIntensityGeneralChannel_32 = 65,	// D - R/W	 (%)
 
-		//piNextParameterValue = 70,
+		/// <summary>Defines the cycle, in second, that determines how often vps reports will be logged for debug purposes.</summary>
+		piVpsReportCycleSeconds = 70,			// D - R/W	 (seconds)
+
+		/// <summary>Defines the data to be used for statistics at the time of reporting. Specifies how many recent seconds of data to use when calculating vps.</summary>
+		piVpsReportTimeSeconds = 71,			// D - R/W	 (seconds)
+
+		/// <summary>Sets MALS highest step for simulation.</summary>
+		piSimulMalsHighestStep = 72,			// I - R/W	 (MALS step)
+
+		/// <summary>Sets MALS lowest step for simulation.</summary>
+		piSimulMalsLowestStep = 73,				// I - R/W	 (MALS step)
+
+		//piNextParameterValue = 74,
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -631,7 +647,7 @@ extern "C"
 	/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 	/// </param>
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraParameter(int* pWidth, int* pHeight, int* pBinning);
-	
+
 	/// <summary>
 	/// Specifies the FOV and binning value.
 	/// This function cannot be called while acquisition is in progress.
@@ -723,7 +739,7 @@ extern "C"
 	/// <param name="roiLeft, roiTop, roiWidth, roiHeight">
 	/// These values are defining a ROI in which the average brightness should be reached.
 	/// </param>
-	__declspec(dllexport) eErrorCode SDOAQ_AutoIlluminate(int illuminationType, int maxIntensity, 
+	__declspec(dllexport) eErrorCode SDOAQ_AutoIlluminate(int illuminationType, int maxIntensity,
 		int targetImageBrightness, int roiLeft, int roiTop, int roiWidth, int roiHeight);
 
 	/// <summary>
@@ -783,7 +799,7 @@ extern "C"
 	/// exception faults.
 	/// </param>
 	/* deprecated. Instead, use SDOAQ_SingleShotFocusStack */__declspec(dllexport) eErrorCode SDOAQ_AcquireFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
-	/* deprecated. Instead, use SDOAQ_SingleShotFocusStack */__declspec(dllexport) eErrorCode SDOAQ_AcquireFocusStack_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams,	int* pPositions, int positionsCount, unsigned char** ppFocusImages,	size_t* pFocusImagesBufferSizes);
+	/* deprecated. Instead, use SDOAQ_SingleShotFocusStack */__declspec(dllexport) eErrorCode SDOAQ_AcquireFocusStack_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
 
 	__declspec(dllexport) eErrorCode SDOAQ_SingleShotFocusStack(
 		sAcquisitionFixedParameters* pAcquisitionParams,
@@ -832,9 +848,9 @@ extern "C"
 	/// exception faults.
 	/// </param>
 	/* deprecated. Instead, use SDOAQ_PlayFocusStack */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages,	size_t* pFocusImagesBufferSizes);
+		int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
 	/* deprecated. Instead, use SDOAQ_PlayFocusStack */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousFocusStack_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages,	size_t* pFocusImagesBufferSizes);
+		int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
 
 	__declspec(dllexport) eErrorCode SDOAQ_PlayFocusStack(
 		sAcquisitionFixedParameters* pAcquisitionParams,
@@ -845,7 +861,7 @@ extern "C"
 		size_t* pFocusImagesBufferSizes);	// size of each buffer => size of array == (ringBufferSize * positionsCount);
 
 	/* deprecated. Instead, use SDOAQ_PlaySingleFocus */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousSingleFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayCallback stackFinishedCb,
-		int ringBufferSize,	unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
+		int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
 
 	__declspec(dllexport) eErrorCode SDOAQ_PlaySingleFocus(
 		sAcquisitionFixedParameters* pAcquisitionParams,
@@ -975,7 +991,7 @@ extern "C"
 	/// If one of the array entries is zero, the associated image is not acquired / copied.
 	/// </param>	
 	/* deprecated. Instead, use SDOAQ_PlayEdof */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousEdof(sAcquisitionFixedParameters* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAcquisitionCallback edofFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages,	size_t* pRingBufferSizes);
+		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
 	/* deprecated. Instead, use SDOAQ_PlayEdof */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousEdof_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAcquisitionCallback edofFinishedCb,
 		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages_V2, size_t* pRingBufferSizes_V2);
 
@@ -1029,7 +1045,7 @@ extern "C"
 		double* pBestFocusStep, double* pBestScore, double* pMatchedSFocusStep);
 
 	/* deprecated. Instead, use SDOAQ_PlayAF */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAfCallback afFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages,	size_t* pRingBufferSizes);
+		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
 
 	__declspec(dllexport) eErrorCode SDOAQ_PlayAF(
 		sAcquisitionFixedParameters* pAcquisitionParams,
@@ -1095,6 +1111,20 @@ extern "C"
 
 	typedef SDOAQ_PlayCallback SDOAQ_SnapCallback;
 
+	typedef struct sSnapParameters
+	{
+		void* version;
+		union
+		{
+			struct sVer2
+			{//version is 2
+				const char* sSnapPath;
+				const char* sConfigFilename;
+				const char* sConfigData;
+			} v2;
+		};
+	} SnapParameters;
+
 	/// <summary>
 	/// Acquire the focus stack using the given parameters WITHOUT stopping the current acquisition operation
 	/// and save the raw images and result
@@ -1102,7 +1132,7 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_PlaySnap(
 		SDOAQ_SnapCallback snapCb,
 		int* pPositions, int positionsCount,
-		const char* sSnapPath);
+		const SnapParameters* pSnapParameters);
 
 	/// <summary>
 	/// Acquire the focus stack using the given parameters WITH stopping the current acquisition operation 
@@ -1111,7 +1141,7 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_PlaySnap_and_Stop(
 		SDOAQ_SnapCallback snapCb,
 		int* pPositions, int positionsCount,
-		const char* sSnapPath);
+		const SnapParameters* pSnapParameters);
 
 #ifdef __cplusplus
 }
