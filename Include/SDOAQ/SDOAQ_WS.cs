@@ -567,7 +567,7 @@ namespace SDOAQ
 			/// <summary>Defines which focus measurement method is used. It has eFocusMeasureMethod value.</summary>
 			piFocusMeasureMethod = 32,          // I - R/W
 
-			/// <summary>Defines a single focus for continuous focus acqisition.</summary>
+			/// <summary>Defines a single focus for continuous single focus acqisition.</summary>
 			piSingleFocus = 33,                 // I - R/W	 (MALS step)
 
 			/// <summary>Sets the intensity of general channel 1~8. These values are all consecutive integer values.</summary>
@@ -925,6 +925,12 @@ namespace SDOAQ
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		/* deprecated. Instead, use SDOAQ_PlaySingleFocus */unsafe public static extern eErrorCode SDOAQ_StartContinuousSingleFocusStack(AcquisitionFixedParameters_V2[] pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, int ringBufferSize, byte*[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
 
+		/// <summary>
+		/// This function starts a focus stack preview with only one focus.
+		/// MALS controller position is given by eParameterId piSingleFocus.
+		/// The position can be changed without stopping focus acquisition.
+		/// A image is produced in a continuous way until SDOAQ_StopFocusStack() is called.
+		/// </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		unsafe public static extern eErrorCode SDOAQ_PlaySingleFocus(
 			AcquisitionFixedParameters[] pAcquisitionParams,
