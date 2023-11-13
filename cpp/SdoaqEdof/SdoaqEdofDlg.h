@@ -55,6 +55,7 @@ public:
 	afx_msg void OnSdoaqSetEdofKernelSize();
 	afx_msg void OnSdoaqSetEdofIteration();
 	afx_msg void OnSdoaqSetEdofThreshold();
+	afx_msg void OnSdoaqSetEdofScaleStep();
 	afx_msg void OnSdoaqSingleShotEdof();
 	afx_msg void OnSdoaqPlayEdof();
 	afx_msg void OnSdoaqStopEdof();

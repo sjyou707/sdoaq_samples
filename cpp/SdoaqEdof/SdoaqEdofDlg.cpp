@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CSdoaqEdofDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_SET_EDOF_KERNEL_SIZE, OnSdoaqSetEdofKernelSize)
 	ON_BN_CLICKED(IDC_SET_EDOF_ITERATION, OnSdoaqSetEdofIteration)
 	ON_BN_CLICKED(IDC_SET_EDOF_THRESHOLD, OnSdoaqSetEdofThreshold)
+	ON_BN_CLICKED(IDC_SET_EDOF_SCALE_STEP, OnSdoaqSetEdofScaleStep)
 	ON_BN_CLICKED(IDC_ACQ_EDOF, OnSdoaqSingleShotEdof)
 	ON_BN_CLICKED(IDC_CONTI_EDOF, OnSdoaqPlayEdof)
 	ON_BN_CLICKED(IDC_STOP_EDOF, OnSdoaqStopEdof)
@@ -108,6 +109,7 @@ BOOL CSdoaqEdofDlg::OnInitDialog()
 	SetDlgItemText(IDC_EDIT_EDOF_KERNEL_SIZE, _T("5"));
 	SetDlgItemText(IDC_EDIT_EDOF_ITERATION, _T("8"));
 	SetDlgItemText(IDC_EDIT_EDOF_THRESHOLD, _T("1.0"));
+	SetDlgItemText(IDC_EDIT_EDOF_SCALE_STEP, _T("160"));
 
 	SendMessage(WM_SIZE); // invoke WSUT_IV_ShowWindow call with size.
 
@@ -221,6 +223,8 @@ LRESULT CSdoaqEdofDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 		OnSdoaqSetEdofKernelSize();
 		OnSdoaqSetEdofIteration();
 		OnSdoaqSetEdofThreshold();
+		OnSdoaqSetEdofScaleStep();
+		::SDOAQ_SetIntParameterValue(pi_edof_is_scale_correction_enabled, 1);
 	}
 	else
 	{
@@ -459,6 +463,30 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofThreshold()
 		}
 	}
 }
+
+//----------------------------------------------------------------------------
+void CSdoaqEdofDlg::OnSdoaqSetEdofScaleStep()
+{
+	CString sEdofScaleStep;
+	GetDlgItemText(IDC_EDIT_EDOF_SCALE_STEP, sEdofScaleStep);
+
+	auto scaleReferStep= _ttoi(sEdofScaleStep);
+
+	int nMin, nMax;
+	auto rv = SDOAQ_GetIntParameterRange(pi_edof_scale_correction_dst_step, &nMin, &nMax);
+	if (ecNoError == rv)
+	{
+		if (scaleReferStep >= nMin && scaleReferStep <= nMax)
+		{
+			::SDOAQ_SetIntParameterValue(pi_edof_scale_correction_dst_step, scaleReferStep);
+		}
+		else
+		{
+			g_LogLine(_T("set EDoF scale correction dst step: value is out of range(%d ~ %d)"), nMin, nMax);
+		}
+	}
+}
+
 //----------------------------------------------------------------------------
 void CSdoaqEdofDlg::OnSdoaqSingleShotEdof()
 {

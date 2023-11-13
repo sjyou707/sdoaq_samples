@@ -19,9 +19,11 @@
 #define IDC_SET_EDOF_ITERATION          1018
 #define IDC_EDIT_EDOF_THRESHOLD         1019
 #define IDC_SET_EDOF_THRESHOLD          1020
+#define IDC_EDIT_EDOF_SCALE_STEP        1021
 #define IDC_ACQ_EDOF                    1022
 #define IDC_CONTI_EDOF                  1023
 #define IDC_STOP_EDOF                   1024
+#define IDC_SET_EDOF_SCALE_STEP         1025
 #define IDC_SET_CALIBRATION             1035
 
 // Next default values for new objects
