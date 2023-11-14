@@ -291,33 +291,33 @@ void CSdoaqEdofDlg::OnSdoaqSetROI()
 	AFP.cameraRoiHeight = _ttoi(sHeight);
 	AFP.cameraBinning = 1;
 
-	int nMin, nMaxWidth, nMaxHeight;
-	auto rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nMin, &nMaxWidth);
+	int nDummy, nMaxWidth, nMaxHeight;
+	auto rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
 	if (ecNoError == rv)
 	{
 		if (AFP.cameraRoiLeft < 0 || AFP.cameraRoiLeft > nMaxWidth)
 		{
-			g_LogLine(_T("Set cameraRoiLeft : value is out of range(%d ~ %d)"), nMin, nMaxWidth);
+			g_LogLine(_T("Set cameraRoiLeft : value is out of range( ~ %d)"), nMaxWidth);
 			return;
 		}
 		if (AFP.cameraRoiWidth < 1 || AFP.cameraRoiWidth > nMaxWidth)
 		{
-			g_LogLine(_T("Set cameraRoiWidth : value is out of range(%d ~ %d)"), nMin, nMaxWidth);
+			g_LogLine(_T("Set cameraRoiWidth : value is out of range( ~ %d)"), nMaxWidth);
 			return;
 		}
 	}
 
-	rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nMin, &nMaxHeight);
+	rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
 	if (ecNoError == rv)
 	{
 		if (AFP.cameraRoiTop < 0 || AFP.cameraRoiTop > nMaxHeight)
 		{
-			g_LogLine(_T("Set cameraRoiTop : value is out of range(%d ~ %d)"), nMin, nMaxHeight);
+			g_LogLine(_T("Set cameraRoiTop : value is out of range( ~ %d)"), nMaxHeight);
 			return;
 		}
 		if (AFP.cameraRoiHeight < 1 || AFP.cameraRoiHeight > nMaxHeight)
 		{
-			g_LogLine(_T("Set cameraRoiHeight : value is out of range(%d ~ %d)"), nMin, nMaxHeight);
+			g_LogLine(_T("Set cameraRoiHeight : value is out of range( ~ %d)"), nMaxHeight);
 			return;
 		}
 	}
