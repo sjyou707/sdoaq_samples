@@ -518,6 +518,8 @@ void CSDOAQ_Dlg::ReadySdoaqDll(void)
 	const int nAlgoVersion = ::SDOAQ_GetAlgorithmVersion();
 	Log(FString(_T(">> SDOAQ DLL Version = %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
 	Log(FString(_T(">> sdedof dll Version = %d.%d"), nAlgoVersion / 1000, nAlgoVersion % 1000));
+
+	SetWindowText(FString(_T("SDOAQ API TESTER (Dll %d.%d.%d)"), nMajorVersion, nMinorVersion, nPatchVersion));
 }
 
 //----------------------------------------------------------------------------
