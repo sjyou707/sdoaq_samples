@@ -1654,6 +1654,7 @@ void CSDOAQ_Dlg::print_wsgl_last_error(void)
 {
 	CString* sLastError = NewWString(::WSGL_GetLastErrorString(m_hwnd3D));
 	Log(FString(_T("[WSGL ERROR] %s"), (CString)*sLastError));
+	delete sLastError;
 }
 
 //----------------------------------------------------------------------------
