@@ -31,6 +31,7 @@ These are sample programs that use the SDOAQ dll to acquire images and WSIO dll 
     ![image](https://github.com/YoungjuLee117/sdoaq_samples/assets/93625956/c16a239c-b3e9-4cf7-827d-ae7ff8add725)
 
   * ⚠️ Set working directory to project directory.
+  * ⚠️ The sample program simulates with saved image files.
 ---
 #### [updll.bat]
   * Update required dlls to system dlls.
