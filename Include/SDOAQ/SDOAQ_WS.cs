@@ -99,6 +99,9 @@ using System.Text;
 										- Add parameter to specify MALS highest steps for simulation (piSimulMalsHighestStep, piSimulMalsLowestStep)
 										- Update the parameter in SNAP API with structure type
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.3.1  2023.11.23  YoungJu Lee		- Set Windows periodic timers to 1 millisecond
+										- If the ring buffer size is 1, image acquisition runs only once and then stops
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
  */
 
 
@@ -887,6 +890,7 @@ namespace SDOAQ
 		/// <param name="positionsCount">Number of positions in the position list.</param>
 		/// <param name="ringBufferSize">
 		/// Number of ring buffer entries. Each ring buffer entry consists of a complete set of focus images.
+		/// If the ring buffer size is 1, stack image is acquired only once and then stops.
 		/// </param>
 		/// <param name="ppFocusImages">
 		/// Array with pointers to enough memory for each single focus stack image acquired.
@@ -1043,6 +1047,7 @@ namespace SDOAQ
 		/// <param name="ringBufferSize">
 		/// Number of ring buffer entries. Each ring buffer entry consists of one EDoF image, one StepMap,
 		/// one QualityMap and one HeightMap.
+		/// If the ring buffer size is 1, EDoF image is acquired only once and then stops.
 		/// </param>
 		/// <param name="ppRingBufferImages">
 		/// Pointer to array with pointers to enough memory for each single image acquired. This memory

@@ -1096,6 +1096,11 @@ LRESULT CSDOAQ_Dlg::OnReceiveZstack(WPARAM wErrorCode, LPARAM lLastFilledRingBuf
 	}
 	else if (SET.rb.active)
 	{
+		if (m_nRingBufferSize == 1)
+		{
+			SET.rb.active = false;
+		}
+
 		(void)UpdateLastMessage(m_hWnd, EUM_RECEIVE_ZSTACK, wErrorCode, lLastFilledRingBufferEntry);
 
 		auto AFP = SET.afp;
@@ -1341,6 +1346,11 @@ LRESULT CSDOAQ_Dlg::OnReceiveEdof(WPARAM wErrorCode, LPARAM lLastFilledRingBuffe
 	}
 	else if (SET.rb.active)
 	{
+		if (m_nRingBufferSize == 1)
+		{
+			SET.rb.active = false;
+		}
+
 		(void)UpdateLastMessage(m_hWnd, EUM_RECEIVE_EDOF, wErrorCode, lLastFilledRingBufferEntry);
 
 		auto AFP = SET.afp;
@@ -1498,6 +1508,11 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf)
 	}
 	else if (SET.rb.active)
 	{
+		if (m_nRingBufferSize == 1)
+		{
+			SET.rb.active = false;
+		}
+
 		auto vRemovedMsg = UpdateLastMessage(m_hWnd, EUM_RECEIVE_AF, wErrorCode, lMsgParaReceiveAf);
 		for (auto& each_msg : vRemovedMsg)
 		{

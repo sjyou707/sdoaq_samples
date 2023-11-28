@@ -5,13 +5,8 @@
 //============================================================================
 // SDOAQ , WSIO LIBRARY & HEADER
 //----------------------------------------------------------------------------
-#if defined(_DEBUG)
-#pragma comment(lib, "../../Include/SDOAQ/SDOAQd.lib")
-#pragma comment(lib, "../../Include/WSIO/WSIODLL_D64.lib")
-#else
 #pragma comment(lib, "../../Include/SDOAQ/SDOAQ.lib")
 #pragma comment(lib, "../../Include/WSIO/WSIODLL_R64.lib")
-#endif
 
 #include "..\..\Include\SDOAQ\SDOAQ_WS.h"
 #include "..\..\Include\WSIO\WSIO_UTIL.h"
