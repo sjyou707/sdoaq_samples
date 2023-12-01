@@ -279,11 +279,11 @@ namespace SDOWSIO
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data, uint data_size);
+			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, byte[] data, uint data_size);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData_V2(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data, uint data_size, string path_name_str);
+			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData_V2(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, byte[] data, uint data_size, string path_name_str);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]

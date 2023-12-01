@@ -9,7 +9,6 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
-using SDOAQ_App_CS;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -232,8 +231,7 @@ namespace SDOWSIO
 		
 		//----------------------------------------------------------------------------
 		[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int WSIO_LastErrorString(IntPtr dest_buffer, int size_of_dest_buffer);
-        //public static extern int WSIO_LastErrorString(StringBuilder dest_buffer, int size_of_dest_buffer);
+		public static extern int WSIO_LastErrorString(StringBuilder dest_buffer, int size_of_dest_buffer);
 
         //============================================================================
         // LOG SYSTEM
