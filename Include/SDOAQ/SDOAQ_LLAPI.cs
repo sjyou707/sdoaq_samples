@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Runtime.InteropServices;
+using System.Text;
 
 /* SDOAQ_LOWLEVEL.cs
 
@@ -22,23 +23,23 @@ namespace SDOAQ
 	public static partial class SDOAQ_API
 	{
 
-		// low level API 사용 권한을 등록한다.
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+        // Register the low level API permission.
+        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern void SDOAQ_RegisterLowLevelAuthorization();
 
 
-		// 'pAcquisitionParams'의 내용으로 카메라를 설정한다.
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SetAcquisitionFixedParameters(AcquisitionFixedParameters[] pAcquisitionParams);
+        // Set the camera to the content of acquisitionParams
+        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_SetAcquisitionFixedParameters(AcquisitionFixedParameters[] acquisitionParams);
 
 
-		// ['FrameDescriptor' structure]
-		//		'typeThis': 'FrameDescriptor'의 종류. 이 값은 항상 1이다.
-		//		'bytesPixel': Frame의 한 픽셀을 이루는 데이터 바이트 수.
-		//		'pixelsWidth': Frame의 가로 픽셀 수
-		//		'pixelsHeight': Frame의 세로 픽셀 수
-		//		'bytesLine': Frame의 가로 줄의 데이터 바이트. 여기에는 패딩 바이트가 포함될 수 있다 ( padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
-		[StructLayout(LayoutKind.Sequential)]
+        // ['FrameDescriptor' structure]
+        //		'typeThis': 'FrameDescriptor' Type. This value is always 1
+        //		'bytesPixel': Number of data bytes that make up a pixel of the frame.
+        //		'pixelsWidth': Number of width pixels in the frame
+        //		'pixelsHeight': Number of height pixels in the frame
+        //		'bytesLine': bytes for the With line in the frame. This may include padding bytes. ( padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
+        [StructLayout(LayoutKind.Sequential)]
 		public struct FrameDescriptor
 		{
 			public int typeThis;
@@ -48,16 +49,16 @@ namespace SDOAQ
 			public int bytesLine;
 		};
 
-		// 'SDOAQ_FrameCallback' 콜백 함수
-		//		'errorCode': ecNoError
-		//		'pBuffer': 프레임 버퍼 포인터. 콜백함수를 리턴하면 버퍼는 더 이상 유효하지 않으므로 콜백 함수 안에서 데이터를 취득해야 한다.
-		//		'BufferSize': 'pBuffer'의 버퍼 크기
-		//		'pFrameDescriptor': 'pBuffer'의 버퍼에 담긴 프레임 정보, 이 값이 NULL이면 정보가 없는 것이임.
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_FrameCallback(eErrorCode errorCode, byte[] pBuffer, size_t BufferSize, FrameDescriptor* pFrameDescriptor);
-		
-		// 프레임 데이터를 받는 콜백함수를 등록한다: 'singleFrameCb'이 NULL일 때는 콜백을 받지 않는다.
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+        // 'SDOAQ_FrameCallback' Call Back Function
+        //		'errorCode': ecNoError
+        //		'buffer': Frame buffer. When the callback function is returned, the buffer is deleted, requiring a copy of the data.
+        //		'bufferSize': buffer size
+        //		'frameDescriptor': buffer frame Info 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		public delegate void SDOAQ_FrameCallback(eErrorCode errorCode, IntPtr buffer, int bufferSize, ref FrameDescriptor frameDescriptor);
+
+        // Register a callback function that receives frame data : Callback is not accepted when 'singleFrameCb' is NULL.
+        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetFrameCallback(SDOAQ_FrameCallback singleFrameCb);
 
 
@@ -67,8 +68,8 @@ namespace SDOAQ
 			ctmSoftware = 2,
 			ctmExternal = 3
 		};
-		// 카메라 트리거 모드를 설정한다.
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+        // Set the camera trigger mode.
+        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm);
 
 
@@ -77,15 +78,15 @@ namespace SDOAQ
 			cgsOffGrabbing = 0,
 			cgsOnGrabbing = 1,
 		};
-		// 카메라 그랩 상태를 설정한다.
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+        // Set the camera grab status.
+        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetCameraGrabbingStatus(eCameraGrabbingStatus cgs);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetCameraGrabbingStatus(eCameraGrabbingStatus[] cgs_ptr);
+		public static extern eErrorCode SDOAQ_GetCameraGrabbingStatus(out eCameraGrabbingStatus cgs);
 
 
-		// 아래 API들은 일부 카메라에서만 적용된다.
-		public enum eCameraParameterType
+        // The API below apply only to some cameras.
+        public enum eCameraParameterType
 		{
 			cptValue = 0,
 			cptMin = 1,
@@ -96,20 +97,20 @@ namespace SDOAQ
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_ExecCameraSoftwareTrigger();
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SetCameraParameterString([MarshalAs(UnmanagedType.LPStr)] string sz_register, [MarshalAs(UnmanagedType.LPStr)] string sz_value);
+		public static extern eErrorCode SDOAQ_SetCameraParameterString([MarshalAs(UnmanagedType.LPStr)] string register, [MarshalAs(UnmanagedType.LPStr)] string value);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetCameraParameterString([MarshalAs(UnmanagedType.LPStr)] string sz_register, StringBuilder buffer_ptr, int buffer_size);
+		public static extern eErrorCode SDOAQ_GetCameraParameterString([MarshalAs(UnmanagedType.LPStr)] string register, StringBuilder buffer, int bufferSize);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SetCameraParameterInteger([MarshalAs(UnmanagedType.LPStr)] string sz_register, long value);
+		public static extern eErrorCode SDOAQ_SetCameraParameterInteger([MarshalAs(UnmanagedType.LPStr)] string register, long value);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetCameraParameterInteger([MarshalAs(UnmanagedType.LPStr)] string sz_register, long[] value_ptr, eCameraParameterType cpt);
+		public static extern eErrorCode SDOAQ_GetCameraParameterInteger([MarshalAs(UnmanagedType.LPStr)] string register, out long value, eCameraParameterType cpt);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SetCameraParameterDouble([MarshalAs(UnmanagedType.LPStr)] string sz_register, double value);
+		public static extern eErrorCode SDOAQ_SetCameraParameterDouble([MarshalAs(UnmanagedType.LPStr)] string register, double value);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetCameraParameterDouble([MarshalAs(UnmanagedType.LPStr)] string sz_register, double[] value_ptr, eCameraParameterType cpt);
+		public static extern eErrorCode SDOAQ_GetCameraParameterDouble([MarshalAs(UnmanagedType.LPStr)] string register, out double value, eCameraParameterType cpt);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SetCameraParameterBool([MarshalAs(UnmanagedType.LPStr)] string sz_register, int value);
+		public static extern eErrorCode SDOAQ_SetCameraParameterBool([MarshalAs(UnmanagedType.LPStr)] string register, bool value);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetCameraParameterBool([MarshalAs(UnmanagedType.LPStr)] string sz_register, int[] value_ptr);
+		public static extern eErrorCode SDOAQ_GetCameraParameterBool([MarshalAs(UnmanagedType.LPStr)] string register, out bool value);
 	}
 }

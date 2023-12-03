@@ -15,8 +15,8 @@
  #                   : CLink+Matrox: Basler(Milx-ACA) / Sentech(Milx-STC) / CIS(Milx-CIS) / VIEWORKS(Milx-VW) / HIKROBOT(Milx-HIK)
  #                   : CoaXPress: Euresys(Coaxlink) / Matrox(Milx)
 
- Camera Model (V2) = { Simul-2040-1086-color , -1 }
- #Camera Model (V2) = { Pylon-USB , -1 }
+ #Camera Model (V2) = { Simul-2040-1086-color , -1 }
+ Camera Model (V2) = { Pylon-USB , -1 }
 
  Camera Trigger Method = Software
  Camera Reverse X = false
