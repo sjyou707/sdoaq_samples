@@ -240,7 +240,7 @@ LRESULT CSdoaqAutoFocusDlg::OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiv
 
 		ImageViewer("AF", m_nContiAF, SET, (BYTE*)SET.rb.ppBuf[base_order + 0]);
 
-		g_LogLine(_T(">> best focus: %d, best focus score: %.4lf, current focus: %d"), (int)(round(ParaAF.dbBestFocusStep)), ParaAF.dbBestScore, (int)ParaAF.dbMatchedFocusStep);
+		g_LogLine(_T(">> best focus: %.4lf, best focus score: %.4lf, current focus: %d"), ParaAF.dbBestFocusStep, ParaAF.dbBestScore, (int)ParaAF.dbMatchedFocusStep);
 	}
 
 	return 0;
@@ -315,7 +315,7 @@ void CSdoaqAutoFocusDlg::OnSdoaqSingleShotAF()
 		{
 			ImageViewer("AF", m_nContiAF, SET, pAFImageBuffer);
 
-			g_LogLine(_T(">> best focus: %d, best focus score: %.4lf, current focus: %d"), (int)(round(dbBestFocusStep)), dbBestScore, (int)dbMatchedFocusStep);
+			g_LogLine(_T(">> best focus: %.4lf, best focus score: %.4lf, current focus: %d"), dbBestFocusStep, dbBestScore, (int)dbMatchedFocusStep);
 		}
 		else
 		{
