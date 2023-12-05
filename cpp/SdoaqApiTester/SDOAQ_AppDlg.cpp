@@ -1410,7 +1410,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 		if (pAFImageBuffer && AFImageBufferSize)
 		{
 			ImageViewer(0, "AF", m_nContiAF, SET, pAFImageBuffer);
-			Log(FString(_T("\t>> BEST FOCUS STEP : %d, SCORE : %.4lf"), (int)dbBestFocusStep, dbScore));
+			Log(FString(_T("\t>> BEST FOCUS STEP : %.4lf, SCORE : %.4lf"), dbBestFocusStep, dbScore));
 		}
 		else
 		{
@@ -1523,7 +1523,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf)
 		++m_nContiAF;
 
 		ImageViewer(0, "AF", m_nContiAF, SET, (BYTE*)SET.rb.ppBuf[base_order + 0]);
-		//Log(FString(_T("[Best Focus Step : %d,\tScore : %.4lf]"), (int)ParaAF.dbFocusStep, ParaAF.dbScore));
+		//Log(FString(_T("[Best Focus Step : %.4lf,\tScore : %.4lf]"), ParaAF.dbFocusStep, ParaAF.dbScore));
 	}
 
 	return 0;

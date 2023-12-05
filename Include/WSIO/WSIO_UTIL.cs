@@ -279,15 +279,23 @@ namespace SDOWSIO
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+<<<<<<< HEAD
 			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, byte[] data, uint data_size);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData_V2(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, byte[] data, uint data_size, string path_name_str);
+=======
+			public static extern WSIORV WSUT_IV_AttachRawImgData(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, byte[] data, uint data_size);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
-			unsafe public static extern WSIORV WSUT_IV_AttachRawImgData_V3(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, void* data_surface, uint data_surface_size, string path_name_str, void* data_f3, uint data_f3_size);
+			public static extern WSIORV WSUT_IV_AttachRawImgData_V2(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, byte[] data, uint data_size, string path_name_str);
+>>>>>>> upstream/master
+
+			//----------------------------------------------------------------------------
+			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+			public static extern WSIORV WSUT_IV_AttachRawImgData_V3(IntPtr viewer_hwnd, uint width, uint height, uint line_bytes, uint pixel_bytes, byte[] data_surface, uint data_surface_size, string path_name_str, byte[] data_f3, uint data_f3_size);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]

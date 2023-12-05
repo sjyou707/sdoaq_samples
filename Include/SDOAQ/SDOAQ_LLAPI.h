@@ -22,20 +22,20 @@ extern "C"
 {
 #endif	
 	
-	// low level API 사용 권한을 등록한다.
+	// Register the low level API permission.
 	__declspec(dllexport) void SDOAQ_RegisterLowLevelAuthorization(void);
 
 
-	// 'pAcquisitionParams'의 내용으로 카메라를 설정한다.
+	// Set the camera to the content of pAcquisitionParams
 	__declspec(dllexport) eErrorCode SDOAQ_SetAcquisitionFixedParameters(sAcquisitionFixedParameters* pAcquisitionParams);
 
 
 	// ['FrameDescriptor' structure]
-	//		'typeThis': 'FrameDescriptor'의 종류. 이 값은 항상 1이다.
-	//		'bytesPixel': Frame의 한 픽셀을 이루는 데이터 바이트 수.
-	//		'pixelsWidth': Frame의 가로 픽셀 수
-	//		'pixelsHeight': Frame의 세로 픽셀 수
-	//		'bytesLine': Frame의 가로 줄의 데이터 바이트. 여기에는 패딩 바이트가 포함될 수 있다 ( padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
+	//		'typeThis': 'FrameDescriptor' Type. This value is always 1
+	//		'bytesPixel': Number of data bytes that make up a pixel of the frame.
+	//		'pixelsWidth': Number of width pixels in the frame
+	//		'pixelsHeight': Number of height pixels in the frame
+	//		'bytesLine': bytes for the With line in the frame. This may include padding bytes. ( padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
 	typedef struct
 	{
 		int typeThis;
@@ -44,14 +44,14 @@ extern "C"
 		int pixelsHeight;
 		int bytesLine;
 	} FrameDescriptor;
-
-	// 'SDOAQ_FrameCallback' 콜백 함수
+	
+	// 'SDOAQ_FrameCallback' Call Back Function
 	//		'errorCode': ecNoError
-	//		'pBuffer': 프레임 버퍼 포인터. 콜백함수를 리턴하면 버퍼는 더 이상 유효하지 않으므로 콜백 함수 안에서 데이터를 취득해야 한다.
-	//		'BufferSize': 'pBuffer'의 버퍼 크기
-	//		'pFrameDescriptor': 'pBuffer'의 버퍼에 담긴 프레임 정보, 이 값이 NULL이면 정보가 없는 것이임.
+	//		'buffer': Frame buffer. When the callback function is returned, the buffer is deleted, requiring a copy of the data.
+	//		'bufferSize': buffer size
+	//		'frameDescriptor': buffer frame Info 
 	typedef void(__stdcall* SDOAQ_FrameCallback)(eErrorCode errorCode, unsigned char* pBuffer, size_t BufferSize, FrameDescriptor* pFrameDescriptor);
-	// 프레임 데이터를 받는 콜백함수를 등록한다: 'singleFrameCb'이 NULL일 때는 콜백을 받지 않는다.
+	// Register a callback function that receives frame data : Callback is not accepted when 'singleFrameCb' is NULL.
 	__declspec(dllexport) eErrorCode SDOAQ_SetFrameCallback(SDOAQ_FrameCallback singleFrameCb);
 
 
@@ -61,7 +61,7 @@ extern "C"
 		ctmSoftware = 2,
 		ctmExternal = 3
 	};
-	// 카메라 트리거 모드를 설정한다.
+	// Set the camera trigger mode.
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm);
 
 
@@ -70,12 +70,12 @@ extern "C"
 		cgsOffGrabbing = 0,
 		cgsOnGrabbing = 1,
 	};
-	// 카메라 그랩 상태를 설정한다.
+	// Set the camera grab status.
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraGrabbingStatus(eCameraGrabbingStatus cgs);
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraGrabbingStatus(eCameraGrabbingStatus* cgs_ptr);
 
 
-	// 아래 API들은 일부 카메라에서만 적용된다.
+	// The API below apply only to some cameras.
 	enum eCameraParameterType
 	{
 		cptValue = 0,
