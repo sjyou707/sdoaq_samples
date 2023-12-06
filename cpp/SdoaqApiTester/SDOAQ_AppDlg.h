@@ -22,8 +22,9 @@ enum EUserMessage
 struct tMsgParaReceiveAf
 {
 	int lastFilledRingBufferEntry;
-	double dbFocusStep;
+	double dbBestFocusStep;
 	double dbScore;
+	double dbMatchedStep;
 };
 
 //============================================================================
@@ -125,7 +126,11 @@ public:
 			}
 		}
 
+#if defined(USE_SDOAL_API_2_4_0)
+		AcquisitionFixedParametersEx afp;
+#else
 		sAcquisitionFixedParameters afp;
+#endif
 
 		inline int PixelSize(void) const { return afp.cameraRoiWidth * afp.cameraRoiHeight; }
 		inline int ImgSize(void) const { return IsMonoCameraInstalled() ? PixelSize() : PixelSize() * COLORBYTES; }

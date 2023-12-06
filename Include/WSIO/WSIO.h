@@ -22,7 +22,8 @@
 #if defined(Vyymmdd_wsio)
 	#define WSIO_VERSION	_T("Ver.3.x.x + "  __DATE__ "") //
 #else
-	#define WSIO_VERSION	_T("Ver.3.26.2") // 2023-11-15 , WSUT_IV_AttachRawImgData(|_V2|F3) 인자 오류 로그 출력에서 예외발생 수정
+	#define WSIO_VERSION	_T("Ver.3.26.3") // 2023-12-05 , MR Script set 초기화 오류 수정
+	//#define WSIO_VERSION	_T("Ver.3.26.2") // 2023-11-15 , WSUT_IV_AttachRawImgData(|_V2|F3) 인자 오류 로그 출력에서 예외발생 수정
 	//#define WSIO_VERSION	_T("Ver.3.26.1") // 2023-11-14 , WSUT_IV_AttachRawImgData(|_V2|F3) 수정 
 	//#define WSIO_VERSION	_T("Ver.3.26.0") // 2023-11-08 , WSIF speed up, ADD WSUT_GetBmpAttributes, WSGL_(S|G)etZscaleRatio, WSUTIVOSDTYPE_TEXT_BOUNDARY, WSUTIVRESOURCE_OBJ(TEXT|BACK|LINE)COLOR
 	//#define WSIO_VERSION	_T("Ver.3.25.5") // 2023-10-13 , FIX NO-TYPE_BUG@MULTI-FOCUS@IVIEWER

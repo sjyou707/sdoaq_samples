@@ -21,6 +21,8 @@
 #define XYZNUMS				3
 #define EDOFRECSIZE			5 // edof + stepmap + qualitymap + heightmap + pointcloud
 
+#define USE_SDOAL_API_2_4_0
+
 //============================================================================
 // SDOAQ Functions
 //----------------------------------------------------------------------------
@@ -48,6 +50,17 @@ inline LPCTSTR GetSdoaqErrorString(int eCode)
 	case ecNotImplemented: return _T("ecNotImplemented");
 	default: return _T("Invalid");
 	}
+}
+
+//----------------------------------------------------------------------------
+inline bool IS_HIGHER_or_EQUAL_VERSION(int major_version, int minor_version, int patch_version)
+{
+	const auto read_major = ::SDOAQ_GetMajorVersion();
+	const auto read_minor = ::SDOAQ_GetMinorVersion();
+	const auto read_patch = ::SDOAQ_GetPatchVersion();
+	if (read_major != major_version) return read_major > major_version;
+	if (read_minor != minor_version) return read_minor > minor_version;
+	return read_patch >= patch_version;
 }
 
 //============================================================================
