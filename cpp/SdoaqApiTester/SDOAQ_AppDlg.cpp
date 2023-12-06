@@ -1671,7 +1671,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf)
 
 	if (ecNoError != wErrorCode)
 	{
-		if (IS_HIGHER_or_EQUAL_VERSION(2, 3, 2))
+		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 		{
 			ApiError(_T("SDOAQ_PlayAfCallbackEx2"), (int)wErrorCode);
 		}
@@ -1731,7 +1731,7 @@ void CSDOAQ_Dlg::OnSdoaqSnap()
 		snap_para.v2.sConfigData = NULL;
 
 #if defined(USE_SDOAQ_API_2_4_0)
-		if (IS_HIGHER_or_EQUAL_VERSION(2, 3, 2))
+		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 		{
 			const auto callbackUserData = (void*)::GetTickCount64();
 			::SDOAQ_PlaySnapEx(g_SnapCallbackEx, callbackUserData, pPositions, (int)nFocusNums, &snap_para);
@@ -1755,7 +1755,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveSnap(WPARAM wErrorCode, LPARAM lLastFilledRingBuffe
 {
 	if (ecNoError != wErrorCode)
 	{
-		if (IS_HIGHER_or_EQUAL_VERSION(2, 3, 2))
+		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 		{
 			ApiError(_T("SDOAQ_SnapCallbackEx"), (int)wErrorCode);
 		}
