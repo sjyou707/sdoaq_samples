@@ -1697,7 +1697,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf)
 		++m_nContiAF;
 
 		ImageViewer(0, "AF", m_nContiAF, SET, (BYTE*)SET.rb.ppBuf[base_order + 0]);
-		//Log(FString(_T("[Best Focus Step : %.4lf,\tScore : %.4lf]"), ParaAF.dbBestFocusStep, ParaAF.dbScore));
+		Log(FString(_T("[Best Focus Step : %.4lf,\tScore : %.4lf]"), ParaAF.dbBestFocusStep, ParaAF.dbScore));
 	}
 
 	return 0;
@@ -1773,6 +1773,8 @@ LRESULT CSDOAQ_Dlg::OnReceiveSnap(WPARAM wErrorCode, LPARAM lLastFilledRingBuffe
 }
 
 //----------------------------------------------------------------------------
+// !!! set up the calibration file after initialization is complete
+//----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqSetCalibrationFile(void)
 {
 	CString sFilter = _T("calibration file (*.csv)|*.csv|");
@@ -1785,6 +1787,8 @@ void CSDOAQ_Dlg::OnSdoaqSetCalibrationFile(void)
 	}
 }
 
+//----------------------------------------------------------------------------
+// !!! set up the calibration file after initialization is complete
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqComboObjective()
 {
