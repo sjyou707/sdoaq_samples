@@ -566,7 +566,7 @@ void CSDOAQ_Dlg::OnSdoaqInitialize()
 
 	eErrorCode rv = ::SDOAQ_Initialize(g_LogCallback, g_ErrorCallback, g_InitDoneCallback);
 
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 	{
 		(void)::SDOAQ_RegisterMoveokCallback(g_MoveokCallback);
@@ -769,7 +769,7 @@ void CSDOAQ_Dlg::OnSdoaqSetROI()
 	AfxExtractSubString(sWidth, sParameters, 2, ',');
 	AfxExtractSubString(sHeight, sParameters, 3, ',');
 
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	AcquisitionFixedParametersEx AFP;
 #else
 	AcquisitionFixedParameters AFP;
@@ -779,7 +779,7 @@ void CSDOAQ_Dlg::OnSdoaqSetROI()
 	AFP.cameraRoiWidth = (_ttoi(sWidth) / 4) * 4;
 	AFP.cameraRoiHeight = _ttoi(sHeight);
 	AFP.cameraBinning = 1;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	AFP.callbackUserData = NULL;
 #endif
 
@@ -995,7 +995,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 	const auto tick_begin = GetTickCount64();
 	eErrorCode rv;
 	LPCTSTR sz_api;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 	{
 		AFP.callbackUserData = (void*)::GetTickCount64();
@@ -1096,7 +1096,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayStack()
 
 	eErrorCode rv;
 	LPCTSTR sz_api;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 	{
 		AFP.callbackUserData = (void*)::GetTickCount64();
@@ -1146,7 +1146,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveZstack(WPARAM wErrorCode, LPARAM lLastFilledRingBuf
 
 	if (ecNoError != wErrorCode)
 	{
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 		{
 			ApiError(_T("SDOAQ_PlayCallbackEx"), (int)wErrorCode);
@@ -1254,7 +1254,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 	const auto tick_begin = GetTickCount64();
 	eErrorCode rv;
 	LPCTSTR sz_api;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 	{
 		AFP.callbackUserData = (void*)::GetTickCount64();
@@ -1399,7 +1399,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayEdof()
 
 	eErrorCode rv;
 	LPCTSTR sz_api;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 	{
 		AFP.callbackUserData = (void*)::GetTickCount64();
@@ -1505,13 +1505,13 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 	unsigned char* pAFImageBuffer = new unsigned char[AFImageBufferSize];
 	double dbBestFocusStep;
 	double dbScore;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	double dbMatchedFocusStep;
 #endif
 
 	eErrorCode rv;
 	LPCTSTR sz_api;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 	{
 		AFP.callbackUserData = (void*)::GetTickCount64();
@@ -1547,7 +1547,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 		if (pAFImageBuffer && AFImageBufferSize)
 		{
 			ImageViewer(0, "AF", m_nContiAF, SET, pAFImageBuffer);
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 			if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 			{
 				Log(FString(_T("\t>> Best focus step : %.4lf, Score : %.4lf, Matched step : %d"), dbBestFocusStep, dbScore, (int)(dbMatchedFocusStep + 0.5)));
@@ -1613,7 +1613,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayAF()
 
 	eErrorCode rv;
 	LPCTSTR sz_api;
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
 	{
 		AFP.callbackUserData = (void*)::GetTickCount64();
@@ -1730,7 +1730,7 @@ void CSDOAQ_Dlg::OnSdoaqSnap()
 		snap_para.v2.sConfigFilename = NULL;
 		snap_para.v2.sConfigData = NULL;
 
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 		if (IS_HIGHER_or_EQUAL_VERSION(2, 3, 2))
 		{
 			const auto callbackUserData = (void*)::GetTickCount64();

@@ -21,7 +21,7 @@
 #define XYZNUMS				3
 #define EDOFRECSIZE			5 // edof + stepmap + qualitymap + heightmap + pointcloud
 
-#define USE_SDOAL_API_2_4_0
+#define USE_SDOAQ_API_2_4_0
 
 //============================================================================
 // SDOAQ Functions

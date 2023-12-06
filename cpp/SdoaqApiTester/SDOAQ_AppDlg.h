@@ -126,7 +126,7 @@ public:
 			}
 		}
 
-#if defined(USE_SDOAL_API_2_4_0)
+#if defined(USE_SDOAQ_API_2_4_0)
 		AcquisitionFixedParametersEx afp;
 #else
 		sAcquisitionFixedParameters afp;
