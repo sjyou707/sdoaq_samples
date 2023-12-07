@@ -67,9 +67,10 @@ inline bool IS_HIGHER_or_EQUAL_VERSION(int major_version, int minor_version, int
 // Utilities
 //----------------------------------------------------------------------------
 #include <vector>
-inline auto UpdateLastMessage(HWND hwnd, UINT wMsgFilter, WPARAM& wParam, LPARAM& lParam)
+typedef std::vector<MSG> t_vmsg;
+inline t_vmsg UpdateLastMessage(HWND hwnd, UINT wMsgFilter, WPARAM& wParam, LPARAM& lParam)
 {
-	std::vector<MSG> v_msg;
+	t_vmsg v_msg;
 	MSG msg;
 	while (::PeekMessage(&msg, hwnd, wMsgFilter, wMsgFilter, PM_REMOVE))
 	{
@@ -143,7 +144,7 @@ template<typename T> void RetrievePointerBlock(T& t, size_t pointer)
 
 //----------------------------------------------------------------------------
 // Multibyte string -> new unicode string
-inline auto NewWString(const char* szMB)
+inline CString* NewWString(const char* szMB)
 {
 	auto pWString = new CString;
 	SetMultibytes2WString(*pWString, szMB);
@@ -151,14 +152,15 @@ inline auto NewWString(const char* szMB)
 }
 
 //----------------------------------------------------------------------------
-inline void DeleteAllWinmsgWithWStringPtrInLparam(HWND hwnd, std::vector<UINT> v_msgid)
+typedef std::vector<UINT> t_vmsgid;
+inline void DeleteAllWinmsgWithWStringPtrInLparam(HWND hwnd, t_vmsgid v_msgid)
 {
 	if (hwnd)
 	{
-		for (auto& each : v_msgid)
+		for (auto it = v_msgid.begin(); it != v_msgid.end(); it++)
 		{
 			MSG msg;
-			while (::PeekMessage(&msg, hwnd, each, each, PM_REMOVE))
+			while (::PeekMessage(&msg, hwnd, *it, *it, PM_REMOVE))
 			{
 				if (msg.lParam)
 				{

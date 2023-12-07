@@ -53,13 +53,13 @@ bool SDOAQ_CalibrationFile::BuildCalibData(const CString& sFileName)
 		std::string line;
 		CalibV2 calib;
 
-		auto CHECK_ITEM = [&](CString& sItemName)
+		auto CHECK_ITEM = [&](CString& sItemName) -> int
 		{
 			getline(calib_file_stream, line);
 			return ((CString)CA2T(line.c_str())).MakeUpper().Find(sItemName);
 		};
 
-		auto GET_VALUE = [&](CString& sItemName)
+		auto GET_VALUE = [&](CString& sItemName) -> CString
 		{
 			if (-1 == CHECK_ITEM(sItemName))
 			{

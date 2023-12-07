@@ -101,6 +101,7 @@ public:
 	struct tTestSet
 	{
 		tTestSet()
+			: m_nColorByte(COLORBYTES)
 		{
 			afp.cameraRoiTop = 0;
 			afp.cameraRoiLeft = 0;
@@ -140,27 +141,36 @@ public:
 
 		struct tRingBuf
 		{
-			bool active = false;
-			void** ppBuf = NULL; // 데이타(이미지) 버퍼 포인터
-			size_t* pSizes = NULL; // 각 데이타 버퍼의 데이타 크기(이미지 크기) 배열
-			size_t numsBuf = 0; // 링버퍼 배열 요소 개수 * 포커스 개수 ==> 링 버퍼의 실제 데이타 개수
+			tRingBuf(void)
+				: active(false)
+				, ppBuf(NULL)
+				, pSizes(NULL)
+				, numsBuf(0)
+			{ ; }
+			bool active;
+			void** ppBuf; // 데이타(이미지) 버퍼 포인터
+			size_t* pSizes; // 각 데이타 버퍼의 데이타 크기(이미지 크기) 배열
+			size_t numsBuf; // 링버퍼 배열 요소 개수 * 포커스 개수 ==> 링 버퍼의 실제 데이타 개수
 		} rb;
 
 		struct tFocus
 		{
-			size_t numsFocus = 10;
+			tFocus(void)
+				: numsFocus(10)
+			{ ; }
+			size_t numsFocus;
 			std::vector<int> vFocusSet;
 		} focus;
 
-		int m_nColorByte = COLORBYTES;
+		int m_nColorByte;
 	} SET;
 
 private:
-	int m_nRingBufferSize = 3;
+	int m_nRingBufferSize;
 
-	int m_nContiStack = 0;
-	int m_nContiEdof = 0;
-	int m_nContiAF = 0;
+	int m_nContiStack;
+	int m_nContiEdof;
+	int m_nContiAF;
 
 public:
 	enum { DFLT_FOCUS_STEP = 160 };
@@ -172,20 +182,20 @@ public:
 	SDOAQ_CalibrationFile m_calFile;
 	std::vector<CString> m_vsCalibList;
 	// calibration table 의 x,y,z 범위(unit um). 3D rendering 에 사용
-	double dxRangeStart = 0.0;
-	double dxRangeEnd = 0.0;
-	double dyRangeStart = 0.0;
-	double dyRangeEnd = 0.0;
-	double dzRangeStart = 0.0;
-	double dzRangeEnd = 0.0;
+	double dxRangeStart;
+	double dxRangeEnd;
+	double dyRangeStart;
+	double dyRangeEnd;
+	double dzRangeStart;
+	double dzRangeEnd;
 
 	//----------------------------------------------------------------------------
 	// LOG WINDOW
 	//----------------------------------------------------------------------------
 	CString m_sLog;
 	CString m_sLogFileName;
-	HANDLE m_hLogFile = INVALID_HANDLE_VALUE;
-	DWORD m_tickLastLog = 0;
+	HANDLE m_hLogFile;
+	DWORD m_tickLastLog;
 
 	void Log(LPCTSTR p_log_str);
 	void PrintLog(void);
@@ -202,7 +212,7 @@ public:
 	//----------------------------------------------------------------------------
 private:
 	std::vector<WSIOVOID> m_vhwndIV;
-	WSIOVOID m_hwnd3D = NULL;
+	WSIOVOID m_hwnd3D;
 	void print_wsio_last_error(void);
 	void print_wsgl_last_error(void);
 

@@ -11,6 +11,19 @@
 //----------------------------------------------------------------------------
 CSDOAQ_Dlg::CSDOAQ_Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_SDOAQ_APP_DIALOG, pParent)
+	, m_nRingBufferSize(3)
+	, m_nContiStack(0)
+	, m_nContiEdof(0)
+	, m_nContiAF(0)
+	, dxRangeStart()
+	, dxRangeEnd()
+	, dyRangeStart()
+	, dyRangeEnd()
+	, dzRangeStart()
+	, dzRangeEnd()
+	, m_hLogFile(INVALID_HANDLE_VALUE)
+	, m_tickLastLog(0)
+	, m_hwnd3D(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -120,18 +133,18 @@ BOOL CSDOAQ_Dlg::OnInitDialog()
 
 	//// CREATE IMAGE VIEWER
 	m_vhwndIV.resize(3, NULL);
-	for (auto& each : m_vhwndIV)
+	for (auto it = m_vhwndIV.begin(); it != m_vhwndIV.end(); it++)
 	{
 		if (WSIORV_SUCCESS <= ::WSUT_IV_CreateImageViewer((WSIOCSTR)_T("Main viewer")
-			, (WSIOVOID)(this->m_hWnd), &each, 0
+			, (WSIOVOID)(this->m_hWnd), &(*it), 0
 			, WSUTIVOPMODE_VISION | WSUTIVOPMODE_TOPTITLE | WSUTIVOPMODE_FRAMEOUTER
 		))
 		{
-			(void)WSUT_IV_SetColor(each, WSUTIVRESOURCE_OUTERFRAME, RGB(70, 130, 180));
+			(void)WSUT_IV_SetColor(*it, WSUTIVRESOURCE_OUTERFRAME, RGB(70, 130, 180));
 		}
 		else
 		{
-			each = NULL;
+			*it = NULL;
 			print_wsio_last_error();
 		}
 	}
@@ -249,16 +262,16 @@ void CSDOAQ_Dlg::BuildCalibrationFile_Combobox()
 
 	// 2. parse file
 	m_calFile.calibData.clear();
-	for (auto& file : vsCalibList)
+	for (auto it = vsCalibList.begin(); it != vsCalibList.end(); it++)
 	{
-		m_calFile.BuildCalibData(file);
+		m_calFile.BuildCalibData(*it);
 	}
 
 	auto p_combo = (CComboBox*)GetDlgItem(IDC_COMBO_OBJECTIVE);
 	p_combo->ResetContent();
-	for (auto calib : m_calFile.calibData)
+	for (auto it = m_calFile.calibData.begin(); it != m_calFile.calibData.end(); it++)
 	{
-		p_combo->AddString(calib.objective);
+		p_combo->AddString(it->objective);
 	}
 }
 
@@ -334,9 +347,9 @@ void CSDOAQ_Dlg::OnClose()
 {
 	::SDOAQ_Finalize();
 
-	for (auto& each : m_vhwndIV)
+	for (auto it = m_vhwndIV.begin(); it != m_vhwndIV.end(); it++)
 	{
-		(void)::WSUT_IV_DestroyImageViewer(each);
+		(void)::WSUT_IV_DestroyImageViewer(*it);
 	}
 	(void)::WSGL_Finalize(m_hwnd3D);
 
@@ -346,7 +359,10 @@ void CSDOAQ_Dlg::OnClose()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnDestroy()
 {
-	DeleteAllWinmsgWithWStringPtrInLparam(m_hWnd, { EUM_LOG, EUM_ERROR });
+	t_vmsgid vmsgid;
+	vmsgid.push_back(EUM_LOG);
+	vmsgid.push_back(EUM_ERROR);
+	DeleteAllWinmsgWithWStringPtrInLparam(m_hWnd, vmsgid);
 
 	__super::OnDestroy();
 }
@@ -983,7 +999,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 	unsigned char** ppFocusImages = new unsigned char*[FOCUS.numsFocus];
 	size_t* pFocusImageBufferSizes = new size_t[FOCUS.numsFocus];
 
-	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		pPositions[pos] = FOCUS.vFocusSet[pos];
 
@@ -1048,7 +1064,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 	}
 
 	delete[] pFocusImageBufferSizes;
-	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		delete[] ppFocusImages[pos];
 	}
@@ -1074,7 +1090,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayStack()
 	copy(m_vFocusSet.begin(), m_vFocusSet.end(), FOCUS.vFocusSet.begin());
 
 	int* pPositions = new int[FOCUS.numsFocus];
-	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		pPositions[pos] = FOCUS.vFocusSet[pos];
 	}
@@ -1213,7 +1229,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 	copy(m_vFocusSet.begin(), m_vFocusSet.end(), FOCUS.vFocusSet.begin());
 
 	int* pPositions = new int[FOCUS.numsFocus];
-	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		pPositions[pos] = FOCUS.vFocusSet[pos];
 	}
@@ -1333,7 +1349,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayEdof()
 	copy(m_vFocusSet.begin(), m_vFocusSet.end(), FOCUS.vFocusSet.begin());
 
 	int* pPositions = new int[nFocusNums];
-	for (int pos = 0; pos < nFocusNums; pos++)
+	for (size_t pos = 0; pos < nFocusNums; pos++)
 	{
 		pPositions[pos] = FOCUS.vFocusSet[pos];
 	}
@@ -1496,7 +1512,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 	copy(m_vFocusSet.begin(), m_vFocusSet.end(), FOCUS.vFocusSet.begin());
 
 	int* pPositions = new int[FOCUS.numsFocus];
-	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		pPositions[pos] = m_vFocusSet[pos];
 	}
@@ -1590,7 +1606,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayAF()
 	copy(m_vFocusSet.begin(), m_vFocusSet.end(), FOCUS.vFocusSet.begin());
 
 	int* pPositions = new int[FOCUS.numsFocus];
-	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		pPositions[pos] = m_vFocusSet[pos];
 	}
@@ -1688,9 +1704,9 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf)
 		}
 
 		auto vRemovedMsg = UpdateLastMessage(m_hWnd, EUM_RECEIVE_AF, wErrorCode, lMsgParaReceiveAf);
-		for (auto& each_msg : vRemovedMsg)
+		for (auto it = vRemovedMsg.begin(); it != vRemovedMsg.end(); it++)
 		{
-			RetrievePointerBlock(ParaAF, each_msg.lParam);
+			RetrievePointerBlock(ParaAF, it->lParam);
 		}
 
 		const int base_order = (ParaAF.lastFilledRingBufferEntry % (int)SET.rb.numsBuf);
@@ -1796,8 +1812,9 @@ void CSDOAQ_Dlg::OnSdoaqComboObjective()
 	((CComboBox*)GetDlgItem(IDC_COMBO_OBJECTIVE))->GetLBText(((CComboBox*)GetDlgItem(IDC_COMBO_OBJECTIVE))->GetCurSel(), sObjective);
 
 	// set calibration data of the selected objective
-	for (auto& list : m_calFile.calibData)
+	for (auto it_data = m_calFile.calibData.begin(); it_data != m_calFile.calibData.end(); it_data++)
 	{
+		auto& list = *it_data;
 		if (0 == sObjective.Compare(list.objective))
 		{
 			const auto size = (int)list.calibTable.size();
@@ -1815,15 +1832,15 @@ void CSDOAQ_Dlg::OnSdoaqComboObjective()
 			auto shitfY = new double[size];
 
 			int index = 0;
-			for (auto data : list.calibTable)
+			for (auto it_table = list.calibTable.begin(); it_table != list.calibTable.end(); it_table++)
 			{
-				height[index] = data.obj_height;
-				pitchX[index] = data.pixel_pitch_x;
-				pitchY[index] = data.pixel_pitch_y;
-				scaleX[index] = data.scale_x;
-				scaleY[index] = data.scale_y;
-				shiftX[index] = data.shift_x;
-				shitfY[index] = data.shift_y;
+				height[index] = it_table->obj_height;
+				pitchX[index] = it_table->pixel_pitch_x;
+				pitchY[index] = it_table->pixel_pitch_y;
+				scaleX[index] = it_table->scale_x;
+				scaleY[index] = it_table->scale_y;
+				shiftX[index] = it_table->shift_x;
+				shitfY[index] = it_table->shift_y;
 				index++;
 			}
 
