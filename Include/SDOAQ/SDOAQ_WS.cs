@@ -102,6 +102,8 @@ using System.Text;
 	 2.3.1  2023.11.23  YoungJu Lee		- Set Windows periodic timers to 1 millisecond
 										- If the ring buffer size is 1, image acquisition runs only once and then stops
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.1  2024.01.04  YoungJu Lee		- The additional stability feature of auto-focus only applies during continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
  */
 
 

@@ -100,6 +100,8 @@
 	 2.4.0  2023.12.06  YoungJu Lee		- Add API to register Moveok callback (It is called when image acquisition is completed)
 										- Add AcquisitionFixedParametersEx struct with user data
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.1  2024.01.04  YoungJu Lee		- The additional stability feature of auto-focus only applies during continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -789,7 +791,7 @@ extern "C"
 	/// This struct holds acquisition parameters.
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ppFocusImages">
 	/// Array with pointers to enough memory for each single focus stack image acquired.
@@ -835,7 +837,7 @@ extern "C"
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
 	/// <param name="stackFinishedCb">This callback function is called after each stack acquisition.</param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ringBufferSize">
 	/// Number of ring buffer entries. Each ring buffer entry consists of a complete set of focus images.
@@ -938,7 +940,7 @@ extern "C"
 	/// acquisition because they affect the pre allocated memory in the ring buffer.
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="pStepMapBuffer">Pointer to the allocated memory for step map</param>
 	/// <param name="stepMapBufferSize">The size of the step map buffer</param>
@@ -975,7 +977,7 @@ extern "C"
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>	
 	/// <param name="edofFinishedCb">This callback function is called after each EDoF-Calculation.</param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ringBufferSize">
 	/// Number of ring buffer entries. Each ring buffer entry consists of one EDoF image, one StepMap,

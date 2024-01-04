@@ -48,6 +48,12 @@ bool SDOAQ_CalibrationFile::BuildCalibData(const CString& sFileName)
 	std::ifstream calib_file_stream;
 	calib_file_stream.open(sFileName);
 
+	// make list only calibration files that match MALS FOCUS size
+	int nMinMalsStep = 0;
+	int nMaxMalsStep = 319;
+	::SDOAQ_GetIntParameterRange(piFocusPosition, &nMinMalsStep, &nMaxMalsStep);
+	auto size = nMaxMalsStep - nMinMalsStep + 1;
+
 	if (calib_file_stream.is_open())
 	{
 		std::string line;
@@ -177,7 +183,8 @@ bool SDOAQ_CalibrationFile::BuildCalibData(const CString& sFileName)
 			}
 		}
 
-		calibData.push_back(calib);
+		if (size == calib.calibTable.size())
+			calibData.push_back(calib);
 
 		calib_file_stream.close();
 	}
