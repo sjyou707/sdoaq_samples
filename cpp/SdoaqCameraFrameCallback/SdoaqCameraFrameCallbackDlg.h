@@ -22,4 +22,14 @@ public:
 	afx_msg void OnBnClickedTriggerFreerun();
 	afx_msg void OnBnClickedTriggerSoftware();
 	afx_msg void OnBnClickedTriggerExternal();
+
+	afx_msg void OnSetFov();
+	afx_msg void OnSetExposureTime();
+	afx_msg void OnSetGain();
+	afx_msg void OnSetWhitebalance();
+	
+	afx_msg void OnSetStringRegister();
+	afx_msg void OnSetIntegerRegister();
+	afx_msg void OnSetDoubleRegister();
+	afx_msg void OnSetBoolRegister();
 };

@@ -4,12 +4,9 @@
 
  SDOAQ_v1.00   2020-03-05    YoungJu Lee    - The illumination operates in continuous mode and the maximum intensity is limited to 30
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v1.10   2020-03-16    YoungJu Lee    - Fix the rotation of the illumination pattern
                                             - Add the default calibration setting functions for each calibration element
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v1.20   2020.03.31    YoungJu Lee    - Remove limit on the memory usage
                                             - Release used memory when FINALIZE
                                             - Close serial port when FINALIZE
@@ -18,9 +15,7 @@
                                             - Fix an issue that ObjectiveChangedCallback is called several times when the add-on lens is mounted or unmounted
                                             - Change the reflex pattern to perform the OFF command for the light if the intensity of the light is 0
                                             - Remove the intensity limit of ring light
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v1.30   2020.06.29    YoungJu Lee    - Fix an issue that dll locks up when the USB port is detached after SDOAQ_Initialize
                                             - Fix an issue that dll locks up when the acquisition starts after the USB port is re-attached
                                             - Return low-memory error if there is not enough memory to proceed by checking the physical memory
@@ -30,13 +25,9 @@
                                             - Update the latest standard calibration table
                                             - Update sdedof library (center aligned version)
                                               : When using sub ROI, calibration data for the area is applied. Previously, center calibration was applied
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
- SDOAQ_v1.40   2020.08.10    YoungJu Lee   - Update Basler Pylon SDK 4.1.0.3660 to 6.1.1.19832
-
+ SDOAQ_v1.40   2020.08.10    YoungJu Lee    - Update Basler Pylon SDK 4.1.0.3660 to 6.1.1.19832
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.0.0  2020.12.14    YoungJu Lee   - Add piSaveFileFormat, piFocusLeftTop and piFocusRightBottom parameters
                                            - Add AcquisitionFixedParameters_V2
                                            - Add SDOAQ_AcquireEdof_V2 function (arguments pPointCloudBuffer is added in SDOAQ_AcquireEdof)
@@ -46,9 +37,7 @@
                                            - Set the pixel format according to the camera reverse situation (Basler acA2040-120uc)
                                            - Change the minimum value for resize_ratio 0.25 to 0.125
                                            - Support both Basler Pylon SDK 4.1.0.3660 and 6.1.1.19832
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
                2021.03.24    YoungJu Lee   - Remove the right and the bottom black edges from the captured image (Basler acA2040-120uc)
                                              : The second to last pixels are just copied into the last
                                            - Fix an issue that the current lighting intensity is set to the maximum intensity when performing auto illumination
@@ -60,53 +49,35 @@
                                            - Change the property of pi_edof_calc_resize_ratio to writable
                                              (The resize ratio has no effect on the size of the image. It only affects the algorithm execution speed)
                                            - Support Basler camera acA2040-55uc
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
                2022.06.20    YoungJu Lee   - Support Basler camera acA2440-75uc, acA2440-75um, acA2040-90uc and acA2040-90um
                                            - Support binning (with algorithm sdedof.dll version 0.6.0)
                                            - Add API set for camera ROI parameter (SDOAQ_GetCameraParameter and SDOAQ_SetCameraParameter)
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
                2022.08.02    YoungJu Lee   - Add SDOAQ_SetExternalCalibrationTable API and objective id oi_user_defined
                                            - Add piSavePixelBits as the depth of the pixel values when saving image
-
 --------------------------------------------------------------------------------------------------------------------------------------------------------
-
                2022.10.25    YoungJu Lee   - Add SDOAQ_StartContinuousSingleFocusStack API and piSingleFocus parameter for continuous acquisition while changing single focus
                                            - Add piFocusMeasureMethod parameter for selecting focus measure method
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
                2023.01.25    YoungJu Lee   - Add CSLCB-PWM illumination (piIntensityGeneralChannel_1 ~ 8)
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.1.0  2023.06.20    YoungJu Lee   - Add SDOAQ_StartContinuousMF, SDOAQ_StopContinuousMF and SDOAQ_UpdateContinuousMF
                                            - Add eSaveFormat enum type
                                            - Add SDOAQ_PlaySnap
                                            - Add grab camera interface
                                            - Add TPSU light
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.2.0  2023.08.04  YoungJu Lee     - Add string type parameter
                                            - Add EDoF algorithm selection (support 3rd party algorithm)
                                            - Add Nikon motorized nosepiece controller
                                            - Fix an issue that camera registry was not updated after running auto whitebalance
                                            - Do hard stop when acquisition is stopped
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.2.1  2023.08.30  YoungJu Lee     - Fix an issue that light could not be turned off when hard stop go too fast
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.2.2  2023.09.22  YoungJu Lee     - Set critical section for image buffer
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.3.0  2023.10.04  YoungJu Lee     - Add low level API
                                            - Update sdedof library v0.82
                                            - Add SDOAQ_SetCalibrationFile
@@ -116,17 +87,22 @@
                2023.11.03  YoungJu Lee     - Add parameters to measure acquisition performance (piVpsReportCycleSeconds, piVpsReportTimeSeconds)
                                            - Add parameter to specify MALS highest steps for simulation (piSimulMalsHighestStep)
                                            - Update the parameter in SNAP API with structure type
-
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.3.1  2023.11.23  YoungJu Lee     - Set Windows periodic timers to 1 millisecond
                                            - If the ring buffer size is 1, image acquisition runs only once and then stops
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
  SDOAQ_v2.4.0  2023.12.06  YoungJu Lee     - Add API to register Moveok callback (It is called when image acquisition is completed)
                                            - Add AcquisitionFixedParametersEx struct with user data
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+ SDOAQ_v2.4.1  2024.01.04  YoungJu Lee     - The additional stability feature of auto-focus only applies during continuous play
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.4.2  2024.01.17  YoungJu Lee     - Update matched focus step in real time during auto-focus continuous play
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.4.3  2024.01.29  YoungJu Lee     - Fix an issue that Edof and auto focus algorithm failure depending on memory status
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ T2024.02.08   2024.02.07  YoungJu Lee     - Add auto-focus algorithm parameter
+                                             (pi_af_sharpness_measure_method, pi_af_resampling_method, pi_af_stability_method, pi_af_stability_debounce_count)
+                                           - Update sdedof library v0.84 and add sdaf v0.2 library
+                                           - Add library pseudo-calibration data based on script MALS settings when no calibration file is specified
+                                           - Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------

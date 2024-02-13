@@ -130,7 +130,7 @@ public:
 #if defined(USE_SDOAQ_API_2_4_0)
 		AcquisitionFixedParametersEx afp;
 #else
-		sAcquisitionFixedParameters afp;
+		AcquisitionFixedParameters afp;
 #endif
 
 		inline int PixelSize(void) const { return afp.cameraRoiWidth * afp.cameraRoiHeight; }

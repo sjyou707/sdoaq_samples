@@ -4,7 +4,7 @@
 
 
 ### MALS
- MALS Device = { Auto , Simul , 0 , 0 }
+ MALS Device = { Auto , Simul , 1.8 , 1.0 }
 
 
 ### CAMERA

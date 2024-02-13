@@ -14,7 +14,9 @@ using System.Text;
 	========================================================================================================================================================
 	Version     date      Author         Descriptions
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 2.3.0  2022.08.25  YoungJu Lee     - Init
+	 2.3.0  2022.08.25  YoungJu Lee     - Init (Camera register setting APIs are only valid for Basler USB and Basler GigE)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 T2024.02.08		YoungJu Lee		- Supports CoaXPress type, Sentech CameraLink and Euresys MultiCam grabber
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -96,6 +98,8 @@ namespace SDOAQ
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_ExecCameraSoftwareTrigger();
+
+		// for CoaXPress, Basler USB, Basler GigE
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetCameraParameterString([MarshalAs(UnmanagedType.LPStr)] string register, [MarshalAs(UnmanagedType.LPStr)] string value);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -112,5 +116,21 @@ namespace SDOAQ
 		public static extern eErrorCode SDOAQ_SetCameraParameterBool([MarshalAs(UnmanagedType.LPStr)] string register, bool value);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_GetCameraParameterBool([MarshalAs(UnmanagedType.LPStr)] string register, out bool value);
+
+		// for Sentech CameraLink
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_SetCameraRegisterInteger(IntPtr id_register, long value);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_GetCameraRegisterInteger(IntPtr id_register, out long value_ptr);
+
+		// for Euresys MultiCam grabber
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_SetGrabberRegisterString(IntPtr id_register, [MarshalAs(UnmanagedType.LPStr)] string sz_value);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_GetGrabberRegisterString(IntPtr id_register, StringBuilder buffer_ptr, int buffer_size);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_SetGrabberRegisterInteger(IntPtr id_register, long value);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_GetGrabberRegisterInteger(IntPtr id_register, out long value_ptr);
 	}
 }

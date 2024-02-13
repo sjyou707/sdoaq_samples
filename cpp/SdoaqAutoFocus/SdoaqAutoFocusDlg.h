@@ -41,9 +41,15 @@ public:
 	afx_msg LRESULT OnInitDone(WPARAM wErrorCode, LPARAM lpMessage);
 	afx_msg LRESULT OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf);
 	afx_msg void OnSdoaqSetAFRoi();
+	afx_msg void OnSdoaqSetSharpnessMeasureMethod();
+	afx_msg void OnSdoaqSetResamplingMethod();
+	afx_msg void OnSdoaqSetStabilityMethod();
+	afx_msg void OnSdoaqSetStabilityDebounceCount();
 	afx_msg void OnSdoaqSingleShotAF();
 	afx_msg void OnSdoaqPlayAF();
 	afx_msg void OnSdoaqStopAF();
+
+	eErrorCode SetIntTypeParaValue(eParameterId paraID, int nValue);
 
 public:
 	struct tTestSet
@@ -74,7 +80,7 @@ public:
 			}
 		}
 
-		sAcquisitionFixedParameters afp;
+		AcquisitionFixedParametersEx afp;
 
 		inline int PixelSize(void) const { return afp.cameraRoiWidth * afp.cameraRoiHeight; }
 		inline int ImgSize(void) const { return IsMonoCameraInstalled() ? PixelSize() : PixelSize() * COLORBYTES; }

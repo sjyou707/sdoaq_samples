@@ -100,6 +100,18 @@
 	 2.4.0  2023.12.06  YoungJu Lee		- Add API to register Moveok callback (It is called when image acquisition is completed)
 										- Add AcquisitionFixedParametersEx struct with user data
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.1  2024.01.04  YoungJu Lee		- The additional stability feature of auto-focus only applies during continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.2  2024.01.17  YoungJu Lee		- Update matched focus step in real time during auto-focus continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.3  2024.01.29  YoungJu Lee		- Fix an issue that Edof and auto focus algorithm failure depending on memory status
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 T2024.02.08		YoungJu Lee		- Add auto-focus algorithm parameter
+										  (pi_af_sharpness_measure_method, pi_af_resampling_method, pi_af_stability_method, pi_af_stability_debounce_count)
+										- Update sdedof library v0.84 and add sdaf v0.2 library
+										- Add library pseudo-calibration data based on script MALS settings when no calibration file is specified
+										- Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -148,7 +160,7 @@ extern "C"
 		/// <summary>This error occurs if a auto adjustment function e.g. SDOAQ_AutoExposure() failed to reach the given target value.</summary>
 		ecAutoAdjustTargetNotReached = 8,
 
-		/// <summary>This error occurs if the function is not implemnted.</summary>
+		/// <summary>This error occurs if the function is not implemented.</summary>
 		ecNotImplemented = 9,
 
 		/// <summary>This error occurs if the function is not supported.</summary>
@@ -243,6 +255,9 @@ extern "C"
 
 		/// <summary>objective 1.0x is is assembled.</summary>
 		oi01_00x = 8,
+
+		/// <summary>Library default objective.</summary>
+		oi_library_default = 99,
 
 		/// <summary>User defined objective.</summary>
 		oi_user_defined = 100
@@ -511,6 +526,26 @@ extern "C"
 		pi_edof_scale_correction_dst_step = 69,	// I - R/W
 
 		/// <summary>
+		/// focus measure (sharpness measure) method (0: Modified Laplacian, 1: Gradient(Sobel), 2: Graylevel local variance)
+		/// </summary>
+		pi_af_sharpness_measure_method = 76,	// I - R/W
+
+		/// <summary>
+		/// image processing resolution(0: full, 1: half, 2: quarter)
+		/// </summary>
+		pi_af_resampling_method = 77,			// I - R/W
+
+		/// <summary>
+		/// range = { 1(None) , 2(stability-fullstep), 3(stability-halfstep), 4(stability-onestep) }
+		/// </summary>
+		pi_af_stability_method = 74,			// I - R/W
+
+		/// <summary>
+		/// range = {0 ~ 10}
+		/// </summary>
+		pi_af_stability_debounce_count = 75,	// I - R/W
+
+		/// <summary>
 		/// Specifies parameters to pass to the HeliconFocus executable when using the HeliconFocus edof algorithm.
 		/// </summary>
 		piAlgoParamHeliconFocus = 66,			// S - R/W
@@ -566,7 +601,7 @@ extern "C"
 		/// <summary>Sets MALS lowest step for simulation.</summary>
 		piSimulMalsLowestStep = 73,				// I - R/W	 (MALS step)
 
-		//piNextParameterValue = 74,
+		//piNextParameterValue = 78,
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -641,12 +676,12 @@ extern "C"
 
 	// manages camera parameter
 	/// <summary>
-	/// This function requests the current ROI and binning value of camera.
-	/// The full ROI is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current FOV and the binning value.
-	/// This function should be called to check ROI after calling SDOAQ_SetCameraParameter() function.
+	/// This function requests the current FOV and binning value of camera.
+	/// The full FOV is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current FOV and the binning value.
+	/// This function should be called to check FOV after calling SDOAQ_SetCameraParameter() function.
 	/// </summary>
 	/// <param name="pWidth, pHeight">
-	/// These values are the current ROI in pixels.
+	/// These values are the current FOV in pixels.
 	/// </param>
 	/// <param name="pBinning">
 	/// This value will be pass 1 if the camera does not support binning.
@@ -658,14 +693,14 @@ extern "C"
 	/// Specifies the FOV and binning value.
 	/// This function cannot be called while acquisition is in progress.
 	/// </summary>
-	/// <param name="FovWidth, FovHeight">
-	/// The FovWidth and FovHeight are not the size of the image to be acquired, but the image size in pixels to be scanned by the camera sensor.
+	/// <param name="nWidth, nHeight">
+	/// The nWidth and nHeight are not the size of the image to be acquired, but the image size in pixels to be scanned by the camera sensor.
 	/// </param>
-	/// <param name="binning">
+	/// <param name="nBinning">
 	/// This value is ignored if the camera does not support binning.
 	/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 	/// </param>
-	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameter(int FovWidth, int FovHeight, int binning);
+	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameter(int nWidth, int nHeight, int nBinning);
 
 	/// <summary>
 	/// Parameters of the AcquisitionFixedParametersEx-struct must be defined before calling an acquisition function and must
@@ -789,7 +824,7 @@ extern "C"
 	/// This struct holds acquisition parameters.
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ppFocusImages">
 	/// Array with pointers to enough memory for each single focus stack image acquired.
@@ -835,7 +870,7 @@ extern "C"
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
 	/// <param name="stackFinishedCb">This callback function is called after each stack acquisition.</param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ringBufferSize">
 	/// Number of ring buffer entries. Each ring buffer entry consists of a complete set of focus images.
@@ -938,7 +973,7 @@ extern "C"
 	/// acquisition because they affect the pre allocated memory in the ring buffer.
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="pStepMapBuffer">Pointer to the allocated memory for step map</param>
 	/// <param name="stepMapBufferSize">The size of the step map buffer</param>
@@ -975,7 +1010,7 @@ extern "C"
 	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>	
 	/// <param name="edofFinishedCb">This callback function is called after each EDoF-Calculation.</param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ringBufferSize">
 	/// Number of ring buffer entries. Each ring buffer entry consists of one EDoF image, one StepMap,
@@ -1038,6 +1073,10 @@ extern "C"
 	/// During this continuous acquisition SDOAQ_PlayAfCallbackEx2() is called
 	/// after every complete auto focus data and image by the SDO acquisition engine.
 	/// </summary>
+	/// <param name="dbBestFocusStep">Best focus step(MALS) where the specified area is shown sharpest</param>
+	/// <param name="dbBestScore">Sharpness score for the resulting best focus step</param>
+	/// <param name="dbMatchedFocusStep">The focus step closest to the best focus in the focus list used to acquire the focus stack.
+	/// This is the focus step of the resulting auto-focus image.</param>
 	typedef void(__stdcall* SDOAQ_PlayAfCallbackEx2)(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData, 
 		double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
 	/* deprecated. Instead, use SDOAQ_PlayAfCallbackEx2 */typedef void(__stdcall* SDOAQ_PlayAfCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
@@ -1048,8 +1087,8 @@ extern "C"
 		AcquisitionFixedParametersEx* pAcquisitionParams,
 		int* pPositions, int positionsCount,
 		unsigned char* pAFImageBuffer, size_t AFImageBufferSize,
-		double* pBestFocusStep, double* pBestScore, double* pMatchedSFocusStep);
-	/* deprecated. Instead, use SDOAQ_SingleShotAFEx */__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF_Ex(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore, double* pMatchedSFocusStep);
+		double* pBestFocusStep, double* pBestScore, double* pMatchedFocusStep);
+	/* deprecated. Instead, use SDOAQ_SingleShotAFEx */__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF_Ex(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore, double* pMatchedFocusStep);
 	/* deprecated. Instead, use SDOAQ_SingleShotAFEx */__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore);
 	/* deprecated. Instead, use SDOAQ_SingleShotAFEx */__declspec(dllexport) eErrorCode SDOAQ_AcquireAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore);
 
@@ -1070,7 +1109,11 @@ extern "C"
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Functions and types needed to acquire a single MF image or an MF preview ...
+	// Functions and types needed to acquire a MF preview ...
+	//
+	// The multi-focus functions provided by SDOAQ.dll is one of several ways to implement multi-focus.
+	// Depending on your purpose and needs, you can freely implement your own multi-focus function
+	// by using APIs such as auto-focus and focus-stack acquisition.
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1082,8 +1125,11 @@ extern "C"
 	/// During this continuous acquisition SDOAQ_PlayMfCallbackEx() is called
 	/// after every complete auto multi focus information and image by the SDO acquisition engine.
 	/// </summary>
-	typedef void(__stdcall* SDOAQ_PlayMfCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData
-		, int countRects, int* pRectIdArray, int* pRectStepArray);
+	/// <param name="countRects">Total number of specified areas</param>
+	/// <param name="pRectIdArray">An array of unique IDs for each area</param>
+	/// <param name="pRectStepArray">An array of resulting focus steps for each area</param>
+	typedef void(__stdcall* SDOAQ_PlayMfCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData,
+		int countRects, int* pRectIdArray, int* pRectStepArray);
 	/* deprecated. Instead, use SDOAQ_PlayMfCallbackEx */typedef void(__stdcall* SDOAQ_PlayMfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int* pRectIdArray, int* pRectStepArray);
 	/* deprecated. Instead, use SDOAQ_PlayMfCallbackEx */typedef void(__stdcall* SDOAQ_ContinuousMfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int* pRectIdArray, int* pRectStepArray);
 

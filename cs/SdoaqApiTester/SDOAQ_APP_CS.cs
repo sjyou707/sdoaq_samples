@@ -292,10 +292,10 @@ namespace SDOAQ_App_CS
 											new{ Name = "piCameraPixelSizeY", Value = ((int)eParameterId.piCameraPixelSizeY).ToString() },
 											new{ Name = "piCameraBinning", Value = ((int)eParameterId.piCameraBinning).ToString() },
 											new{ Name = "piCameraGain", Value = ((int)eParameterId.piCameraGain).ToString() },
+											new{ Name = "piCameraColor", Value = ((int)eParameterId.piCameraColor).ToString() },
 											new{ Name = "piWhiteBalanceRed", Value = ((int)eParameterId.piWhiteBalanceRed).ToString() },
 											new{ Name = "piWhiteBalanceGreen", Value = ((int)eParameterId.piWhiteBalanceGreen).ToString() },
 											new{ Name = "piWhiteBalanceBlue", Value = ((int)eParameterId.piWhiteBalanceBlue).ToString() },
-											new{ Name = "piCameraColor", Value = ((int)eParameterId.piCameraColor).ToString() },
 
 											new{ Name = "piFocusPosition", Value = ((int)eParameterId.piFocusPosition).ToString() },
 											new{ Name = "piSaveFileFormat", Value = ((int)eParameterId.piSaveFileFormat).ToString() },
@@ -317,6 +317,17 @@ namespace SDOAQ_App_CS
 											new{ Name = "pi_edof_bilateral_sigma_color", Value = ((int)eParameterId.pi_edof_bilateral_sigma_color).ToString() },
 											new{ Name = "pi_edof_bilateral_sigma_space", Value = ((int)eParameterId.pi_edof_bilateral_sigma_space).ToString() },
 											new{ Name = "pi_edof_num_thread", Value = ((int)eParameterId.pi_edof_num_thread).ToString() },
+											new{ Name = "pi_edof_is_scale_correction_enabled", Value = ((int)eParameterId.pi_edof_is_scale_correction_enabled).ToString() },
+											new{ Name = "pi_edof_scale_correction_dst_step", Value = ((int)eParameterId.pi_edof_scale_correction_dst_step).ToString() },
+											new{ Name = "pi_af_sharpness_measure_method", Value = ((int)eParameterId.pi_af_sharpness_measure_method).ToString() },
+											new{ Name = "pi_af_resampling_method", Value = ((int)eParameterId.pi_af_resampling_method).ToString() },
+											new{ Name = "pi_af_stability_method", Value = ((int)eParameterId.pi_af_stability_method).ToString() },
+											new{ Name = "pi_af_stability_debounce_count", Value = ((int)eParameterId.pi_af_stability_debounce_count).ToString() },
+
+											new{ Name = "piVpsReportCycleSeconds", Value = ((int)eParameterId.piVpsReportCycleSeconds).ToString() },
+											new{ Name = "piVpsReportTimeSeconds", Value = ((int)eParameterId.piVpsReportTimeSeconds).ToString() },
+											new{ Name = "piSimulMalsHighestStep", Value = ((int)eParameterId.piSimulMalsHighestStep).ToString() },
+											new{ Name = "piSimulMalsLowestStep", Value = ((int)eParameterId.piSimulMalsLowestStep).ToString() },
 
 											new{ Name = "piInnerRingIntensity", Value = ((int)eParameterId.piInnerRingIntensity).ToString() },
 											new{ Name = "piMiddleRingIntensity", Value = ((int)eParameterId.piMiddleRingIntensity).ToString() },
@@ -2244,6 +2255,10 @@ namespace SDOAQ_App_CS
 				snap_para[0].v2.sConfigData = null;
 
 				SDOAQ_PlaySnap(sDOAQ_SnapCallback, pPositions, (int)numsFocus, snap_para);
+			}
+			else
+			{
+				WriteLog(LogLevel.Info, ">> Snap is only valid during acquisition processing.");
 			}
 		}
 		#endregion

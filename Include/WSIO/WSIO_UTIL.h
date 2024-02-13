@@ -530,6 +530,10 @@ WSIODLL_API WSIORV			WSUT_GetBmpAttributes(
 	WSIOINT*				ptr_pixel_bytes
 );
 
+//----------------------------------------------------------------------------
+WSIODLL_API WSIORV WSUT_GetRainbowBGR(float v255, unsigned char* pbgr);
+WSIODLL_API WSIORV WSUT_GenerateRainbowColorMap(float* pFloat, int stride, size_t pixels, unsigned char* pbgr_map, float lowest, float highest);
+
 //============================================================================
 // LICENSE
 //----------------------------------------------------------------------------

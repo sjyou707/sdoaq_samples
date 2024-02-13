@@ -17,7 +17,7 @@
 static WSIOVOID g_hViewer = NULL;
 //----------------------------------------------------------------------------
 static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage);
-static void g_PlayAFCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
+static void g_PlayAFCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
 //----------------------------------------------------------------------------
 static void g_LogLine(LPCTSTR sFormat, ...)
 {
@@ -58,6 +58,10 @@ BEGIN_MESSAGE_MAP(CSdoaqAutoFocusDlg, CDialogEx)
 	ON_MESSAGE(EUM_INITDONE, OnInitDone)
 	ON_MESSAGE(EUM_RECEIVE_AF, OnReceiveAF)
 	ON_BN_CLICKED(IDC_SET_AFROI, OnSdoaqSetAFRoi)
+	ON_BN_CLICKED(IDC_SET_SMM, OnSdoaqSetSharpnessMeasureMethod)
+	ON_BN_CLICKED(IDC_SET_RM, OnSdoaqSetResamplingMethod)
+	ON_BN_CLICKED(IDC_SET_SM, OnSdoaqSetStabilityMethod)
+	ON_BN_CLICKED(IDC_SET_SDC, OnSdoaqSetStabilityDebounceCount)
 	ON_BN_CLICKED(IDC_ACQ_AF, OnSdoaqSingleShotAF)
 	ON_BN_CLICKED(IDC_CONTI_AF, OnSdoaqPlayAF)
 	ON_BN_CLICKED(IDC_STOP_AF, OnSdoaqStopAF)
@@ -171,7 +175,7 @@ LRESULT CSdoaqAutoFocusDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 		rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nWidth);
 		rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nHeight);
 
-		AcquisitionFixedParameters AFP;
+		AcquisitionFixedParametersEx AFP;
 		AFP.cameraRoiTop = 0;
 		AFP.cameraRoiLeft = 0;
 		AFP.cameraRoiWidth = nWidth;
@@ -203,6 +207,18 @@ LRESULT CSdoaqAutoFocusDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 		//----------------------------------------------------------------------------
 		SetDlgItemText(IDC_EDIT_AFROI, _T("956,479,128,128"));
 		OnSdoaqSetAFRoi();
+
+		SetDlgItemText(IDC_EDIT_SMM, _T("0"));
+		OnSdoaqSetSharpnessMeasureMethod();
+
+		SetDlgItemText(IDC_EDIT_RM, _T("1"));
+		OnSdoaqSetResamplingMethod();
+
+		SetDlgItemText(IDC_EDIT_SM, _T("1"));
+		OnSdoaqSetStabilityMethod();
+
+		SetDlgItemText(IDC_EDIT_SDC, _T("4"));
+		OnSdoaqSetStabilityDebounceCount();
 	}
 	else
 	{
@@ -272,6 +288,67 @@ void CSdoaqAutoFocusDlg::OnSdoaqSetAFRoi()
 }
 
 //----------------------------------------------------------------------------
+eErrorCode CSdoaqAutoFocusDlg::SetIntTypeParaValue(eParameterId paraID, int nValue)
+{
+	int nMin, nMax;
+	eErrorCode rv = ::SDOAQ_GetIntParameterRange(paraID, &nMin, &nMax);
+
+	if (nValue >= nMin && nValue <= nMax)
+	{
+		return ::SDOAQ_SetIntParameterValue(paraID, nValue);
+	}
+	else
+	{
+		g_LogLine(_T("[ParamID-%d] : value is out of range[%d ~ %d]"), paraID, nMin, nMax);
+		return ecInvalidParameter;
+	}
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetSharpnessMeasureMethod()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_SMM, sValue);
+	
+	// focus measure (sharpness measure) method (0: Modified Laplacian, 1: Gradient(Sobel), 2: Graylevel local variance)
+	if (ecNoError != SetIntTypeParaValue(pi_af_sharpness_measure_method, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_SMM, _T("0"));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetResamplingMethod()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_RM, sValue);
+
+	// image processing resolution(0: full, 1: half, 2: quarter)
+	if (ecNoError != SetIntTypeParaValue(pi_af_resampling_method, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_RM, _T("1"));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetStabilityMethod()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_SM, sValue);
+
+	// range = { 1(None) , 2(stability-fullstep), 3(stability-halfstep), 4(stability-onestep) }
+	if (ecNoError != SetIntTypeParaValue(pi_af_stability_method, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_SM, _T("1"));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetStabilityDebounceCount()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_SDC, sValue);
+
+	// range = {0 ~ 10}
+	if (ecNoError != SetIntTypeParaValue(pi_af_stability_debounce_count, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_SDC, _T("4"));
+}
+
+//----------------------------------------------------------------------------
 void CSdoaqAutoFocusDlg::OnSdoaqSingleShotAF()
 {
 	if (SET.rb.active)
@@ -298,7 +375,8 @@ void CSdoaqAutoFocusDlg::OnSdoaqSingleShotAF()
 	double dbBestScore;
 	double dbMatchedFocusStep;
 
-	eErrorCode rv = ::SDOAQ_SingleShotAF_Ex(
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv = ::SDOAQ_SingleShotAFEx(
 		&AFP,
 		pPositions, (int)FOCUS.numsFocus,
 		pAFImageBuffer,
@@ -324,7 +402,7 @@ void CSdoaqAutoFocusDlg::OnSdoaqSingleShotAF()
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_SingleShotAF_Ex() returns error(%d)."), rv);
+		g_LogLine(_T("SDOAQ_SingleShotAFEx() returns error(%d)."), rv);
 	}
 
 	delete[] pAFImageBuffer;
@@ -368,9 +446,10 @@ void CSdoaqAutoFocusDlg::OnSdoaqPlayAF()
 		uidx++;
 	}
 
-	eErrorCode rv = ::SDOAQ_PlayAF_Ex(
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv = ::SDOAQ_PlayAFEx(
 		&AFP,
-		g_PlayAFCallback,
+		g_PlayAFCallbackEx,
 		pPositions, (int)FOCUS.numsFocus,
 		m_nRingBufferSize,
 		SET.rb.ppBuf,
@@ -382,7 +461,7 @@ void CSdoaqAutoFocusDlg::OnSdoaqPlayAF()
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_PlayAF_Ex() returns error(%d)."), rv);
+		g_LogLine(_T("SDOAQ_PlayAFEx() returns error(%d)."), rv);
 	}
 
 	delete[] pPositions;
@@ -430,7 +509,7 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 }
 
 //----------------------------------------------------------------------------
-static void g_PlayAFCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep)
+static void g_PlayAFCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep)
 {
 	if (theApp.m_pMainWnd)
 	{
@@ -440,5 +519,7 @@ static void g_PlayAFCallback(eErrorCode errorCode, int lastFilledRingBufferEntry
 		pcPara->dbBestScore = dbBestScore;
 		pcPara->dbMatchedFocusStep = dbMatchedFocusStep;
 		theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_AF, (WPARAM)errorCode, (LPARAM)pcPara);
+
+		static void* g_prev = NULL; if (g_prev != callbackUserData) { g_prev = callbackUserData; g_LogLine(_T("AF callback 0x%I64X"), (unsigned long long)callbackUserData); }
 	}
 }

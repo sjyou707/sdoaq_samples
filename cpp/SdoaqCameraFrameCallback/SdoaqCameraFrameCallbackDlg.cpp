@@ -47,6 +47,15 @@ static void g_LogLine(LPCTSTR sFormat, ...)
 		}
 	}
 }
+//----------------------------------------------------------------------------
+inline CString FString(LPCTSTR sFormat, ...)
+{
+	va_list args;
+	va_start(args, sFormat);
+	CString s;
+	s.FormatV(sFormat, args);
+	return s;
+}
 //============================================================================
 
 CSdoaqCameraFrameCallbackDlg::CSdoaqCameraFrameCallbackDlg(CWnd* pParent /*=nullptr*/)
@@ -69,6 +78,14 @@ BEGIN_MESSAGE_MAP(CSdoaqCameraFrameCallbackDlg, CDialogEx)
 	ON_COMMAND(IDC_TRIGGER_FREERUN, &OnBnClickedTriggerFreerun)
 	ON_COMMAND(IDC_TRIGGER_SOFTWARE, &OnBnClickedTriggerSoftware)
 	ON_COMMAND(IDC_TRIGGER_EXTERNAL, &OnBnClickedTriggerExternal)
+	ON_BN_CLICKED(IDC_BTN_SET_FOV, OnSetFov)
+	ON_BN_CLICKED(IDC_BTN_SET_EXPOSURE, OnSetExposureTime)
+	ON_BN_CLICKED(IDC_BTN_SET_GAIN, OnSetGain)
+	ON_BN_CLICKED(IDC_BTN_SET_WB, OnSetWhitebalance)
+	ON_BN_CLICKED(IDC_BTN_SET_STRING, OnSetStringRegister)
+	ON_BN_CLICKED(IDC_BTN_SET_INT, OnSetIntegerRegister)
+	ON_BN_CLICKED(IDC_BTN_SET_DOUBLE, OnSetDoubleRegister)
+	ON_BN_CLICKED(IDC_BTN_SET_BOOL, OnSetBoolRegister)
 END_MESSAGE_MAP()
 
 
@@ -84,6 +101,13 @@ BOOL CSdoaqCameraFrameCallbackDlg::OnInitDialog()
 
 	GetDlgItem(IDC_CHECK_FRAME_CALLBACK)->EnableWindow(FALSE);
 	GetDlgItem(IDC_SW_TRIGGER)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_FOV_WIDTH)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_FOV_HEIGHT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_EXPOSURE)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_GAIN)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_WB_R)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_WB_G)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_WB_B)->EnableWindow(FALSE);
 
 	g_LogLine(_T("================================================"));
 	g_LogLine(_T(" SDOAQ CAMERA FRAME CALLBACK SAMPLE"));
@@ -219,6 +243,195 @@ void CSdoaqCameraFrameCallbackDlg::OnBnClickedTriggerExternal()
 	}
 }
 
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetFov()
+{
+	CString sWidth, sHeight;
+	GetDlgItemText(IDC_EDIT_FOV_WIDTH, sWidth);
+	GetDlgItemText(IDC_EDIT_FOV_HEIGHT, sHeight);
+
+	int nDummy, nMaxWidth, nMaxHeight, nWidth, nHeight;
+	nWidth = _ttoi(sWidth);
+	nHeight = _ttoi(sHeight);
+	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
+	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
+
+	if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
+	{
+		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameter(nWidth, nHeight, 1);
+		if (ecNoError == rv_sdoaq)
+		{
+			int nBinning;
+			::SDOAQ_GetCameraParameter(&nWidth, &nHeight, &nBinning);
+			SetDlgItemText(IDC_EDIT_FOV_WIDTH, FString(_T("%d"), nWidth));
+			SetDlgItemText(IDC_EDIT_FOV_HEIGHT, FString(_T("%d"), nHeight));
+			g_LogLine(_T("Set FOV (%d, %d)"), nWidth, nHeight);
+		}
+		else
+		{
+			g_LogLine(_T("SDOAQ_SetCameraParameter(rv_sdoaq) returns error(%d)."), rv_sdoaq);
+		}
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_SetCameraParameter(FOV) value is out of range."));
+	}
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetExposureTime()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_EXPOSURE, sValue);
+
+	int nMin, nMax, nValue;
+	nValue = _ttoi(sValue);
+	::SDOAQ_GetIntParameterRange(piCameraExposureTime, &nMin, &nMax);
+
+	if (nMin <= nValue && nValue <= nMax)
+	{
+		eErrorCode rv_sdoaq = ::SDOAQ_SetIntParameterValue(piCameraExposureTime, nValue);
+		if (ecNoError == rv_sdoaq)
+		{
+			g_LogLine(_T("Set camera exposure time: %d"), nValue);
+		}
+		else
+		{
+			g_LogLine(_T("SDOAQ_SetIntParameterValue(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
+		}
+	}
+	else
+	{
+		g_LogLine(_T("CameraExposureTime value is out of range (%d ~ %d)."), nMin, nMax);
+	}
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetGain()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_GAIN, sValue);
+
+	double dbMin, dbMax, dbValue;
+	dbValue = _ttof(sValue);
+	::SDOAQ_GetDblParameterRange(piCameraGain, &dbMin, &dbMax);
+
+	if (dbMin <= dbValue && dbValue <= dbMax)
+	{
+		eErrorCode rv_sdoaq = ::SDOAQ_SetDblParameterValue(piCameraGain, dbValue);
+		if (ecNoError == rv_sdoaq)
+		{
+			g_LogLine(_T("Set camera gain: %.3lf"), dbValue);
+		}
+		else
+		{
+			g_LogLine(_T("SDOAQ_SetDblParameterValue(piCameraGain) returns error(%d)."), rv_sdoaq);
+		}
+	}
+	else
+	{
+		g_LogLine(_T("CameraGain value is out of range (%.3lf ~ %.3lf)."), dbMin, dbMax);
+	}
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetWhitebalance()
+{
+	CString sRed, sGreen, sBlue;
+	GetDlgItemText(IDC_EDIT_WB_R, sRed);
+	GetDlgItemText(IDC_EDIT_WB_G, sGreen);
+	GetDlgItemText(IDC_EDIT_WB_B, sBlue);
+
+	double dbValue = _ttof(sRed);
+	eErrorCode rv_sdoaq = ::SDOAQ_SetDblParameterValue(piWhiteBalanceRed, dbValue);
+	if (ecNoError == rv_sdoaq)
+	{
+		g_LogLine(_T("Set camera whitebalance red: %.3lf"), dbValue);
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_SetDblParameterValue(piWhiteBalanceRed) returns error(%d)."), rv_sdoaq);
+	}
+
+	dbValue = _ttof(sGreen);
+	rv_sdoaq = ::SDOAQ_SetDblParameterValue(piWhiteBalanceGreen, dbValue);
+	if (ecNoError == rv_sdoaq)
+	{
+		g_LogLine(_T("Set camera whitebalance green: %.3lf"), dbValue);
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_SetDblParameterValue(piWhiteBalanceGreen) returns error(%d)."), rv_sdoaq);
+	}
+
+	dbValue = _ttof(sBlue);
+	rv_sdoaq = ::SDOAQ_SetDblParameterValue(piWhiteBalanceBlue, dbValue);
+	if (ecNoError == rv_sdoaq)
+	{
+		g_LogLine(_T("Set camera whitebalance blue: %.3lf"), dbValue);
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_SetDblParameterValue(piWhiteBalanceBlue) returns error(%d)."), rv_sdoaq);
+	}
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetStringRegister()
+{	
+	CString sRegister, sValue;
+	GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
+	GetDlgItemText(IDC_EDIT_REG_STRING, sValue);
+	eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterString(CT2CA(sRegister), CT2CA(sValue));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetIntegerRegister()
+{
+	//----------------------------------------------------------------------------
+	// Depending on the register type, the value cannot be changed in the grabbing on state.
+	// In this case, you must set the value after grabbing off.
+	//----------------------------------------------------------------------------
+	g_LogLine(_T("check the camera grabbing status before making some register changes"));
+	eCameraGrabbingStatus cgs;
+	eErrorCode rv_sdoaq = ::SDOAQ_GetCameraGrabbingStatus(&cgs);
+	if (ecNoError == rv_sdoaq)
+	{
+		if (cgsOnGrabbing == cgs)
+		{
+			rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgsOffGrabbing);
+		}
+		
+		CString sRegister, sValue;
+		GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
+		GetDlgItemText(IDC_EDIT_REG_INT, sValue);
+		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterInteger(CT2CA(sRegister), _ttoi(sValue));
+
+		rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgs);
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetCameraGrabbingStatus() returns error(%d)."), rv_sdoaq);
+	}	
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetDoubleRegister()
+{
+	CString sRegister, sValue;
+	GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
+	GetDlgItemText(IDC_EDIT_REG_DOUBLE, sValue);
+	eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterDouble(CT2CA(sRegister), _ttof(sValue));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqCameraFrameCallbackDlg::OnSetBoolRegister()
+{
+	CString sRegister, sValue;
+	GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
+	GetDlgItemText(IDC_EDIT_REG_BOOL, sValue);
+	eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterBool(CT2CA(sRegister), _ttoi(sValue));
+}
 
 //============================================================================
 // CALLBACK FUNCTION:
@@ -238,26 +451,34 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 			theApp.m_pMainWnd->GetDlgItem(IDC_SW_TRIGGER)->EnableWindow(TRUE);
 			((CButton*)theApp.m_pMainWnd->GetDlgItem(IDC_TRIGGER_SOFTWARE))->SetCheck(TRUE);
 			g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
-		}
 
-		//----------------------------------------------------------------------------
-		// !!! CURRENTLY, REGISTER SETTINGS ARE ONLY VALID FOR BASLER CAMERA !!!!
-		//----------------------------------------------------------------------------
-		g_LogLine(_T("check the camera grabbing status before making some register changes"));
-		eCameraGrabbingStatus cgs;
-		eErrorCode rv_sdoaq = ::SDOAQ_GetCameraGrabbingStatus(&cgs);
-		if (ecNoError == rv_sdoaq)
-		{
-			if (cgsOnGrabbing == cgs)
-			{
-				rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgsOffGrabbing);
-			}
-			rv_sdoaq = ::SDOAQ_SetCameraParameterInteger("Width", 1024);
-			rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgs);
-		}
-		else
-		{
-			g_LogLine(_T("SDOAQ_GetCameraGrabbingStatus() returns error(%d)."), rv_sdoaq);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_WIDTH)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_HEIGHT)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_EXPOSURE)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_GAIN)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_WB_R)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_WB_G)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_WB_B)->EnableWindow(TRUE);
+
+			int nWidth, nHeight, nBinning;
+			(void)::SDOAQ_GetCameraParameter(&nWidth, &nHeight, &nBinning);
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_FOV_WIDTH, FString(_T("%d"), nWidth));
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_FOV_HEIGHT, FString(_T("%d"), nHeight));
+
+			int nValue;
+			(void)::SDOAQ_GetIntParameterValue(piCameraExposureTime, &nValue);
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_EXPOSURE, FString(_T("%d"), nValue));
+
+			double dbValue;
+			(void)::SDOAQ_GetDblParameterValue(piCameraGain, &dbValue);
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_GAIN, FString(_T("%.3lf"), dbValue));
+
+			(void)::SDOAQ_GetDblParameterValue(piWhiteBalanceRed, &dbValue);
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_WB_R, FString(_T("%.3lf"), dbValue));
+			(void)::SDOAQ_GetDblParameterValue(piWhiteBalanceGreen, &dbValue);
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_WB_G, FString(_T("%.3lf"), dbValue));
+			(void)::SDOAQ_GetDblParameterValue(piWhiteBalanceBlue, &dbValue);
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_WB_B, FString(_T("%.3lf"), dbValue));
 		}
 	}
 	else

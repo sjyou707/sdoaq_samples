@@ -9,7 +9,8 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
-#pragma once
+#ifndef _GL_DEFINE
+#define _GL_DEFINE
 
 #define GL_MG_ONSTAGE "onstage"
 #define GL_MG_GUEST "guest"
@@ -176,3 +177,5 @@ struct tPara_Display25D
 
 enum { NUMOF_TRIANGLE_INDICES_OF_PLANE_XY_PER_PIXEL = 6 };
 enum { NUMOF_TEXCOORD_BUF_NUMBER_PER_PIXEL = 2 };
+
+#endif

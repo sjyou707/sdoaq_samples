@@ -17,7 +17,7 @@
 static WSIOVOID g_hViewer = NULL;
 //----------------------------------------------------------------------------
 static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage);
-static void g_PlayEdofCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
+static void g_PlayEdofCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData);
 //----------------------------------------------------------------------------
 static void g_LogLine(LPCTSTR sFormat, ...)
 {
@@ -284,12 +284,13 @@ void CSdoaqEdofDlg::OnSdoaqSetROI()
 	AfxExtractSubString(sWidth, sParameters, 2, ',');
 	AfxExtractSubString(sHeight, sParameters, 3, ',');
 
-	AcquisitionFixedParameters AFP;
+	AcquisitionFixedParametersEx AFP;
 	AFP.cameraRoiTop = _ttoi(sTop);
 	AFP.cameraRoiLeft = _ttoi(sLeft);
 	AFP.cameraRoiWidth = (_ttoi(sWidth) / 4) * 4;
 	AFP.cameraRoiHeight = _ttoi(sHeight);
 	AFP.cameraBinning = 1;
+	AFP.callbackUserData = NULL;
 
 	int nDummy, nMaxWidth, nMaxHeight;
 	auto rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
@@ -513,7 +514,8 @@ void CSdoaqEdofDlg::OnSdoaqSingleShotEdof()
 	unsigned char* pEdofImageBuffer = new unsigned char[SET.ImgSize()];
 	size_t edofImageBufferSize = SET.ImgSize();
 
-	eErrorCode rv = ::SDOAQ_SingleShotEdof(
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv = ::SDOAQ_SingleShotEdofEx(
 		&AFP,
 		pPositions, (int)FOCUS.numsFocus,
 		NULL, 0,
@@ -601,9 +603,10 @@ void CSdoaqEdofDlg::OnSdoaqPlayEdof()
 		uidx++; // PointCloud
 	}
 
-	eErrorCode rv = ::SDOAQ_PlayEdof(
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv = ::SDOAQ_PlayEdofEx(
 		&AFP,
-		g_PlayEdofCallback,
+		g_PlayEdofCallbackEx,
 		pPositions, (int)nFocusNums,
 		m_nRingBufferSize,
 		SET.rb.ppBuf,
@@ -676,10 +679,12 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 }
 
 //----------------------------------------------------------------------------
-static void g_PlayEdofCallback(eErrorCode errorCode, int lastFilledRingBufferEntry)
+static void g_PlayEdofCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData)
 {
 	if (theApp.m_pMainWnd)
 	{
 		theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_EDOF, (WPARAM)errorCode, (LPARAM)lastFilledRingBufferEntry);
+
+		static void* g_prev = NULL; if (g_prev != callbackUserData) { g_prev = callbackUserData; g_LogLine(_T("EDOF"), errorCode, callbackUserData); }
 	}
 }

@@ -226,6 +226,10 @@ void CSDOAQ_Dlg::BuildParameterID_Combobox(void)
 		ADD_PI(_T("edof_num_thread"), pi_edof_num_thread);
 		ADD_PI(_T("edof_is_scale_correction_enabled"), pi_edof_is_scale_correction_enabled);
 		ADD_PI(_T("edof_scale_correction_dst_step"), pi_edof_scale_correction_dst_step);
+		ADD_PI(_T("af_sharpness_measure_method"), pi_af_sharpness_measure_method);
+		ADD_PI(_T("af_resampling_method"), pi_af_resampling_method);
+		ADD_PI(_T("af_stability_method"), pi_af_stability_method);
+		ADD_PI(_T("af_stability_debounce_count"), pi_af_stability_debounce_count);
 		ADD_PI(_T("SaveFileFormat"), piSaveFileFormat);
 		ADD_PI(_T("SavePixelBits - not supported yet"), piSavePixelBits);
 		ADD_PI(_T("FocusLeftTop"), piFocusLeftTop);

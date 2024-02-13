@@ -6,7 +6,7 @@
  #Patch = { 1251 }
 
 ### MALS
- MALS Device = { Auto , simul , 0 , 0 }
+ MALS Device = { Auto , simul , 1.8 , 1.0 }
  Camera TPSU Trigger Delay = 30000
 
 ### CAMERA

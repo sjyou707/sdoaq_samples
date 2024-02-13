@@ -102,6 +102,21 @@ using System.Text;
 	 2.3.1  2023.11.23  YoungJu Lee		- Set Windows periodic timers to 1 millisecond
 										- If the ring buffer size is 1, image acquisition runs only once and then stops
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.0  2023.12.06  YoungJu Lee		- Add API to register Moveok callback (It is called when image acquisition is completed)
+										- Add AcquisitionFixedParametersEx struct with user data
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.1  2024.01.04  YoungJu Lee		- The additional stability feature of auto-focus only applies during continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.2  2024.01.17  YoungJu Lee		- Update matched focus step in real time during auto-focus continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.3  2024.01.29  YoungJu Lee		- Fix an issue that Edof and auto focus algorithm failure depending on memory status
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 T2024.02.08		YoungJu Lee		- Add auto-focus algorithm parameter
+										  (pi_af_sharpness_measure_method, pi_af_resampling_method, pi_af_stability_method, pi_af_stability_debounce_count)
+										- Update sdedof library v0.84 and add sdaf v0.2 library
+										- Add library pseudo-calibration data based on script MALS settings when no calibration file is specified
+										- Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
  */
 
 
@@ -252,6 +267,9 @@ namespace SDOAQ
 
 			/// <summary>objective 1.0x is is assembled.</summary>
 			oi01_00x = 8,
+
+			/// <summary>Library default objective.</summary>
+			oi_library_default = 99,
 
 			/// <summary>User defined objective</summary>
 			oi_user_defined = 100
@@ -544,6 +562,26 @@ namespace SDOAQ
 			pi_edof_scale_correction_dst_step = 69, // I - R/W
 
 			/// <summary>
+			/// focus measure (sharpness measure) method (0: Modified Laplacian, 1: Gradient(Sobel), 2: Graylevel local variance)
+			/// </summary>
+			pi_af_sharpness_measure_method = 76,	// I - R/W
+
+			/// <summary>
+			/// image processing resolution(0: full, 1: half, 2: quarter)
+			/// </summary>
+			pi_af_resampling_method = 77,		// I - R/W
+
+			/// <summary>
+			/// range = { 1(None) , 2(stability-fullstep), 3(stability-halfstep), 4(stability-onestep) }
+			/// </summary>
+			pi_af_stability_method = 74,		// I - R/W
+
+			/// <summary>
+			/// range = {0 ~ 10}
+			/// </summary>
+			pi_af_stability_debounce_count = 75,// I - R/W
+
+			/// <summary>
 			/// Specifies parameters to pass to the HeliconFocus executable when using the HeliconFocus edof algorithm.
 			/// </summary>
 			piAlgoParamHeliconFocus = 66,       // S - R/W
@@ -597,7 +635,7 @@ namespace SDOAQ
 			/// <summary>Sets MALS lowest step for simulation.</summary>
 			piSimulMalsLowestStep = 73,         // I - R/W	 (MALS step)
 
-			//piNextParameterValue = 74,
+			//piNextParameterValue = 78,
 
 			/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 			piInvalidParameter = 100
@@ -624,7 +662,7 @@ namespace SDOAQ
 			//fmCustomized2 // reserved, not yet implemented
 			fmMax
 		};
-
+		
 		public enum eCameraColor
 		{
 			ccColor = 0,
@@ -682,12 +720,12 @@ namespace SDOAQ
 
 		// manages camera parameter
 		/// <summary>
-		/// This function requests the current ROI and binning value of camera.
-		/// The full ROI is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current FOV and the binning value.
-		/// This function should be called to check ROI after calling SDOAQ_SetCameraParameter() function.
+		/// This function requests the current FOV and binning value of camera.
+		/// The full FOV is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current FOV and the binning value.
+		/// This function should be called to check FOV after calling SDOAQ_SetCameraParameter() function.
 		/// </summary>
 		/// <param name="pWidth, pHeight">
-		/// These values are the current ROI in pixels.
+		/// These values are the current FOV in pixels.
 		/// </param>
 		/// <param name="pBinning">
 		/// This value will be pass 1 if the camera does not support binning.
@@ -700,15 +738,15 @@ namespace SDOAQ
 		/// Specifies the FOV and binning value.
 		/// This function cannot be called while acquisition is in progress.
 		/// </summary>
-		/// <param name="FovWidth, FovHeight">
-		/// The FovWidth and FovHeight are not the size of the image to be acquired, but the image size in pixels to be scanned by the camera sensor.
+		/// <param name="nWidth, nHeight">
+		/// The nWidth and nHeight are not the size of the image to be acquired, but the image size in pixels to be scanned by the camera sensor.
 		/// </param>
 		/// <param name="binning">
 		/// This value is ignored if the camera does not support binning.
 		/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 		/// </param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SetCameraParameter(int FovWidth, int FovHeight, int binning);
+		public static extern eErrorCode SDOAQ_SetCameraParameter(int nWidth, int nHeight, int binning);
 
 		/// <summary>
 		/// Parameters of the AcquisitionFixedParameters-struct must be defined before calling an acquisition function and must
@@ -716,7 +754,7 @@ namespace SDOAQ
 		/// size of the predefined memory blocks allocated for the ring buffer.
 		/// </summary>
 		[StructLayout(LayoutKind.Sequential)]
-		public struct AcquisitionFixedParameters
+		public struct AcquisitionFixedParametersEx
 		{
 			/// <summary>The upper edge of the camera ROI used for acquisition in pixels. This value is 0 if full ROI should be used.</summary>
 			public int cameraRoiTop;
@@ -731,18 +769,16 @@ namespace SDOAQ
 			/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 			///</summary>
 			public int cameraBinning;
-		};
-
-		/* deprecated. Instead, use AcquisitionFixedParameters */
+			/// <summary>
+			/// User data with a size of 8 bytes.
+			/// User data is passed as is through the registered callback function.
+			/// </summary>
+			public IntPtr callbackUserData;
+		};		
 		[StructLayout(LayoutKind.Sequential)]
-		public struct AcquisitionFixedParameters_V2
-		{
-			public int cameraRoiTop;
-			public int cameraRoiLeft;
-			public int cameraRoiWidth;
-			public int cameraRoiHeight;
-			public int cameraBinning;
-		};
+		/* deprecated. Instead, use AcquisitionFixedParametersEx */public struct AcquisitionFixedParameters{public int cameraRoiTop;public int cameraRoiLeft;public int cameraRoiWidth;public int cameraRoiHeight;public int cameraBinning;};		
+		[StructLayout(LayoutKind.Sequential)]
+		/* deprecated. Instead, use AcquisitionFixedParametersEx */public struct AcquisitionFixedParameters_V2{public int cameraRoiTop;public int cameraRoiLeft;public int cameraRoiWidth;public int cameraRoiHeight;public int cameraBinning;};
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -806,19 +842,28 @@ namespace SDOAQ
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_AutoWhiteBalance(int roiLeft, int roiTop, int roiWidth, int roiHeight);
 
+		/// It is called when image acquisition is completed. 
+		/// User data delivered through the API requesting image acquisition is passed as is.
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		public delegate void SDOAQ_MoveokCallback(eErrorCode errorCode, IntPtr callbackUserData);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_RegisterMoveokCallback(SDOAQ_MoveokCallback cbf);
+
 		/// <summary>
 		/// After a call of SDOAQ_PlayFocusStack() or SDOAQ_PlayEdof()
 		/// focus stacks or edof images are acquired in continuously until a call of SDOAQ_StopFocusStack() or SDOAQ_StopEdof() is done.
 		/// During this continuous acquisition SDOAQ_PlayCallback() is called
 		/// after every complete focus stack or edof acquisition by the SDO acquisition engine.
-		/// </summary>				
+		/// </summary>
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		/* deprecated. Instead, use SDOAQ_PlayCallback */public delegate void SDOAQ_ContinuousAcquisitionCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		/* deprecated. Instead, use SDOAQ_PlayCallback */public delegate void SDOAQ_ContinuousEdofCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
+		public delegate void SDOAQ_PlayCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, IntPtr callbackUserData);
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_PlayCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
+		/* deprecated. Instead, use SDOAQ_PlayCallbackEx */public delegate void SDOAQ_PlayCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		/* deprecated. Instead, use SDOAQ_PlayCallbackEx */public delegate void SDOAQ_ContinuousAcquisitionCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		/* deprecated. Instead, use SDOAQ_PlayCallbackEx */public delegate void SDOAQ_ContinuousEdofCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -859,25 +904,20 @@ namespace SDOAQ
 		/// These values should be checked before acquisition/copying images to detect allocation errors and prevent
 		/// exception faults.
 		/// </param>
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotFocusStack */public static extern eErrorCode SDOAQ_AcquireFocusStack(
-            AcquisitionFixedParameters[] pAcquisitionParams, 
-            int[] pPositions, int positionsCount,
-            IntPtr[] ppFocusImages, 
-            ulong[] pFocusImagesBufferSizes);
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotFocusStack */public static extern eErrorCode SDOAQ_AcquireFocusStack_V2(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            int[] pPositions, int positionsCount,
-            IntPtr[] ppFocusImages, 
-            ulong[] pFocusImagesBufferSizes);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SingleShotFocusStack(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			int[] pPositions, int positionsCount,
-			IntPtr[] ppFocusImages,
-			ulong[] pFocusImagesBufferSizes);
+		public static extern eErrorCode SDOAQ_SingleShotFocusStackEx(
+				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				int[] pPositions, int positionsCount,
+				IntPtr[] ppFocusImages,
+				ulong[] pFocusImagesBufferSizes);
+
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_SingleShotFocusStack(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_AcquireFocusStack_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_AcquireFocusStack(AcquisitionFixedParameters[] pAcquisitionParams, int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
 
 		/// <summary>
 		/// This function starts a focus stack preview. Stack images are produced in a continuous
@@ -921,35 +961,20 @@ namespace SDOAQ
 		/// exception faults.
 		/// </param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayFocusStack */public static extern eErrorCode SDOAQ_StartContinuousFocusStack(
-            AcquisitionFixedParameters[] pAcquisitionParams, 
-            SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, 
-            int[] pPositions, int positionsCount, 
-            int ringBufferSize, 
-            IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayFocusStack */public static extern eErrorCode SDOAQ_StartContinuousFocusStack_V2(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, 
-            int[] pPositions, int positionsCount, 
-            int ringBufferSize, IntPtr[] ppFocusImages, 
-            ulong[] pFocusImagesBufferSizes);
+		public static extern eErrorCode SDOAQ_PlayFocusStackEx(
+				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				SDOAQ_PlayCallbackEx stackFinishedCallback,
+				int[] pPositions, int positionsCount,
+				int ringBufferSize,
+				IntPtr[] ppFocusImages,              // array of (ringBufferSize * positionsCount) unsigned char* entries
+				ulong[] pFocusImagesBufferSizes);   // size of each buffer => size of array == (ringBufferSize * positionsCount);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlayFocusStack(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			SDOAQ_PlayCallback stackFinishedCallback,
-			int[] pPositions, int positionsCount,
-			int ringBufferSize,
-			IntPtr[] ppFocusImages,              // array of (ringBufferSize * positionsCount) unsigned char* entries
-			ulong[] pFocusImagesBufferSizes);   // size of each buffer => size of array == (ringBufferSize * positionsCount);
-
+		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_PlayFocusStack(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayCallback stackFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlaySingleFocus */public static extern eErrorCode SDOAQ_StartContinuousSingleFocusStack(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, 
-            int ringBufferSize, 
-            IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_StartContinuousFocusStack_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize, IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_StartContinuousFocusStack(AcquisitionFixedParameters[] pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, int[] pPositions, int positionsCount, int ringBufferSize, IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
 
 		/// <summary>
 		/// This function starts a focus stack preview with only one focus.
@@ -958,22 +983,27 @@ namespace SDOAQ
 		/// A image is produced in a continuous way until SDOAQ_StopFocusStack() is called.
 		/// </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlaySingleFocus(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			SDOAQ_PlayCallback singleFinishedCb,
-			int ringBufferSize,
-			IntPtr[] ppFocusImage,               // array of (ringBufferSize) unsigned char* entries
-			ulong[] pFocusImagesBufferSizes);   // size of each buffer => size of array == (ringBufferSize);
+		public static extern eErrorCode SDOAQ_PlaySingleFocusEx(
+				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				SDOAQ_PlayCallbackEx singleFinishedCb,
+				int ringBufferSize,
+				IntPtr[] ppFocusImage,               // array of (ringBufferSize) unsigned char* entries
+				ulong[] pFocusImagesBufferSizes);   // size of each buffer => size of array == (ringBufferSize);
+
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */public static extern eErrorCode SDOAQ_PlaySingleFocus(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayCallback singleFinishedCb,int ringBufferSize,IntPtr[] ppFocusImage, ulong[] pFocusImagesBufferSizes);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */public static extern eErrorCode SDOAQ_StartContinuousSingleFocusStack(AcquisitionFixedParameters_V2[] pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, int ringBufferSize, IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
 
 		/// <summary>
 		/// This function requests a stop of the running continuous focus stack acquisition. After this function
 		/// returns the ring buffer allocated by the client can be released. No further calls of the callback will be done.
 		/// </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_StopFocusStack */public static extern eErrorCode SDOAQ_StopContinuousFocusStack();
+		public static extern eErrorCode SDOAQ_StopFocusStack();
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StopFocusStack();
+		/* deprecated. Instead, use SDOAQ_StopFocusStack */public static extern eErrorCode SDOAQ_StopContinuousFocusStack();
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1031,28 +1061,9 @@ namespace SDOAQ
 		/// <param name="heightMapBufferSize">The size of the height map buffer</param>
 		/// <param name="pPointCloudBuffer">Pointer to the allocated memory for point cloud</param>
 		/// <param name="pointCloudBufferSize">The size of the point cloud buffer</param>
-
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotEdof */public static extern eErrorCode SDOAQ_AcquireEdof(
-            AcquisitionFixedParameters[] pAcquisitionParams, 
-            EdofCalculationFixedParameters[] pCalculationParams, 
-            int[] pPositions, int positionsCount, 
-            float[] pStepMapBuffer, ulong stepMapBufferSize, 
-            byte[] pEdofImageBuffer, ulong edofImageBufferSize, 
-            float[] pQualityMapBuffer, ulong qualityMapBufferSize, float[] pHeightMapBuffer, ulong heightMapBufferSize);
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotEdof */public static extern eErrorCode SDOAQ_AcquireEdof_V2(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            EdofCalculationFixedParameters[] pCalculationParams, 
-            int[] pPositions, int positionsCount, float[] pStepMapBuffer, 
-            ulong stepMapBufferSize, byte[] pEdofImageBuffer, 
-            ulong edofImageBufferSize, float[] pQualityMapBuffer, ulong qualityMapBufferSize, 
-            float[] pHeightMapBuffer, ulong heightMapBufferSize, 
-            float[] pPointCloudBuffer, ulong pointCloudBufferSize);
-
-		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SingleShotEdof(
-			  AcquisitionFixedParameters[] pAcquisitionParams,
+		public static extern eErrorCode SDOAQ_SingleShotEdofEx(
+			  AcquisitionFixedParametersEx[] pAcquisitionParams,
 			  int[] pPositions, int positionsCount,
 			  float[] pStepMapBuffer, ulong stepMapBufferSize,
 			  byte[] pEdofImageBuffer, ulong edofImageBufferSize,
@@ -1060,95 +1071,88 @@ namespace SDOAQ
 			  float[] pHeightMapBuffer, ulong heightMapBufferSize,
 			  float[] pPointCloudBuffer, ulong pointCloudBufferSize);
 
-        /// <summary>
-        /// This function starts an EDoF-Preview. EDoF images are produced in a continuous way until
-        /// SDOAQ_StopEdof() is called.
-        /// First a focus stack is acquired using currently set parameters, the values in pAcquisitionParams
-        /// and the given MALS controller positions stored in pPositions.
-        /// From this set of focus stack images, a StepMap, a EDoF image, a QualityMap and a HeightMap
-        /// is calculated using the currently stored parameters and pCalculationsParameters. This set of
-        /// calculated images is copied to the next ring buffer memory set. After this the given callback
-        /// function edofFinishedCallback is called.
-        /// After that a new focus stack is acquired and so on until SDOAQ_StopEdof() is called.
-        /// </summary>
-        /// <param name="pAcquisitionParams">
-        /// This struct holds acquisition parameters which must not be changed during continuous EDoF
-        /// acquisition because they affect the pre allocated memory in the ring buffer.
-        /// Please refer to AcquisitionFixedParameters.
-        /// </param>
-        /// <param name="edofFinishedCallback">This callback function is called after each EDoF-Calculation.</param>
-        /// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
-        /// <param name="positionsCount">Number of positions in the position list.</param>
-        /// <param name="ringBufferSize">
-        /// Number of ring buffer entries. Each ring buffer entry consists of one EDoF image, one StepMap,
-        /// one QualityMap and one HeightMap.
-        /// If the ring buffer size is 1, EDoF image is acquired only once and then stops.
-        /// </param>
-        /// <param name="ppRingBufferImages">
-        /// Pointer to array with pointers to enough memory for each single image acquired. This memory
-        /// is pre allocated by the client.
-        /// Example:
-        ///    ringBufferSize = 2 =>
-        ///       ppRingBufferImages[0] => EDoF image of ring buffer position 0
-        ///       ppRingBufferImages[1] => StepMap of ring buffer position 0
-        ///       ppRingBufferImages[2] => QualityMap of ring buffer position 0
-        ///       ppRingBufferImages[3] => HeightMap of ring buffer position 0
-        ///       ppRingBufferImages[4] => EDoF image of ring buffer position 1
-        ///       ppRingBufferImages[5] => StepMap of ring buffer position 1
-        ///       ppRingBufferImages[6] => QualityMap of ring buffer position 1
-        ///       ppRingBufferImages[7] => HeightMap of ring buffer position 1
-        ///       ppRingBufferImages[8] => HeightMap of ring buffer position 1
-        ///       ppRingBufferImages[9] => PintCloudData of ring buffer position 1
-        /// If a image pointer (e.g. ppRingBufferImages[3]) == nullptr this image should not be generated/copied.
-        /// </param>
-        /// <param name="pRingBufferSizes">
-        /// Pointer to an array holding the size of the allocated memory for every ppRingBufferImages pointer in bytes.
-        /// These values should be checked before acquisition/copying images to detect allocation errors and prevent
-        /// exception faults.
-        /// If one of the array entries is zero, the associated image is not acquired / copied.
-        /// </param>
-        
-        /* deprecated. Instead, use SDOAQ_PlayEdof */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StartContinuousEdof(
-            AcquisitionFixedParameters[] pAcquisitionParams, 
-            EdofCalculationFixedParameters[] pCalculationParams, 
-            SDOAQ_ContinuousEdofCallback edofFinishedCallback, 
-            int[] pPositions, int positionsCount, 
-            int ringBufferSize, 
-            IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_SingleShotEdof(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,float[] pStepMapBuffer, ulong stepMapBufferSize,byte[] pEdofImageBuffer, ulong edofImageBufferSize,float[] pQualityMapBuffer, ulong qualityMapBufferSize,float[] pHeightMapBuffer, ulong heightMapBufferSize,float[] pPointCloudBuffer, ulong pointCloudBufferSize);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_AcquireEdof_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,EdofCalculationFixedParameters[] pCalculationParams,int[] pPositions, int positionsCount, float[] pStepMapBuffer,ulong stepMapBufferSize, byte[] pEdofImageBuffer,ulong edofImageBufferSize, float[] pQualityMapBuffer, ulong qualityMapBufferSize,float[] pHeightMapBuffer, ulong heightMapBufferSize,float[] pPointCloudBuffer, ulong pointCloudBufferSize);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_AcquireEdof(AcquisitionFixedParameters[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, int[] pPositions, int positionsCount, float[] pStepMapBuffer, ulong stepMapBufferSize, byte[] pEdofImageBuffer, ulong edofImageBufferSize, float[] pQualityMapBuffer, ulong qualityMapBufferSize, float[] pHeightMapBuffer, ulong heightMapBufferSize);
 
-        /* deprecated. Instead, use SDOAQ_PlayEdof */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StartContinuousEdof_V2(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            EdofCalculationFixedParameters[] pCalculationParams, 
-            SDOAQ_ContinuousEdofCallback edofFinishedCallback, 
-            int[] pPositions, int positionsCount, 
-            int ringBufferSize, 
-            IntPtr[] ppRingBufferImages_V2, ulong[] pRingBufferSizes_V2);
+
+		/// <summary>
+		/// This function starts an EDoF-Preview. EDoF images are produced in a continuous way until
+		/// SDOAQ_StopEdof() is called.
+		/// First a focus stack is acquired using currently set parameters, the values in pAcquisitionParams
+		/// and the given MALS controller positions stored in pPositions.
+		/// From this set of focus stack images, a StepMap, a EDoF image, a QualityMap and a HeightMap
+		/// is calculated using the currently stored parameters and pCalculationsParameters. This set of
+		/// calculated images is copied to the next ring buffer memory set. After this the given callback
+		/// function edofFinishedCallback is called.
+		/// After that a new focus stack is acquired and so on until SDOAQ_StopEdof() is called.
+		/// </summary>
+		/// <param name="pAcquisitionParams">
+		/// This struct holds acquisition parameters which must not be changed during continuous EDoF
+		/// acquisition because they affect the pre allocated memory in the ring buffer.
+		/// Please refer to AcquisitionFixedParameters.
+		/// </param>
+		/// <param name="edofFinishedCallback">This callback function is called after each EDoF-Calculation.</param>
+		/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+		/// <param name="positionsCount">Number of positions in the position list.</param>
+		/// <param name="ringBufferSize">
+		/// Number of ring buffer entries. Each ring buffer entry consists of one EDoF image, one StepMap,
+		/// one QualityMap and one HeightMap.
+		/// If the ring buffer size is 1, EDoF image is acquired only once and then stops.
+		/// </param>
+		/// <param name="ppRingBufferImages">
+		/// Pointer to array with pointers to enough memory for each single image acquired. This memory
+		/// is pre allocated by the client.
+		/// Example:
+		///    ringBufferSize = 2 =>
+		///       ppRingBufferImages[0] => EDoF image of ring buffer position 0
+		///       ppRingBufferImages[1] => StepMap of ring buffer position 0
+		///       ppRingBufferImages[2] => QualityMap of ring buffer position 0
+		///       ppRingBufferImages[3] => HeightMap of ring buffer position 0
+		///       ppRingBufferImages[4] => EDoF image of ring buffer position 1
+		///       ppRingBufferImages[5] => StepMap of ring buffer position 1
+		///       ppRingBufferImages[6] => QualityMap of ring buffer position 1
+		///       ppRingBufferImages[7] => HeightMap of ring buffer position 1
+		///       ppRingBufferImages[8] => HeightMap of ring buffer position 1
+		///       ppRingBufferImages[9] => PintCloudData of ring buffer position 1
+		/// If a image pointer (e.g. ppRingBufferImages[3]) == nullptr this image should not be generated/copied.
+		/// </param>
+		/// <param name="pRingBufferSizes">
+		/// Pointer to an array holding the size of the allocated memory for every ppRingBufferImages pointer in bytes.
+		/// These values should be checked before acquisition/copying images to detect allocation errors and prevent
+		/// exception faults.
+		/// If one of the array entries is zero, the associated image is not acquired / copied.
+		/// </param>
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_PlayEdofEx(
+				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				SDOAQ_PlayCallbackEx edofFinishedCallback,
+				int[] pPositions, int positionsCount,
+				int ringBufferSize,
+				IntPtr[] ppRingBufferImages,     // poniter to pointer array of (ringBufferSize * (stepMap* + edof* + qualityMap* + heightMap* + pointCloud*)) unsigned char* entries
+				ulong[] pRingBufferSizes);       // size of each image buffer => size of array == (ringBufferSize * 5);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlayEdof(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			SDOAQ_PlayCallback edofFinishedCallback,
-			int[] pPositions, int positionsCount,
-			int ringBufferSize,
-			IntPtr[] ppRingBufferImages,     // poniter to pointer array of (ringBufferSize * (stepMap* + edof* + qualityMap* + heightMap* + pointCloud*)) unsigned char* entries
-			ulong[] pRingBufferSizes);       // size of each image buffer => size of array == (ringBufferSize * 5);
-
-        /// <summary>
-        /// This function requests a stop of the running continuous EDoF acquisition. After this functions returns the ring buffer
-        /// allocated by the client can be released. No further calls of the callback will be done.
-        /// </param>
-        /* deprecated. Instead, use SDOAQ_StopEdof */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StopContinuousEdof();
-
+		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_PlayEdof(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayCallback edofFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);		
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_StartContinuousEdof_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,EdofCalculationFixedParameters[] pCalculationParams,SDOAQ_ContinuousEdofCallback edofFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages_V2, ulong[] pRingBufferSizes_V2);		
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_StartContinuousEdof(AcquisitionFixedParameters[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, SDOAQ_ContinuousEdofCallback edofFinishedCallback, int[] pPositions, int positionsCount, int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
+		
+		/// <summary>
+		/// This function requests a stop of the running continuous EDoF acquisition. After this functions returns the ring buffer
+		/// allocated by the client can be released. No further calls of the callback will be done.
+		/// </param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		unsafe public static extern eErrorCode SDOAQ_StopEdof();
+		
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_StopEdof */public static extern eErrorCode SDOAQ_StopContinuousEdof();
 
-
+		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//
 		// Functions and types needed to acquire a single AF image or an AF preview ...
@@ -1157,149 +1161,130 @@ namespace SDOAQ
 
 		public const string NAME_AF_IMAGE = "AF";
 
-        /// <summary>
-        /// After a call of SDOAQ_PlayAF()
-        /// AF data and AF images are acquired in continuously until a call of SDOAQ_StopAF() is done.
-        /// During this continuous acquisition SDOAQ_PlayAfCallback() is called
-        /// after every complete auto focus data and image by the SDO acquisition engine.
-        /// </summary>
-        /* deprecated. Instead, use SDOAQ_PlayAfCallback */
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_ContinuousAfCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
-
+		/// <summary>
+		/// After a call of SDOAQ_PlayAF()
+		/// AF data and AF images are acquired in continuously until a call of SDOAQ_StopAF() is done.
+		/// During this continuous acquisition SDOAQ_PlayAfCallback() is called
+		/// after every complete auto focus data and image by the SDO acquisition engine.
+		/// </summary>
+		/// <param name="dbBestFocusStep">Best focus step(MALS) where the specified area is shown sharpest</param>
+		/// <param name="dbBestScore">Sharpness score for the resulting best focus step</param>
+		/// <param name="dbMatchedFocusStep">The focus step closest to the best focus in the focus list used to acquire the focus stack.
+		/// This is the focus step of the resulting auto-focus image.</param>
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_PlayAfCallback(
-			  eErrorCode errorCode,
-			  int lastFilledRingBufferEntry,
-			  double dbBestFocusStep,
-			  double dbBestScore);
-
+		public delegate void SDOAQ_PlayAfCallbackEx2(
+				eErrorCode errorCode,
+				int lastFilledRingBufferEntry,
+				IntPtr callbackUserData,
+				double dbBestFocusStep,
+				double dbBestScore,
+				double dbMatchedFocusStep);
+		
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_PlayAfCallbackEx(
-			  eErrorCode errorCode,
-			  int lastFilledRingBufferEntry,
-			  double dbBestFocusStep,
-			  double dbBestScore,
-			  double dbMatchedFocusStep);
-
-        /* deprecated. Instead, use SDOAQ_SingleShotAF */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_AcquireAF(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            EdofCalculationFixedParameters[] pCalculationParams, 
-            int[] pPositions, int positionsCount, 
-            byte[] pAFImageBuffer, ulong AFImageBufferSize, 
-            double[] pBestFocusStep, double[] pBestScore);
+		/* deprecated. Instead, use SDOAQ_PlayAfCallbackEx2 */public delegate void SDOAQ_PlayAfCallbackEx(eErrorCode errorCode,int lastFilledRingBufferEntry,double dbBestFocusStep,double dbBestScore,double dbMatchedFocusStep);
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		/* deprecated. Instead, use SDOAQ_PlayAfCallbackEx2 */public delegate void SDOAQ_PlayAfCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);		
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		/* deprecated. Instead, use SDOAQ_PlayAfCallbackEx2 */public delegate void SDOAQ_ContinuousAfCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SingleShotAF(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			int[] pPositions, int positionsCount,
-			byte[] pAFImageBuffer, ulong AFImageBufferSize,
-			double[] pBestFocusStep, double[] pBestScore);
+		public static extern eErrorCode SDOAQ_SingleShotAFEx(
+				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				int[] pPositions, int positionsCount,
+				byte[] pAFImageBuffer, ulong AFImageBufferSize,
+				double[] pBestFocusStep, double[] pBestScore, double[] pMatchedFocusStep);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_SingleShotAF_Ex(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			int[] pPositions, int positionsCount,
-			byte[] pAFImageBuffer, ulong AFImageBufferSize,
-			double[] pBestFocusStep, double[] pBestScore, double[] pMatchedSFocusStep);
-
-        /* deprecated. Instead, use SDOAQ_PlayAF */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StartContinuousAF(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            EdofCalculationFixedParameters[] pCalculationParams, 
-            SDOAQ_ContinuousAfCallback afFinishedCallback, 
-            int[] pPositions, int positionsCount, 
-            int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
+		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_SingleShotAF_Ex(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,byte[] pAFImageBuffer, ulong AFImageBufferSize,double[] pBestFocusStep, double[] pBestScore, double[] pMatchedFocusStep);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_SingleShotAF(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,byte[] pAFImageBuffer, ulong AFImageBufferSize,double[] pBestFocusStep, double[] pBestScore);		
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_AcquireAF(AcquisitionFixedParameters_V2[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, int[] pPositions, int positionsCount, byte[] pAFImageBuffer, ulong AFImageBufferSize, double[] pBestFocusStep, double[] pBestScore);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlayAF(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			SDOAQ_PlayAfCallback afFinishedCallback,
-			int[] pPositions, int positionsCount,
-			int ringBufferSize,
-			IntPtr[] ppRingBufferImages,    // array of (ringBufferSize * AF) unsigned char* entries
-			ulong[] pRingBufferSizes);     // size of each image buffer => size of array == (ringBufferSize * 1);
+		public static extern eErrorCode SDOAQ_PlayAFEx(
+				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				SDOAQ_PlayAfCallbackEx2 afFinishedCallback,
+				int[] pPositions, int positionsCount,
+				int ringBufferSize,
+				IntPtr[] ppRingBufferImages,    // array of (ringBufferSize * AF) unsigned char* entries
+				ulong[] pRingBufferSizes);     // size of each image buffer => size of array == (ringBufferSize * 1);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlayAF_Ex(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			SDOAQ_PlayAfCallbackEx afFinishedCallback,
-			int[] pPositions, int positionsCount,
-			int ringBufferSize,
-			IntPtr[] ppRingBufferImages,    // array of (ringBufferSize * AF) unsigned char* entries
-			ulong[] pRingBufferSizes);     // size of each image buffer => size of array == (ringBufferSize * 1);
-
-        /* deprecated. Instead, use SDOAQ_StopAF */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StopContinuousAF();
+		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_PlayAF_Ex(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayAfCallbackEx afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_PlayAF(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayAfCallback afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);		
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_StartContinuousAF(AcquisitionFixedParameters_V2[] pAcquisitionParams,EdofCalculationFixedParameters[] pCalculationParams,SDOAQ_ContinuousAfCallback afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_StopAF();
+		
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_StopAF */public static extern eErrorCode SDOAQ_StopContinuousAF();
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//
-		// Functions and types needed to acquire a single MF image or an MF preview ...
+		// Functions and types needed to acquire an MF preview ...
+		//
+		// The multi-focus functions provided by SDOAQ.dll is one of several ways to implement multi-focus.
+		// Depending on your purpose and needs, you can freely implement your own multi-focus function
+		// by using APIs such as auto-focus and focus-stack acquisition.
 		//
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		public const string NAME_MF_IMAGE = "MF";
 
-        /// <summary>
-        /// After a call of SDOAQ_PlayMF()
-        /// MF data and MF images are acquired in continuously until a call of SDOAQ_StopMF() is done.
-        /// During this continuous acquisition SDOAQ_PlayMfCallback() is called
-        /// after every complete auto multi focus information and image by the SDO acquisition engine.
-        /// </summary>
-        /// /* deprecated. Instead, use SDOAQ_PlayMfCallback */
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_ContinuousMfCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int[] pRectIdArray, int[] pRectStepArray);
+		/// <summary>
+		/// After a call of SDOAQ_PlayMF()
+		/// MF data and MF images are acquired in continuously until a call of SDOAQ_StopMF() is done.
+		/// During this continuous acquisition SDOAQ_PlayMfCallback() is called
+		/// after every complete auto multi focus information and image by the SDO acquisition engine.
+		/// </summary>
+		/// <param name="countRects">Total number of specified areas</param>
+		/// <param name="pRectIdArray">An array of unique IDs for each area</param>
+		/// <param name="pRectStepArray">An array of resulting focus steps for each area</param>
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		public delegate void SDOAQ_PlayMfCallbackEx(
+				  eErrorCode errorCode,
+				  int lastFilledRingBufferEntry,
+				  IntPtr callbackUserData,
+				  int countRects,
+				  int[] pRectIdArray,
+				  int[] pRectStepArray);
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_PlayMfCallback(
-			  eErrorCode errorCode,
-			  int lastFilledRingBufferEntry,
-			  int countRects,
-			  int[] pRectIdArray,
-			  int[] pRectStepArray);
-
-        /* deprecated. Instead, use SDOAQ_PlayMF */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StartContinuousMF(
-            AcquisitionFixedParameters_V2[] pAcquisitionParams, 
-            EdofCalculationFixedParameters[] pCalculationParams, 
-            SDOAQ_ContinuousMfCallback mfFinishedCallback, 
-            int[] pPositions, int positionsCount, 
-            [MarshalAs(UnmanagedType.LPStr)] string sFunctionScript, 
-            int ringBufferSize, 
-            IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayMfCallbackEx */public delegate void SDOAQ_PlayMfCallback(eErrorCode errorCode,int lastFilledRingBufferEntry,int countRects,int[] pRectIdArray,int[] pRectStepArray);
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		/* deprecated. Instead, use SDOAQ_PlayMfCallbackEx */public delegate void SDOAQ_ContinuousMfCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int[] pRectIdArray, int[] pRectStepArray);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlayMF(
-			AcquisitionFixedParameters[] pAcquisitionParams,
-			SDOAQ_PlayMfCallback mfFinishedCallback,
-			int[] pPositions, int positionsCount,
-			[MarshalAs(UnmanagedType.LPStr)] string sFunctionScript,
-			int ringBufferSize,
-			IntPtr[] ppRingBufferImages,    // array of (ringBufferSize * MF) unsigned char* entries
-			ulong[] pRingBufferSizes);      // size of each image buffer => size of array == (ringBufferSize * 1);
+		public static extern eErrorCode SDOAQ_PlayMFEx(
+				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				SDOAQ_PlayMfCallbackEx mfFinishedCallback,
+				int[] pPositions, int positionsCount,
+				[MarshalAs(UnmanagedType.LPStr)] string sFunctionScript,
+				int ringBufferSize,
+				IntPtr[] ppRingBufferImages,    // array of (ringBufferSize * MF) unsigned char* entries
+				ulong[] pRingBufferSizes);      // size of each image buffer => size of array == (ringBufferSize * 1);
 
-        /* deprecated. Instead, use SDOAQ_StopMF */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_StopContinuousMF();
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlayMFEx */public static extern eErrorCode SDOAQ_PlayMF(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayMfCallback mfFinishedCallback,int[] pPositions, int positionsCount,[MarshalAs(UnmanagedType.LPStr)] string sFunctionScript,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlayMFEx */public static extern eErrorCode SDOAQ_StartContinuousMF(AcquisitionFixedParameters_V2[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, SDOAQ_ContinuousMfCallback mfFinishedCallback, int[] pPositions, int positionsCount, [MarshalAs(UnmanagedType.LPStr)] string sFunctionScript, int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_StopMF();
-
-        /* deprecated. Instead, use SDOAQ_UpdatePlayMF */
-        [DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_UpdateContinuousMF([MarshalAs(UnmanagedType.LPStr)] string sFunctionScript);
+		
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_StopMF */public static extern eErrorCode SDOAQ_StopContinuousMF();
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_UpdatePlayMF([MarshalAs(UnmanagedType.LPStr)] string sFunctionScript);
+
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_UpdatePlayMF */public static extern eErrorCode SDOAQ_UpdateContinuousMF([MarshalAs(UnmanagedType.LPStr)] string sFunctionScript);
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1309,7 +1294,10 @@ namespace SDOAQ
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate void SDOAQ_SnapCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
+		public delegate void SDOAQ_SnapCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, IntPtr callbackUserData);
+
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		/* deprecated. Instead, use SDOAQ_SnapCallbackEx */public delegate void SDOAQ_SnapCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
 
 		[StructLayout(LayoutKind.Explicit)]
 		public struct SnapParameters
@@ -1331,15 +1319,21 @@ namespace SDOAQ
 		};
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlaySnap(
-			SDOAQ_SnapCallback snapCb,
+		public static extern eErrorCode SDOAQ_PlaySnapEx(
+			SDOAQ_SnapCallbackEx snapCb,
 			int[] pPositions, int positionsCount,
 			SnapParameters[] pSnapParameters);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_PlaySnap_and_Stop(
-			SDOAQ_SnapCallback snapCb,
+		/* deprecated. Instead, use SDOAQ_PlaySnapEx */public static extern eErrorCode SDOAQ_PlaySnap(SDOAQ_SnapCallback snapCb,int[] pPositions, int positionsCount,SnapParameters[] pSnapParameters);
+
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_PlaySnap_and_StopEx(
+			SDOAQ_SnapCallbackEx snapCb,
 			int[] pPositions, int positionsCount,
 			SnapParameters[] pSnapParameters);
+
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		/* deprecated. Instead, use SDOAQ_PlaySnap_and_StopEx */public static extern eErrorCode SDOAQ_PlaySnap_and_Stop(SDOAQ_SnapCallback snapCb,int[] pPositions, int positionsCount,SnapParameters[] pSnapParameters);
 	}
 }
