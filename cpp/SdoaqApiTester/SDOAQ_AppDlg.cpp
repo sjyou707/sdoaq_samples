@@ -123,7 +123,7 @@ BOOL CSDOAQ_Dlg::OnInitDialog()
 	((CButton*)GetDlgItem(IDC_CHECK_HEIGHTMAP))->SetCheck(1);
 	((CButton*)GetDlgItem(IDC_CHECK_POINTCLOUD))->SetCheck(1);
 
-	BuildCalibrationFile_Combobox();
+	//BuildCalibrationFile_Combobox();
 
 	(void)::CreateDirectory(FString(_T("%s\\Log"), GetCurrentDir()), NULL);
 
@@ -538,6 +538,8 @@ void CSDOAQ_Dlg::ReadySdoaqDll(void)
 	const int nAlgoVersion = ::SDOAQ_GetAlgorithmVersion();
 	Log(FString(_T(">> SDOAQ DLL Version = %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
 	Log(FString(_T(">> sdedof dll Version = %d.%d"), nAlgoVersion / 1000, nAlgoVersion % 1000));
+
+	BuildCalibrationFile_Combobox();
 
 	SetWindowText(FString(_T("SDOAQ API TESTER (Dll %d.%d.%d)"), nMajorVersion, nMinorVersion, nPatchVersion));
 }
