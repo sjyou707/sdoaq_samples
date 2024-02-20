@@ -15,6 +15,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	DECLARE_MESSAGE_MAP()
 public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnClose();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnBnClickedCheckFrameCallback();
@@ -27,7 +28,7 @@ public:
 	afx_msg void OnSetExposureTime();
 	afx_msg void OnSetGain();
 	afx_msg void OnSetWhitebalance();
-	
+
 	afx_msg void OnSetStringRegister();
 	afx_msg void OnSetIntegerRegister();
 	afx_msg void OnSetDoubleRegister();

@@ -100,9 +100,12 @@
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
  SDOAQ_v2.4.3  2024.01.29  YoungJu Lee     - Fix an issue that Edof and auto focus algorithm failure depending on memory status
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
- T2024.02.08   2024.02.07  YoungJu Lee     - Add auto-focus algorithm parameter
+ SDOAQ_v2.5.0  2024.02.20  YoungJu Lee     - Add auto-focus algorithm parameter
                                              (pi_af_sharpness_measure_method, pi_af_resampling_method, pi_af_stability_method, pi_af_stability_debounce_count)
                                            - Update sdedof library v0.84 and add sdaf v0.2 library
                                            - Add library pseudo-calibration data based on script MALS settings when no calibration file is specified
                                            - Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
+                                           - Add parameters to check whether auto-functions are supported
+                                             (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
+                                           - Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------

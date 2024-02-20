@@ -106,11 +106,14 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.4.3  2024.01.29  YoungJu Lee		- Fix an issue that Edof and auto focus algorithm failure depending on memory status
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 T2024.02.08		YoungJu Lee		- Add auto-focus algorithm parameter
+	 2.5.0  2024.02.20	YoungJu Lee		- Add auto-focus algorithm parameter
 										  (pi_af_sharpness_measure_method, pi_af_resampling_method, pi_af_stability_method, pi_af_stability_debounce_count)
 										- Update sdedof library v0.84 and add sdaf v0.2 library
 										- Add library pseudo-calibration data based on script MALS settings when no calibration file is specified
 										- Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
+										- Add parameters to check whether auto-functions are supported
+										  (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
+										- Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -555,8 +558,10 @@ extern "C"
 		/// </summary>
 		piSaveFileFormat = 27,					// I - R/W
 
-		/// <summary>pixel size of camera, 8/10/12 bit. This is defined by the pixel format.</summary>
-		piSavePixelBits = 28,					// I - R
+		/// <summary>
+		/// The depth of the pixel in the snap image, 8/10/12 bit. Determines the pixel format of the snap imamge.
+		/// </summary>
+		piSavePixelBits = 28,					// I - R/W
 
 		/// <summary>left and top point of focus ROI
 		/// The upper 16 bits are left and lower 16 bits are top position. 0xAAAABBBB
@@ -601,7 +606,14 @@ extern "C"
 		/// <summary>Sets MALS lowest step for simulation.</summary>
 		piSimulMalsLowestStep = 73,				// I - R/W	 (MALS step)
 
-		//piNextParameterValue = 78,
+		/// <summary>Gets whether auto-exposure function is supported.</summary>
+		piFeatureAutoExposure = 78,				// I - R
+		/// <summary>Gets whether auto-whitebalance function is supported.</summary>
+		piFeatureAutoWhiteBalance = 79,			// I - R
+		/// <summary>Gets whether auto-illuminate function is supported.</summary>
+		piFeatureAutoIlluminate = 80,			// I - R
+
+		//piNextParameterValue = 81,
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -676,31 +688,45 @@ extern "C"
 
 	// manages camera parameter
 	/// <summary>
-	/// This function requests the current FOV and binning value of camera.
-	/// The full FOV is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current FOV and the binning value.
-	/// This function should be called to check FOV after calling SDOAQ_SetCameraParameter() function.
+	/// This function requests the current ROI and binning value of camera.
+	/// The FOV is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
+	/// This function should be called to check ROI after calling SDOAQ_SetCameraParameter() function.
 	/// </summary>
 	/// <param name="pWidth, pHeight">
-	/// These values are the current FOV in pixels.
+	/// These values are the current ROI in pixels.
 	/// </param>
+	/// <param name="pOffsetX">
+	/// Horizontal offset from the left of the sensor to the roi in pixels.
+	/// </param>
+	/// <param name="pOffsetY">
+	/// Vertical offset from the top of the sensor to the roi in pixels.
+	/// </param>	
 	/// <param name="pBinning">
 	/// This value will be pass 1 if the camera does not support binning.
 	/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 	/// </param>
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraParameter(int* pWidth, int* pHeight, int* pBinning);
+	__declspec(dllexport) eErrorCode SDOAQ_GetCameraRoiParameter(int* pWidth, int* pHeight, int* pOffsetX, int* pOffsetY, int* pBinning);
 
 	/// <summary>
-	/// Specifies the FOV and binning value.
+	/// Specifies the ROI and binning value.
 	/// This function cannot be called while acquisition is in progress.
 	/// </summary>
 	/// <param name="nWidth, nHeight">
 	/// The nWidth and nHeight are not the size of the image to be acquired, but the image size in pixels to be scanned by the camera sensor.
+	/// </param>
+	/// <param name="pOffsetX">
+	/// Horizontal offset from the left of the sensor to the roi in pixels.
+	/// </param>
+	/// <param name="pOffsetY">
+	/// Vertical offset from the top of the sensor to the roi in pixels.
 	/// </param>
 	/// <param name="nBinning">
 	/// This value is ignored if the camera does not support binning.
 	/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 	/// </param>
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameter(int nWidth, int nHeight, int nBinning);
+	__declspec(dllexport) eErrorCode SDOAQ_SetCameraRoiParameter(int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nBinning);
 
 	/// <summary>
 	/// Parameters of the AcquisitionFixedParametersEx-struct must be defined before calling an acquisition function and must

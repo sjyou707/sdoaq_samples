@@ -22,8 +22,8 @@
 #if defined(Vyymmdd_wsio)
 	#define WSIO_VERSION	_T("Ver.3.x.x + "  __DATE__ "") //
 #else
-	//#define WSIO_VERSION	_T("Ver.3.27.xx") // 2023-xx-xx , add here
-	#define WSIO_VERSION	_T("Ver.3.27.0") // 2024-01-08 , ADD WSUT_GetRainbowBGR, WSUT_GenerateRainbowColorMap, IV MR list line type deletion issue.
+	#define WSIO_VERSION	_T("Ver.3.28.0") // 2024-02-15 , add WSGL_SetActivation, WSGL_GetActivation, EPFT_RZ_XY
+	//#define WSIO_VERSION	_T("Ver.3.27.0") // 2024-01-08 , ADD WSUT_GetRainbowBGR, WSUT_GenerateRainbowColorMap, IV MR list line type deletion issue.
 	//#define WSIO_VERSION	_T("Ver.3.26.3") // 2023-12-05 , MR Script set 초기화 오류 수정
 	//#define WSIO_VERSION	_T("Ver.3.26.2") // 2023-11-15 , WSUT_IV_AttachRawImgData(|_V2|F3) 인자 오류 로그 출력에서 예외발생 수정
 	//#define WSIO_VERSION	_T("Ver.3.26.1") // 2023-11-14 , WSUT_IV_AttachRawImgData(|_V2|F3) 수정 
@@ -105,7 +105,9 @@ enum WSIORV_Enum
 	//------------------------------------------
 	WSIORV_FAIL							= -2001,
 	WSIORV_NODLL						= -2038,		// Failed to load dll module
+	WSIORV_NO_DLL_API					= -2040,		// Failed to load dll api
 	WSIORV_DEPRECATED_API				= -2037,		// This api is deprecated.
+	WSIORV_NO_FUNCTIONALITY				= -2041,		// No functionality
 
 	WSIORV_WSIFCLASS_INVALID			= -2002,		// WSIFCLASS is invalid.
 	WSIORV_WSIHANDLE_NOTEXIST			= -2003,		// WSIHANDLE does not exist.
@@ -144,7 +146,7 @@ enum WSIORV_Enum
 	WSIORV_FAILEDTOWRITEFILE			= -2036,		// File writing error
 	WSIORV_FAILEDTOREADFILE				= -2039,
 	//------------------------------------------
-	WSIORV_ERROR_NEXT					= -2040,
+	WSIORV_ERROR_NEXT					= -2042,
 	//------------------------------------------
 	WSIORV_ERROR_END					= -4999
 	//==========================================

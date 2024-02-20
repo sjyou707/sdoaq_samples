@@ -36,6 +36,9 @@
 #define IDC_EDIT_REG_BOOL               1029
 #define IDC_BTN_SET_BOOL                1030
 #define IDC_EDIT_REGISTER               1031
+#define IDC_EDIT_FOV_OFFSETX            1032
+#define IDC_EDIT_FOV_HEIGHT2            1033
+#define IDC_EDIT_FOV_OFFSETY            1033
 
 // Next default values for new objects
 // 

@@ -12,9 +12,7 @@
 #pragma once
 
 #include "WSIO.h"
-#if !defined(SDP_WSIO)
 #include "WSIO_GL_DEFINE.h"
-#endif
 
 //====================================================================================================================================
 // WSIO Graphic Library Definition & API
@@ -143,6 +141,18 @@ WSIODLL_API WSIORV			WSGL_ClearScreen(
 			);
 
 //----------------------------------------------------------------------------
+WSIODLL_API WSIORV			WSGL_SetActivation(
+			WSGLHANDLE		hd3v,
+			WSGLKEY			ekey,
+			int				activation
+);
+
+WSIODLL_API WSIORV			WSGL_GetActivation(
+			WSGLHANDLE		hd3v,
+			WSGLKEY			ekey,
+			int*			p_activation
+);
+
 WSIODLL_API WSIORV			WSGL_SetDisplayAttributes(
 			WSGLHANDLE		hd3v,
 			int				attributes
@@ -239,7 +249,7 @@ WSIODLL_API WSIORV			WSGL_ClearLastMeasureData(
 WSIODLL_API WSIORV			WSGL_SetProfileValue(
 			WSGLHANDLE		hd3v,
 			WSGLKEY			type,
-			double			db0to1,
+			double			value,
 			bool			o_rendering
 			);
 
@@ -255,6 +265,7 @@ WSIODLL_API WSIORV			WSGL_RegisterProfileValueUpdateCallback(
 			unsigned		msg
 			);
 
+// 'WSGL_SetGradient' api currently has no functionality.
 WSIODLL_API WSIORV			WSGL_SetGradient(
 			WSGLHANDLE		hd3v,
 			double			dx,

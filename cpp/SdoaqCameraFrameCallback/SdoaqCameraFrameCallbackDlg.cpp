@@ -43,6 +43,8 @@ static void g_LogLine(LPCTSTR sFormat, ...)
 		if (p_wnd)
 		{
 			p_wnd->SetWindowText(g_sLog);
+			const int nLen = p_wnd->GetWindowTextLength();
+			p_wnd->SetSel(nLen, nLen);
 			//theApp.m_pMainWnd->PostMessage(WM_VSCROLL, SB_BOTTOM);
 		}
 	}
@@ -103,6 +105,8 @@ BOOL CSdoaqCameraFrameCallbackDlg::OnInitDialog()
 	GetDlgItem(IDC_SW_TRIGGER)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT_FOV_WIDTH)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT_FOV_HEIGHT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_FOV_OFFSETX)->EnableWindow(FALSE);
+	GetDlgItem(IDC_EDIT_FOV_OFFSETY)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT_EXPOSURE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT_GAIN)->EnableWindow(FALSE);
 	GetDlgItem(IDC_EDIT_WB_R)->EnableWindow(FALSE);
@@ -136,6 +140,21 @@ BOOL CSdoaqCameraFrameCallbackDlg::OnInitDialog()
 	SendMessage(WM_SIZE); // invoke WSUT_IV_ShowWindow call with size.
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+//----------------------------------------------------------------------------
+BOOL CSdoaqCameraFrameCallbackDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		if (pMsg->wParam == VK_RETURN)
+			return TRUE;
+		else if (pMsg->wParam == VK_ESCAPE)
+			return TRUE;
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 //----------------------------------------------------------------------------
@@ -246,26 +265,32 @@ void CSdoaqCameraFrameCallbackDlg::OnBnClickedTriggerExternal()
 //----------------------------------------------------------------------------
 void CSdoaqCameraFrameCallbackDlg::OnSetFov()
 {
-	CString sWidth, sHeight;
+	CString sWidth, sHeight, sOffsetX, sOffsetY;
 	GetDlgItemText(IDC_EDIT_FOV_WIDTH, sWidth);
 	GetDlgItemText(IDC_EDIT_FOV_HEIGHT, sHeight);
+	GetDlgItemText(IDC_EDIT_FOV_OFFSETX, sOffsetX);
+	GetDlgItemText(IDC_EDIT_FOV_OFFSETY, sOffsetY);
 
-	int nDummy, nMaxWidth, nMaxHeight, nWidth, nHeight;
+	int nDummy, nMaxWidth, nMaxHeight, nWidth, nHeight, nOffsetX, nOffsetY;
 	nWidth = _ttoi(sWidth);
 	nHeight = _ttoi(sHeight);
+	nOffsetX = _ttoi(sOffsetX);
+	nOffsetY = _ttoi(sOffsetY);
 	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
 	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
 
 	if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
 	{
-		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameter(nWidth, nHeight, 1);
+		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraRoiParameter(nWidth, nHeight, nOffsetX, nOffsetY, 1);
 		if (ecNoError == rv_sdoaq)
 		{
 			int nBinning;
-			::SDOAQ_GetCameraParameter(&nWidth, &nHeight, &nBinning);
+			::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
 			SetDlgItemText(IDC_EDIT_FOV_WIDTH, FString(_T("%d"), nWidth));
 			SetDlgItemText(IDC_EDIT_FOV_HEIGHT, FString(_T("%d"), nHeight));
-			g_LogLine(_T("Set FOV (%d, %d)"), nWidth, nHeight);
+			SetDlgItemText(IDC_EDIT_FOV_OFFSETX, FString(_T("%d"), nOffsetX));
+			SetDlgItemText(IDC_EDIT_FOV_OFFSETY, FString(_T("%d"), nOffsetY));
+			g_LogLine(_T("Set ROI (l:%d, t:%d, w:%d, h:%d)"), nOffsetX, nOffsetY, nWidth, nHeight);
 		}
 		else
 		{
@@ -378,7 +403,7 @@ void CSdoaqCameraFrameCallbackDlg::OnSetWhitebalance()
 
 //----------------------------------------------------------------------------
 void CSdoaqCameraFrameCallbackDlg::OnSetStringRegister()
-{	
+{
 	CString sRegister, sValue;
 	GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
 	GetDlgItemText(IDC_EDIT_REG_STRING, sValue);
@@ -401,7 +426,7 @@ void CSdoaqCameraFrameCallbackDlg::OnSetIntegerRegister()
 		{
 			rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgsOffGrabbing);
 		}
-		
+
 		CString sRegister, sValue;
 		GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
 		GetDlgItemText(IDC_EDIT_REG_INT, sValue);
@@ -412,7 +437,7 @@ void CSdoaqCameraFrameCallbackDlg::OnSetIntegerRegister()
 	else
 	{
 		g_LogLine(_T("SDOAQ_GetCameraGrabbingStatus() returns error(%d)."), rv_sdoaq);
-	}	
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -454,16 +479,20 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_WIDTH)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_HEIGHT)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_OFFSETX)->EnableWindow(TRUE);
+			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_OFFSETY)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_EXPOSURE)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_GAIN)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_WB_R)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_WB_G)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_WB_B)->EnableWindow(TRUE);
 
-			int nWidth, nHeight, nBinning;
-			(void)::SDOAQ_GetCameraParameter(&nWidth, &nHeight, &nBinning);
+			int nWidth, nHeight, nOffsetX, nOffsetY, nBinning;
+			(void)::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
 			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_FOV_WIDTH, FString(_T("%d"), nWidth));
 			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_FOV_HEIGHT, FString(_T("%d"), nHeight));
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_FOV_OFFSETX, FString(_T("%d"), nOffsetX));
+			theApp.m_pMainWnd->SetDlgItemText(IDC_EDIT_FOV_OFFSETY, FString(_T("%d"), nOffsetY));
 
 			int nValue;
 			(void)::SDOAQ_GetIntParameterValue(piCameraExposureTime, &nValue);

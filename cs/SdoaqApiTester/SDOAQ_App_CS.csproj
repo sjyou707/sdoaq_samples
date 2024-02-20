@@ -24,12 +24,12 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>811</ApplicationRevision>
-    <ApplicationVersion>2.2.0.811</ApplicationVersion>
+    <ApplicationVersion>2.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -39,6 +39,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.3</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -55,6 +56,9 @@
   <PropertyGroup>
     <ApplicationIcon>SD.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -70,7 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Include\SDOAQ\SDOAQ_WS.cs">
-      <Link>0.SDOAQ\SDOAQ_WS.cs</Link>
+      <Link>SDOAQ\SDOAQ_WS.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharpTool\Logger.cs">
       <Link>SDOAQCSharpTool\Logger.cs</Link>
@@ -88,13 +92,13 @@
       <Link>SDOAQCSharpTool\Utils.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\WSIO\WSIO.cs">
-      <Link>4.WSIO\WSIO.cs</Link>
+      <Link>WSIO\WSIO.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\WSIO\WSIO_GL.cs">
-      <Link>4.WSIO\WSIO_GL.cs</Link>
+      <Link>WSIO\WSIO_GL.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\WSIO\WSIO_UTIL.cs">
-      <Link>4.WSIO\WSIO_UTIL.cs</Link>
+      <Link>WSIO\WSIO_UTIL.cs</Link>
     </Compile>
     <Compile Include="SDOAQ_TEST_SET.cs" />
     <Compile Include="SDOAQ_APP_CS.cs">
@@ -140,7 +144,7 @@
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.8%28x86 및 x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
