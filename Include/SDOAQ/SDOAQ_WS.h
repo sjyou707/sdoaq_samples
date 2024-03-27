@@ -408,11 +408,6 @@ extern "C"
 	/// </summary>
 	__declspec(dllexport) void SDOAQ_SetCamfilePath(const char* sCamfilePath);
 
-	/// <summary>
-	/// This function sets the camfile path, not including file name.
-	/// </summary>
-	__declspec(dllexport) void SDOAQ_SetCamfilePath(const char* sCamfilePath);
-
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	// Functions and types needed to get available parameters / parameter ranges / parameter values
