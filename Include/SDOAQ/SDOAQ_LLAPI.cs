@@ -18,7 +18,9 @@ using System.Text;
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.5.0  2024.02.20	YoungJu Lee		- Supports CoaXPress type, Sentech CameraLink camera and Euresys MultiCam grabber
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-*/
+	 2.5.1  2024.03.26	YoungJu Lee		- The image buffer is released immediately when the callback function registered in the SDOAQ_SetFrameCallback is completed
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+ */
 
 namespace SDOAQ
 {

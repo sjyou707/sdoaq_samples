@@ -3,6 +3,7 @@
 ### OPERATION
  Product ID = wisescope
  Image Manager Size GB = 0.5
+ #Patch = { 1251 }
 
 ### MALS
  MALS Device = { Auto , simul , 1.8 , 1.0 }

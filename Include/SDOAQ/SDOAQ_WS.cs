@@ -118,10 +118,13 @@ using System.Text;
 										- Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
 										- Add parameters to check whether auto-functions are supported
 										  (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
-										- Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
+										- Add SDOAQ_Set/GetCameraRoiParameter APIs that specify ROI by applying horizontal and vertical offset
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
- 	 2.6.0  2024.03.19  YoungJu Lee     - Supports multiple WiseScopes
+	 2.5.1  2024.03.26	YoungJu Lee		- Apply the maximum size of the image manager specified in the script
+										  (The size of image manager is calculated based on the size of all raw images and resulting data)
 										- Add APIs that specify the script file and camfile folders
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+  	 2.6.0  2024.03.19  YoungJu Lee     - Supports multiple WiseScopes
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -223,8 +226,8 @@ namespace SDOAQ
 		};
 
 		/// <summary>
-		/// This function is a callback. It is called by SDOAQ and is implemented in the client (ZENService).
-		/// The message should be logged by the client to a window or a file. ZENService currently logs to log4net.
+		/// This function is a callback. It is called by SDOAQ and is implemented in the client.
+		/// The message should be logged by the client to a window or a file.
 		/// The message buffer is allocated by SDOAQ. The client has to process/copy the message before this
 		/// function returns back to SDOAQ, because the message may be allocated on the function stack.
 		/// This callback must be assigned during initialization.
@@ -284,7 +287,7 @@ namespace SDOAQ
 		/// <summary>
 		/// This callback signals the client that a objective has been changed.
 		/// It is called once during initialization to inform about the current objective and whenever objective is changed.
-		/// Basic lens 1.3x objective is always mounted.
+		/// For Visioner 1, basic lens 1.3x objective is always mounted.
 		/// </summary>
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 		public delegate void SDOAQ_ObjectiveChanged(eObjectiveId newObjectiveId);
@@ -380,7 +383,7 @@ namespace SDOAQ
 
 		/// <summary>
 		/// This function starts the initialization of the SDOAQ. The loggingCallback, 
-		/// the errorCallback and the initDoneCallback are given by the client (ZENService).
+		/// the errorCallback and the initDoneCallback are given by the client.
 		/// This function only kicks of the initialization and returns to the client. 
 		/// When the initialization is done, "initDoneCallback" is called with the error
 		/// result value.
@@ -425,10 +428,10 @@ namespace SDOAQ
 		public static extern int SDOAQ_GetAlgorithmVersion();
 
 		/// <summary>
-		/// This function sets the script file path, not including file name.
+		/// This function sets the script data.
 		/// </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern int SDOAQ_SetScriptAP([MarshalAs(UnmanagedType.LPStr)] string sScriptfilePath);
+		public static extern void SDOAQ_SetSystemScriptData([MarshalAs(UnmanagedType.LPStr)] string sScriptData);
 
 		/// <summary>
 		/// This function specifies the script file by the file name including the absolute path.
@@ -610,7 +613,9 @@ namespace SDOAQ
 			/// </summary>
 			piAlgoParamHeliconFocus = 66,       // S - R/W
 
-			/// <summary></summary>
+			/// <summary>
+			/// Defines the format of the raw images and the resulting image to be saved. Refer to eSaveFormat.
+			/// </summary>
 			piSaveFileFormat = 27,              // I - R/W
 
 			/// <summary>

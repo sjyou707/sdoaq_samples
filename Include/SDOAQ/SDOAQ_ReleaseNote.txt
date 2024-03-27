@@ -107,7 +107,12 @@
                                            - Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
                                            - Add parameters to check whether auto-functions are supported
                                              (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
-                                           - Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
+                                           - Add SDOAQ_Set/GetCameraRoiParameter APIs that specify ROI by applying horizontal and vertical offset
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.5.1  2024.03.26  YoungJu Lee     - The image buffer is released immediately when the callback function registered in the SDOAQ_SetFrameCallback is completed
+                                           - Apply the maximum size of the image manager specified in the script
+                                             (The size of image manager is calculated based on the size of all raw images and resulting data)
+                                           - Add APIs that specify the script file and camfile folders
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
  SDOAQ_v2.6.0  2024.03.19  YoungJu Lee     - Support multiple wisescope
                                            - Add APIs that specify the script file and camfile folders
