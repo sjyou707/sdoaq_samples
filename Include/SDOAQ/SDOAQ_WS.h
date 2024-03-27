@@ -113,7 +113,11 @@
 										- Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
 										- Add parameters to check whether auto-functions are supported
 										  (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
-										- Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
+										- Add SDOAQ_Set/GetCameraRoiParameter APIs that specify ROI by applying horizontal and vertical offset
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.5.1  2024.03.26	YoungJu Lee		- Apply the maximum size of the image manager specified in the script
+										  (The size of image manager is calculated based on the size of all raw images and resulting data)
+										- Add APIs that specify the script file and camfile folders
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -208,8 +212,8 @@ extern "C"
 	};
 
 	/// <summary>
-	/// This function is a callback. It is called by SDOAQ and is implemented in the client (ZENService).
-	/// The message should be logged by the client to a window or a file. ZENService currently logs to log4net.
+	/// This function is a callback. It is called by SDOAQ and is implemented in the client.
+	/// The message should be logged by the client to a window or a file.
 	/// The message buffer is allocated by SDOAQ. The client has to process/copy the message before this
 	/// function returns back to SDOAQ, because the message may be allocated on the function stack.
 	/// This callback must be assigned during initialization.
@@ -269,7 +273,7 @@ extern "C"
 	/// <summary>
 	/// This callback signals the client that a objective has been changed.
 	/// It is called once during initialization to inform about the current objective and whenever objective is changed.
-	/// Basic lens 1.3x objective is always mounted.
+	/// For Visioner 1, basic lens 1.3x objective is always mounted.
 	/// </summary>
 	typedef void(__stdcall* SDOAQ_ObjectiveChanged)(eObjectiveId newObjectiveId);
 
@@ -347,8 +351,8 @@ extern "C"
 
 	/// <summary>
 	/// This function starts the initialization of the SDOAQ. The loggingCallback, 
-	/// the errorCallback and the initDoneCallback are given by the client (ZENService).
-	/// This function only kicks of the initialization and returns to the client. 
+	/// the errorCallback and the initDoneCallback are given by the client.
+	/// This function only kicks of the initialization and returns to the client.
 	/// When the initialization is done, "initDoneCallback" is called with the error
 	/// result value.
 	/// </summary>
@@ -384,6 +388,20 @@ extern "C"
 	/// </summary>
 	__declspec(dllexport) int SDOAQ_GetAlgorithmVersion();
 
+	/// <summary>
+	/// This function sets the script data.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetSystemScriptData(const char* sScriptData);
+
+	/// <summary>
+	/// This function specifies the script file by the file name including the absolute path.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetSystemScriptFilename(const char* sScriptFilename);
+
+	/// <summary>
+	/// This function sets the camfile path, not including file name.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetCamfilePath(const char* sCamfilePath);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -457,7 +475,7 @@ extern "C"
 		/// For products using a motorized nosepiece controller,
 		/// it is read-write and the objective id is different depending on the device controller.
 		/// </summary>
-		piObjectiveId = 18,						// I - R/W
+		piObjectiveId = 18,						// I - R, R/W
 
 		/// <summary>
 		/// EDoF Algorithm method. Select an algorithm to generate EDoF image, including the built-in sdedof algorithm. 
@@ -689,7 +707,8 @@ extern "C"
 	// manages camera parameter
 	/// <summary>
 	/// This function requests the current ROI and binning value of camera.
-	/// The FOV is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
+	/// The increments in width and height varies depending on the camera, and the FOV changes when binning is applied.
+	/// Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
 	/// This function should be called to check ROI after calling SDOAQ_SetCameraParameter() function.
 	/// </summary>
 	/// <param name="pWidth, pHeight">

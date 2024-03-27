@@ -1,6 +1,6 @@
-/* SDOAQ_LOWLEVEL.h
+/* SDOAQ_LLAPI.h
 
-	Comments : This file exports all types and functions needed to access the SDO acquisition engine.
+	Comments : This file exports all types and functions required to directly access the HW components that make up the SDO acquisition engine.
 	Date     : 2023/08/25
 	Author   : YoungJu Lee
 	Copyright (c) 2019 SD Optics,Inc. All rights reserved.
@@ -10,9 +10,11 @@
 	========================================================================================================================================================
 	Version     date      Author         Descriptions
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 2.3.0  2022.08.25  YoungJu Lee     - Init (Camera register setting APIs are only valid for Basler USB and Basler GigE)
+	 2.3.0  2023.08.25  YoungJu Lee     - Init (Camera register setting APIs are only valid for Basler USB and Basler GigE)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 2.5.0  2024.02.20	YoungJu Lee		- Supports CoaXPress type, Sentech CameraLink and Euresys MultiCam grabber
+	 2.5.0  2024.02.20	YoungJu Lee		- Supports CoaXPress type, Sentech CameraLink camera and Euresys MultiCam grabber
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.5.1  2024.03.26	YoungJu Lee		- The image buffer is released immediately when the callback function registered in the SDOAQ_SetFrameCallback is completed
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -24,11 +26,11 @@ extern "C"
 {
 #endif
 
-	// Register the low level API permission.
+	// Registers the low level API permission.
 	__declspec(dllexport) void SDOAQ_RegisterLowLevelAuthorization(void);
 
 
-	// Set the camera to the content of pAcquisitionParams
+	// Sets the camera to the content of pAcquisitionParams
 	__declspec(dllexport) eErrorCode SDOAQ_SetAcquisitionFixedParameters(sAcquisitionFixedParameters* pAcquisitionParams);
 
 
@@ -37,7 +39,7 @@ extern "C"
 	//		'bytesPixel': Number of data bytes that make up a pixel of the frame.
 	//		'pixelsWidth': Number of width pixels in the frame
 	//		'pixelsHeight': Number of height pixels in the frame
-	//		'bytesLine': bytes for the With line in the frame. This may include padding bytes. ( padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
+	//		'bytesLine': bytes for the With line in the frame. This may include padding bytes. (padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
 	typedef struct
 	{
 		int typeThis;
@@ -53,7 +55,7 @@ extern "C"
 	//		'bufferSize': buffer size
 	//		'frameDescriptor': buffer frame Info 
 	typedef void(__stdcall* SDOAQ_FrameCallback)(eErrorCode errorCode, unsigned char* pBuffer, size_t BufferSize, FrameDescriptor* pFrameDescriptor);
-	// Register a callback function that receives frame data : Callback is not accepted when 'singleFrameCb' is NULL.
+	// Registers a callback function that receives frame data : Callback is not accepted when 'singleFrameCb' is NULL.
 	__declspec(dllexport) eErrorCode SDOAQ_SetFrameCallback(SDOAQ_FrameCallback singleFrameCb);
 
 
@@ -63,7 +65,7 @@ extern "C"
 		ctmSoftware = 2,
 		ctmExternal = 3
 	};
-	// Set the camera trigger mode.
+	// Sets the camera trigger mode.
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm);
 
 
@@ -72,12 +74,12 @@ extern "C"
 		cgsOffGrabbing = 0,
 		cgsOnGrabbing = 1,
 	};
-	// Set the camera grab status.
+	// Sets the camera grab status.
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraGrabbingStatus(eCameraGrabbingStatus cgs);
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraGrabbingStatus(eCameraGrabbingStatus* cgs_ptr);
 
 
-	// The API below apply only to some cameras.
+	// The APIs below only apply to some cameras.
 	enum eCameraParameterType
 	{
 		cptValue = 0,
