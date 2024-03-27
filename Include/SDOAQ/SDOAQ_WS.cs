@@ -120,7 +120,10 @@ using System.Text;
 										  (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
 										- Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
- */
+ 	 2.6.0  2024.03.19  YoungJu Lee     - Supports multiple WiseScopes
+										- Add APIs that specify the script file and camfile folders
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
 
 
 namespace SDOAQ
@@ -286,7 +289,7 @@ namespace SDOAQ
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 		public delegate void SDOAQ_ObjectiveChanged(eObjectiveId newObjectiveId);
 
-		/// <summary>This function registers the objectiveChanged callback funtion </summary>
+		/// <summary>This function registers the objectiveChanged callback funtion. Allow MULTI_WS_ALL in multiWS selection.</summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_RegisterObjectiveChangedCallback(SDOAQ_ObjectiveChanged cbf);
 
@@ -421,6 +424,24 @@ namespace SDOAQ
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int SDOAQ_GetAlgorithmVersion();
 
+		/// <summary>
+		/// This function sets the script file path, not including file name.
+		/// </summary>
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int SDOAQ_SetScriptAP([MarshalAs(UnmanagedType.LPStr)] string sScriptfilePath);
+
+		/// <summary>
+		/// This function specifies the script file by the file name including the absolute path.
+		/// </summary>
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern void SDOAQ_SetSystemScriptFilename([MarshalAs(UnmanagedType.LPStr)] string sScriptFilename);
+
+		/// <summary>
+		/// This function sets the camfile path, not including file name.
+		/// </summary>
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int SDOAQ_SetCamfilePath([MarshalAs(UnmanagedType.LPStr)] string sCamfilePath);
+
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//
 		// Functions and types needed to get available parameters / parameter ranges / parameter values
@@ -493,7 +514,7 @@ namespace SDOAQ
 			/// For products using a motorized nosepiece controller,
 			/// it is read-write and the objective id is different depending on the device controller.
 			/// </summary>
-			piObjectiveId = 18,                 // I - R/W
+			piObjectiveId = 18,                 // I - R, R/W
 
 			/// <summary>
 			/// EDoF Algorithm method. Select an algorithm to generate EDoF image, including the built-in sdedof algorithm. 
@@ -733,7 +754,8 @@ namespace SDOAQ
 		// manages camera parameter
 		/// <summary>
 		/// This function requests the current ROI and binning value of camera.
-		/// The FOV is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
+		/// The increments in width and height varies depending on the camera, and the FOV changes when binning is applied.
+		/// Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
 		/// This function should be called to check ROI after calling SDOAQ_SetCameraParameter() function.
 		/// </summary>
 		/// <param name="pWidth, pHeight">
@@ -874,6 +896,7 @@ namespace SDOAQ
 		/// User data delivered through the API requesting image acquisition is passed as is.
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 		public delegate void SDOAQ_MoveokCallback(eErrorCode errorCode, IntPtr callbackUserData);
+		/// Register a callback function. Allow MULTI_WS_ALL in multiWS selection.
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_RegisterMoveokCallback(SDOAQ_MoveokCallback cbf);
 

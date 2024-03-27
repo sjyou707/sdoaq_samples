@@ -109,3 +109,6 @@
                                              (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
                                            - Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.6.0  2024.03.19  YoungJu Lee     - Support multiple wisescope
+                                           - Add APIs that specify the script file and camfile folders
+---------------------------------------------------------------------------------------------------------------------------------------------------------------

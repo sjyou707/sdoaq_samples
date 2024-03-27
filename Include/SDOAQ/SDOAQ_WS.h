@@ -115,6 +115,9 @@
 										  (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
 										- Add SDOAQ_Set/GetCameraRoiParameter that specify ROI by applying horizontal and vertical offset
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.6.0  2024.03.19  YoungJu Lee     - Supports multiple WiseScopes
+										- Add APIs that specify the script file and camfile folders
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -171,6 +174,9 @@ extern "C"
 
 		/// <summary>This error occurs when there is no authorization.</summary>
 		ecNoAuthorization = 11,
+
+		/// <summary>This error occurs when given wisescope is not exist.</summary>
+		ecNoWisescope = 12,
 
 		/// <summary>ToDo: Further values have to be defined ...</summary>
 	};
@@ -273,7 +279,7 @@ extern "C"
 	/// </summary>
 	typedef void(__stdcall* SDOAQ_ObjectiveChanged)(eObjectiveId newObjectiveId);
 
-	/// <summary>This function registers the objectiveChanged callback funtion.</summary>
+	/// <summary>This function registers the objectiveChanged callback funtion.  Allow MULTI_WS_ALL in multiWS selection.</summary>
 	__declspec(dllexport) eErrorCode SDOAQ_RegisterObjectiveChangedCallback(SDOAQ_ObjectiveChanged cbf);
 
 	/// <summary>
@@ -384,6 +390,15 @@ extern "C"
 	/// </summary>
 	__declspec(dllexport) int SDOAQ_GetAlgorithmVersion();
 
+	/// <summary>
+	/// This function specifies the script file by the file name including the absolute path.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetSystemScriptFilename(const char* sScriptFilename);
+
+	/// <summary>
+	/// This function sets the camfile path, not including file name.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetCamfilePath(const char* sCamfilePath);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -457,7 +472,7 @@ extern "C"
 		/// For products using a motorized nosepiece controller,
 		/// it is read-write and the objective id is different depending on the device controller.
 		/// </summary>
-		piObjectiveId = 18,						// I - R/W
+		piObjectiveId = 18,						// I - R, R/W
 
 		/// <summary>
 		/// EDoF Algorithm method. Select an algorithm to generate EDoF image, including the built-in sdedof algorithm. 
@@ -689,7 +704,8 @@ extern "C"
 	// manages camera parameter
 	/// <summary>
 	/// This function requests the current ROI and binning value of camera.
-	/// The FOV is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
+	/// The increments in width and height varies depending on the camera, and the FOV changes when binning is applied.
+	/// Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
 	/// This function should be called to check ROI after calling SDOAQ_SetCameraParameter() function.
 	/// </summary>
 	/// <param name="pWidth, pHeight">
@@ -822,6 +838,7 @@ extern "C"
 	/// It is called when image acquisition is completed. 
 	/// User data delivered through the API requesting image acquisition is passed as is.
 	typedef void(__stdcall* SDOAQ_MoveokCallback)(eErrorCode errorCode, void* callbackUserData);
+	/// Register a callback function. Allow MULTI_WS_ALL in multiWS selection.
 	__declspec(dllexport) eErrorCode SDOAQ_RegisterMoveokCallback(SDOAQ_MoveokCallback cbf);
 
 	/// <summary>

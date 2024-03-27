@@ -472,7 +472,7 @@ WSIODLL_API WSIORV			WSUT_IntFromCmdLine(
 // LINE SCRIPT
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_StringFromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOPSTR				value_buffer,
 			WSIOUINT				size_of_value_buffer
@@ -480,21 +480,21 @@ WSIODLL_API WSIORV			WSUT_StringFromLineScript(
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_IntFromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOINT*				ptr_int
 			);
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_Uint64FromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOUINT64*				ptr_uint64
 			);
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_AddressFromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOVOID*				ptr_address
 			);

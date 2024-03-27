@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="vs Files">
+      <UniqueIdentifier>{d3a68cf2-0329-4070-a31b-055544fadac6}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Library Header Files">
+      <UniqueIdentifier>{895ec258-2ff5-4dc3-b3c5-24e827836008}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>vs Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>vs Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>vs Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>vs Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_LLAPI.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_MULTIWS.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SdoaqMultiCameraFrameCallbackDlg.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SdoaqMultiCameraFrameCallback.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>vs Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SdoaqMultiCameraFrameCallbackDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SdoaqMultiCameraFrameCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="wisescope.script.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\SdoaqMultiCameraFrameCallback.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SdoaqMultiCameraFrameCallback.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\SdoaqMultiCameraFrameCallback.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

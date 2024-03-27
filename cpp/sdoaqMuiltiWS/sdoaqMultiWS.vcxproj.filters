@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Basic Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Script and Calibration Files">
+      <UniqueIdentifier>{457a075f-cef9-43b9-8f44-db7f151e77f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library Header Files">
+      <UniqueIdentifier>{5782eff0-4fa5-4ab6-84b7-ed3666929b78}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Basic Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Basic Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Basic Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDOAQ_AppDlg.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDOAQ_App.h">
+      <Filter>Basic Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDOAQ_Callback.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDOAQ_CalibrationFile.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDOAQ_Lib.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_MULTIWS.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\WSIO\WSIO_GL.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h">
+      <Filter>Library Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SDOAQ_AppDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Basic Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDOAQ_App.cpp">
+      <Filter>Basic Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDOAQ_Callback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDOAQ_CalibrationFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SDOAQ_App.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\SDOAQ_App.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="wisescope.script.txt">
+      <Filter>Script and Calibration Files</Filter>
+    </None>
+    <None Include="calib_v21_1.0x.csv">
+      <Filter>Script and Calibration Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\SDOAQ_App.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\SD.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

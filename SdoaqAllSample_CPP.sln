@@ -15,6 +15,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SdoaqEdof", "cpp\SdoaqEdof\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SdoaqMultiFocus", "cpp\SdoaqMultiFocus\SdoaqMultiFocus.vcxproj", "{9E631DA3-E674-4D7B-86C1-BC4373A1EEC9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SdoaqMultiCameraFrameCallback", "cpp\SdoaqMultiCameraFrameCallback\SdoaqMultiCameraFrameCallback.vcxproj", "{D71E88E5-D1BB-4FC3-9236-EA485B204527}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdoaqMultiWS", "cpp\sdoaqMuiltiWS\sdoaqMultiWS.vcxproj", "{9C17F421-2BE4-4AD3-B9F9-03A1B29A6887}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +45,14 @@ Global
 		{9E631DA3-E674-4D7B-86C1-BC4373A1EEC9}.Debug|x64.Build.0 = Debug|x64
 		{9E631DA3-E674-4D7B-86C1-BC4373A1EEC9}.Release|x64.ActiveCfg = Release|x64
 		{9E631DA3-E674-4D7B-86C1-BC4373A1EEC9}.Release|x64.Build.0 = Release|x64
+		{D71E88E5-D1BB-4FC3-9236-EA485B204527}.Debug|x64.ActiveCfg = Debug|x64
+		{D71E88E5-D1BB-4FC3-9236-EA485B204527}.Debug|x64.Build.0 = Debug|x64
+		{D71E88E5-D1BB-4FC3-9236-EA485B204527}.Release|x64.ActiveCfg = Release|x64
+		{D71E88E5-D1BB-4FC3-9236-EA485B204527}.Release|x64.Build.0 = Release|x64
+		{9C17F421-2BE4-4AD3-B9F9-03A1B29A6887}.Debug|x64.ActiveCfg = Debug|x64
+		{9C17F421-2BE4-4AD3-B9F9-03A1B29A6887}.Debug|x64.Build.0 = Debug|x64
+		{9C17F421-2BE4-4AD3-B9F9-03A1B29A6887}.Release|x64.ActiveCfg = Release|x64
+		{9C17F421-2BE4-4AD3-B9F9-03A1B29A6887}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

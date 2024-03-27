@@ -60,7 +60,6 @@ protected:
 	afx_msg LRESULT OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf);
 	afx_msg LRESULT OnReceiveSnap(WPARAM wErrorCode, LPARAM lLastFilledRingBufferEntry);
 
-public:
 	afx_msg void OnSdoaqInitialize();
 	afx_msg void OnSdoaqFinalize();
 	afx_msg void OnSelectedCombobox();
@@ -84,6 +83,7 @@ public:
 	afx_msg void OnSdoaqSetCalibrationFile();
 	afx_msg void OnSdoaqComboObjective();
 
+	void BuildEnvironment(void);
 	void ReadySdoaqDll(void);
 	void ShowViewer(void);
 
@@ -91,6 +91,11 @@ private:
 	void BuildParameterID_Combobox(void);
 	eParameterId GetCurrentParameterID(void);
 	void BuildCalibrationFile_Combobox(void);
+
+	//----------------------------------------------------------------------------
+private:
+	CString m_sScriptFile;
+	CString m_sLogPath;
 
 public:
 	enum
@@ -127,14 +132,10 @@ public:
 			}
 		}
 
-#if defined(USE_SDOAQ_API_2_4_0)
 		AcquisitionFixedParametersEx afp;
-#else
-		AcquisitionFixedParameters afp;
-#endif
 
 		inline int PixelSize(void) const { return afp.cameraRoiWidth * afp.cameraRoiHeight; }
-		inline int ImgSize(void) const { return IsMonoCameraInstalled() ? PixelSize() : PixelSize() * COLORBYTES; }
+		inline int ImgSize(void) const { return PixelSize() * m_nColorByte; }
 		inline int DataSize(void) const { return PixelSize() * sizeof(float); }
 		inline int PixelWidth(void) const { return afp.cameraRoiWidth; }
 		inline int PixelHeight(void) const { return afp.cameraRoiHeight; }
@@ -148,9 +149,9 @@ public:
 				, numsBuf(0)
 			{ ; }
 			bool active;
-			void** ppBuf; // 데이타(이미지) 버퍼 포인터
-			size_t* pSizes; // 각 데이타 버퍼의 데이타 크기(이미지 크기) 배열
-			size_t numsBuf; // 링버퍼 배열 요소 개수 * 포커스 개수 ==> 링 버퍼의 실제 데이타 개수
+			void** ppBuf;	// pointer to the data (image) buffer
+			size_t* pSizes;	// array of data sizes (image sizes) for each data buffer
+			size_t numsBuf;	// number of actual data in the ring buffer
 		} rb;
 
 		struct tFocus
@@ -181,7 +182,7 @@ public:
 
 	SDOAQ_CalibrationFile m_calFile;
 	std::vector<CString> m_vsCalibList;
-	// calibration table 의 x,y,z 범위(unit um). 3D rendering 에 사용
+	// x,y and z range of calibration table (unit um). used for 3D rendering.
 	double dxRangeStart;
 	double dxRangeEnd;
 	double dyRangeStart;

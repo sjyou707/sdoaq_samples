@@ -5,9 +5,6 @@
 #include "afxdialogex.h"
 #include "SDOAQ_Callback.h"
 
-#include <string>
-#include <fstream>
-#include <algorithm>
 //----------------------------------------------------------------------------
 CSDOAQ_Dlg::CSDOAQ_Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_SDOAQ_APP_DIALOG, pParent)
@@ -107,15 +104,9 @@ BOOL CSDOAQ_Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+    BuildEnvironment();
 
 	BuildParameterID_Combobox();
-
-	GetDlgItem(IDC_EDIT_ROI)->SetWindowText(_T("0,0,2040,1086"));
-	GetDlgItem(IDC_EDIT_AFROI)->SetWindowText(_T("956,479,128,128"));
-	GetDlgItem(IDC_EDIT_RING_BUF_SIZE)->SetWindowText(_T("3"));
-	GetDlgItem(IDC_EDIT_FOCUS_SET)->SetWindowText(_T("0-319-32"));
-	GetDlgItem(IDC_EDIT_EDOF_RESIZE_RATIO)->SetWindowText(_T("0.5"));
-	GetDlgItem(IDC_EDIT_SNAPFOCUS_SET)->SetWindowText(_T("0-319-16"));
 
 	((CButton*)GetDlgItem(IDC_CHECK_STEPMAP))->SetCheck(1);
 	((CButton*)GetDlgItem(IDC_CHECK_EDOF))->SetCheck(1);
@@ -124,12 +115,6 @@ BOOL CSDOAQ_Dlg::OnInitDialog()
 	((CButton*)GetDlgItem(IDC_CHECK_POINTCLOUD))->SetCheck(1);
 
 	//BuildCalibrationFile_Combobox();
-
-	(void)::CreateDirectory(FString(_T("%s\\Log"), GetCurrentDir()), NULL);
-
-	Log(_T(">> ==========================="));
-	Log(_T(">> Welcome to SDOAQ API Tester"));
-	Log(_T(">> ==========================="));
 
 	//// CREATE IMAGE VIEWER
 	m_vhwndIV.resize(3, NULL);
@@ -308,6 +293,7 @@ void CSDOAQ_Dlg::ShowViewer(void)
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
+//----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnPaint()
 {
 	if (IsIconic())
@@ -374,6 +360,7 @@ void CSDOAQ_Dlg::OnDestroy()
 //----------------------------------------------------------------------------
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
+//----------------------------------------------------------------------------
 HCURSOR CSDOAQ_Dlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -432,7 +419,7 @@ BOOL CSDOAQ_Dlg::PreTranslateMessage(MSG* pMsg)
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::Log(LPCTSTR p_log_str)
 {
-	CString sLogFileName = FString(_T("%s\\Log\\%s.log"), GetCurrentDir(), CTime::GetCurrentTime().Format("%Y.%m.%d"));
+	CString sLogFileName = FString(_T("%s\\%s.log"), m_sLogPath, CTime::GetCurrentTime().Format("%Y.%m.%d"));
 	DWORD dwDummy;
 	if (m_sLogFileName != sLogFileName)
 	{
@@ -528,20 +515,39 @@ LRESULT CSDOAQ_Dlg::OnUmError(WPARAM wErrorCode, LPARAM lpMessage)
 }
 
 //----------------------------------------------------------------------------
-void CSDOAQ_Dlg::ReadySdoaqDll(void)
+void CSDOAQ_Dlg::BuildEnvironment(void)
 {
-	Log(FString(_T(">> ============================================================")));
+	m_sScriptFile = FString(_T("%s\\wisescope.script.txt"), GetCurrentDir());
+	m_sLogPath = FString(_T("%s\\Log"), GetCurrentDir());
+
+	(void)::CreateDirectory(m_sLogPath, NULL);
 
 	const int nMajorVersion = ::SDOAQ_GetMajorVersion();
 	const int nMinorVersion = ::SDOAQ_GetMinorVersion();
 	const int nPatchVersion = ::SDOAQ_GetPatchVersion();
 	const int nAlgoVersion = ::SDOAQ_GetAlgorithmVersion();
-	Log(FString(_T(">> SDOAQ DLL Version = %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
-	Log(FString(_T(">> sdedof dll Version = %d.%d"), nAlgoVersion / 1000, nAlgoVersion % 1000));
 
+	SetWindowText(FString(_T("SDOAQ API TESTER (dll %d.%d.%d)"), nMajorVersion, nMinorVersion, nPatchVersion));
+
+	Log(_T(">> =================================================="));
+	Log(_T(">> Welcome to SDOAQ API Tester"));
+	Log(_T(">> =================================================="));
+
+	Log(FString(_T(">> SDOAQ dll version: %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
+	Log(FString(_T(">> sdedof dll version: %d.%d"), nAlgoVersion / 1000, nAlgoVersion % 1000));
+
+	if (m_sScriptFile.GetLength())
+	{
+		::SDOAQ_SetSystemScriptFilename((CStringA)m_sScriptFile);
+		Log(FString(_T(">> Script file: %s"), m_sScriptFile));
+	}
+	Log(FString(_T(">> Log path: %s"), m_sLogPath));
+}
+
+//----------------------------------------------------------------------------
+void CSDOAQ_Dlg::ReadySdoaqDll(void)
+{
 	BuildCalibrationFile_Combobox();
-
-	SetWindowText(FString(_T("SDOAQ API TESTER (Dll %d.%d.%d)"), nMajorVersion, nMinorVersion, nPatchVersion));
 }
 
 //----------------------------------------------------------------------------
@@ -553,9 +559,19 @@ LRESULT CSDOAQ_Dlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 
 	if (ecNoError == wErrorCode)
 	{
+		GetDlgItem(IDC_INITIALIZE)->EnableWindow(FALSE);
+
 		ReadySdoaqDll();
 
 		SET.m_nColorByte = IsMonoCameraInstalled() ? MONOBYTES : COLORBYTES;
+
+		// It is appropriate that some of the items in the initial settings below are actually read from SDOAQ
+		GetDlgItem(IDC_EDIT_ROI)->SetWindowText(_T("0,0,2040,1086"));
+		GetDlgItem(IDC_EDIT_AFROI)->SetWindowText(_T("956,479,128,128"));
+		GetDlgItem(IDC_EDIT_RING_BUF_SIZE)->SetWindowText(_T("3"));
+		GetDlgItem(IDC_EDIT_FOCUS_SET)->SetWindowText(_T("0-319-32"));
+		GetDlgItem(IDC_EDIT_EDOF_RESIZE_RATIO)->SetWindowText(_T("0.5"));
+		GetDlgItem(IDC_EDIT_SNAPFOCUS_SET)->SetWindowText(_T("0-319-16"));
 
 		OnSdoaqSetROI();
 		OnSdoaqSetAFROI();
@@ -588,18 +604,14 @@ void CSDOAQ_Dlg::OnSdoaqInitialize()
 
 	eErrorCode rv = ::SDOAQ_Initialize(g_LogCallback, g_ErrorCallback, g_InitDoneCallback);
 
-#if defined(USE_SDOAQ_API_2_4_0)
-	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-	{
-		(void)::SDOAQ_RegisterMoveokCallback(g_MoveokCallback);
-	}
-#endif
+	(void)::SDOAQ_RegisterMoveokCallback(g_MoveokCallback);
 }
 
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqFinalize()
 {
 	eErrorCode rv = ::SDOAQ_Finalize();
+	GetDlgItem(IDC_INITIALIZE)->EnableWindow(TRUE);
 
 	SET.rb.active = false;
 	SET.ClearBuffer();
@@ -608,7 +620,7 @@ void CSDOAQ_Dlg::OnSdoaqFinalize()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSelectedCombobox()
 {
-	// 콤보박스에서 선택한 파라미터 아이디
+	// The parameter id selected in the combo box
 	eParameterId paraID = GetCurrentParameterID();
 
 	bool flagAvailable = false;
@@ -675,7 +687,7 @@ void CSDOAQ_Dlg::OnSelectedCombobox()
 		ApiError(FString(_T("SDOAQ_IsParameterAvailable[ParamID-%d]"), paraID), rv);
 	}
 
-	// Writable 이 아니면 비활성화시킨다
+	// Disable items that are not allowed to be written
 	bool flagWritable = false;
 	(void)::SDOAQ_IsParameterWritable(paraID, &flagWritable);
 	const BOOL WRITABLE = flagWritable ? TRUE : FALSE;
@@ -686,7 +698,7 @@ void CSDOAQ_Dlg::OnSelectedCombobox()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqSetParameter()
 {
-	// 콤보박스에서 선택한 파라미터 아이디
+	// The parameter id selected in the combo box
 	eParameterId paraID = GetCurrentParameterID();
 
 	bool flagAvailable = false;
@@ -791,19 +803,13 @@ void CSDOAQ_Dlg::OnSdoaqSetROI()
 	AfxExtractSubString(sWidth, sParameters, 2, ',');
 	AfxExtractSubString(sHeight, sParameters, 3, ',');
 
-#if defined(USE_SDOAQ_API_2_4_0)
 	AcquisitionFixedParametersEx AFP;
-#else
-	AcquisitionFixedParameters AFP;
-#endif
 	AFP.cameraRoiTop = _ttoi(sTop);
 	AFP.cameraRoiLeft = _ttoi(sLeft);
 	AFP.cameraRoiWidth = (_ttoi(sWidth) / 4) * 4;
 	AFP.cameraRoiHeight = _ttoi(sHeight);
 	AFP.cameraBinning = 1;
-#if defined(USE_SDOAQ_API_2_4_0)
 	AFP.callbackUserData = NULL;
-#endif
 
 	int nDummy;
 	auto rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
@@ -860,10 +866,12 @@ void CSDOAQ_Dlg::OnSdoaqSetAFROI()
 	if (rv1 != ecNoError)
 	{
 		ApiError(FString(_T("Set AF ROI [ParamID-%d]"), piFocusLeftTop), rv1);
+		return;
 	}
 	if (rv2 != ecNoError)
 	{
 		ApiError(FString(_T("Set AF ROI [ParamID-%d]"), piFocusRightBottom), rv2);
+		return;
 	}
 }
 
@@ -974,11 +982,13 @@ void CSDOAQ_Dlg::OnSdoaqSetEdofResize()
 		else
 		{
 			ApiError(FString(_T("Set EDoF resize ratio : value is out of range[%.2lf ~ %.2lf]"), dbMin, dbMax), ecUnknownError);
+			return;
 		}
 	}
 	else
 	{
 		ApiError(_T("SDOAQ_GetDblParameterRange [pi_edof_calc_resize_ratio]"), rv);
+		return;
 	}
 }
 
@@ -1015,29 +1025,13 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 	}
 
 	const auto tick_begin = GetTickCount64();
-	eErrorCode rv;
-	LPCTSTR sz_api;
-#if defined(USE_SDOAQ_API_2_4_0)
-	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-	{
-		AFP.callbackUserData = (void*)::GetTickCount64();
-		sz_api = _T("SDOAQ_SingleShotFocusStackEx");
-		rv = ::SDOAQ_SingleShotFocusStackEx(
-			&AFP,
-			pPositions, (int)FOCUS.numsFocus,
-			ppFocusImages, pFocusImageBufferSizes
-		);
-	}
-	else
-#endif
-	{
-		sz_api = _T("SDOAQ_SingleShotFocusStack");
-		rv = ::SDOAQ_SingleShotFocusStack(
-			(AcquisitionFixedParameters*)&AFP,
-			pPositions, (int)FOCUS.numsFocus,
-			ppFocusImages, pFocusImageBufferSizes
-		);
-	}
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	const LPCTSTR sz_api = _T("SDOAQ_SingleShotFocusStackEx");
+	const eErrorCode rv = ::SDOAQ_SingleShotFocusStackEx(
+		&AFP,
+		pPositions, (int)FOCUS.numsFocus,
+		ppFocusImages, pFocusImageBufferSizes
+	);
 	const auto tick_end = GetTickCount64();
 	Log(FString(_T(">> %s() takes : %llu ms / %d imgs"), sz_api, tick_end - tick_begin, FOCUS.numsFocus));
 
@@ -1116,29 +1110,13 @@ void CSDOAQ_Dlg::OnSdoaqPlayStack()
 		SET.rb.pSizes[uidx] = size;
 	}
 
-	eErrorCode rv;
-	LPCTSTR sz_api;
-#if defined(USE_SDOAQ_API_2_4_0)
-	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-	{
-		AFP.callbackUserData = (void*)::GetTickCount64();
-		sz_api = _T("SDOAQ_PlayFocusStackEx");
-		rv = ::SDOAQ_PlayFocusStackEx(
-			&AFP,
-			g_PlayFocusStackCallbackEx,
-			pPositions, (int)FOCUS.numsFocus,
-			m_nRingBufferSize, (unsigned char**)SET.rb.ppBuf, SET.rb.pSizes);
-	}
-	else
-#endif
-	{
-		sz_api = _T("SDOAQ_PlayFocusStack");
-		rv = ::SDOAQ_PlayFocusStack(
-			(AcquisitionFixedParameters*)&AFP,
-			g_PlayFocusStackCallback,
-			pPositions, (int)FOCUS.numsFocus,
-			m_nRingBufferSize, (unsigned char**)SET.rb.ppBuf, SET.rb.pSizes);
-	}
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	const LPCTSTR sz_api = _T("SDOAQ_PlayFocusStackEx");
+	const eErrorCode rv = ::SDOAQ_PlayFocusStackEx(
+		&AFP,
+		g_PlayFocusStackCallbackEx,
+		pPositions, (int)FOCUS.numsFocus,
+		m_nRingBufferSize, (unsigned char**)SET.rb.ppBuf, SET.rb.pSizes);
 
 	if (ecNoError == rv)
 	{
@@ -1168,16 +1146,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveZstack(WPARAM wErrorCode, LPARAM lLastFilledRingBuf
 
 	if (ecNoError != wErrorCode)
 	{
-#if defined(USE_SDOAQ_API_2_4_0)
-		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-		{
-			ApiError(_T("SDOAQ_PlayCallbackEx"), (int)wErrorCode);
-		}
-		else
-#endif
-		{
-			ApiError(_T("SDOAQ_PlayCallback"), (int)wErrorCode);
-		}
+		ApiError(_T("SDOAQ_PlayCallbackEx"), (int)wErrorCode);
 	}
 	else if (SET.rb.active)
 	{
@@ -1274,37 +1243,17 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 	}
 
 	const auto tick_begin = GetTickCount64();
-	eErrorCode rv;
-	LPCTSTR sz_api;
-#if defined(USE_SDOAQ_API_2_4_0)
-	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-	{
-		AFP.callbackUserData = (void*)::GetTickCount64();
-		sz_api = _T("SDOAQ_SingleShotEdofEx");
-		rv = ::SDOAQ_SingleShotEdofEx(
-			&AFP,
-			pPositions, (int)FOCUS.numsFocus,
-			pStepMapImageBuffer, stepMapBufferSize,
-			pEdofImageBuffer, edofImageBufferSize,
-			pQualityMapBuffer, qualityMapBufferSize,
-			pHeightMapBuffer, heightMapBufferSize,
-			pPointCloudBuffer, pointCloudBufferSize
-		);
-	}
-	else
-#endif
-	{
-		sz_api = _T("SDOAQ_SingleShotEdof");
-		rv = ::SDOAQ_SingleShotEdof(
-			(AcquisitionFixedParameters*)&AFP,
-			pPositions, (int)FOCUS.numsFocus,
-			pStepMapImageBuffer, stepMapBufferSize,
-			pEdofImageBuffer, edofImageBufferSize,
-			pQualityMapBuffer, qualityMapBufferSize,
-			pHeightMapBuffer, heightMapBufferSize,
-			pPointCloudBuffer, pointCloudBufferSize
-		);
-	}
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	const LPCTSTR sz_api = _T("SDOAQ_SingleShotEdofEx");
+	const eErrorCode rv = ::SDOAQ_SingleShotEdofEx(
+		&AFP,
+		pPositions, (int)FOCUS.numsFocus,
+		pStepMapImageBuffer, stepMapBufferSize,
+		pEdofImageBuffer, edofImageBufferSize,
+		pQualityMapBuffer, qualityMapBufferSize,
+		pHeightMapBuffer, heightMapBufferSize,
+		pPointCloudBuffer, pointCloudBufferSize
+	);	
 	const auto tick_end = GetTickCount64();
 	Log(FString(_T(">> %s() takes : %llu ms / %d imgs"), sz_api, tick_end - tick_begin, FOCUS.numsFocus));
 
@@ -1419,36 +1368,16 @@ void CSDOAQ_Dlg::OnSdoaqPlayEdof()
 		uidx++; // PointCloud
 	}
 
-	eErrorCode rv;
-	LPCTSTR sz_api;
-#if defined(USE_SDOAQ_API_2_4_0)
-	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-	{
-		AFP.callbackUserData = (void*)::GetTickCount64();
-		sz_api = _T("SDOAQ_PlayEdofEx");
-		rv = ::SDOAQ_PlayEdofEx(
-			&AFP,
-			g_PlayEdofCallbackEx,
-			pPositions, (int)nFocusNums,
-			m_nRingBufferSize,
-			SET.rb.ppBuf,
-			SET.rb.pSizes
-		);
-	}
-	else
-#endif
-	{
-		sz_api = _T("SDOAQ_PlayEdof");
-		rv = ::SDOAQ_PlayEdof(
-			(AcquisitionFixedParameters*)&AFP,
-			g_PlayEdofCallback,
-			pPositions, (int)nFocusNums,
-			m_nRingBufferSize,
-			SET.rb.ppBuf,
-			SET.rb.pSizes
-		);
-	}
-	
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	const LPCTSTR sz_api = _T("SDOAQ_PlayEdofEx");
+	const eErrorCode rv = ::SDOAQ_PlayEdofEx(
+		&AFP,
+		g_PlayEdofCallbackEx,
+		pPositions, (int)nFocusNums,
+		m_nRingBufferSize,
+		SET.rb.ppBuf,
+		SET.rb.pSizes
+	);	
 	if (ecNoError == rv)
 	{
 		SET.rb.active = true;
@@ -1527,41 +1456,19 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 	unsigned char* pAFImageBuffer = new unsigned char[AFImageBufferSize];
 	double dbBestFocusStep;
 	double dbScore;
-#if defined(USE_SDOAQ_API_2_4_0)
 	double dbMatchedFocusStep;
-#endif
 
-	eErrorCode rv;
-	LPCTSTR sz_api;
-#if defined(USE_SDOAQ_API_2_4_0)
-	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-	{
-		AFP.callbackUserData = (void*)::GetTickCount64();
-		sz_api = _T("SDOAQ_SingleShotAFEx");
-		rv = ::SDOAQ_SingleShotAFEx(
-			&AFP,
-			pPositions, (int)FOCUS.numsFocus,
-			pAFImageBuffer,
-			AFImageBufferSize,
-			&dbBestFocusStep,
-			&dbScore,
-			&dbMatchedFocusStep
-		);
-	}
-	else
-#endif
-	{
-		sz_api = _T("SDOAQ_SingleShotAF");
-		rv = ::SDOAQ_SingleShotAF(
-			(AcquisitionFixedParameters*)&AFP,
-			pPositions, (int)FOCUS.numsFocus,
-			pAFImageBuffer,
-			AFImageBufferSize,
-			&dbBestFocusStep,
-			&dbScore
-		);
-	}
-
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	const LPCTSTR sz_api = _T("SDOAQ_SingleShotAFEx");
+	const eErrorCode rv = ::SDOAQ_SingleShotAFEx(
+		&AFP,
+		pPositions, (int)FOCUS.numsFocus,
+		pAFImageBuffer,
+		AFImageBufferSize,
+		&dbBestFocusStep,
+		&dbScore,
+		&dbMatchedFocusStep
+	);
 	if (ecNoError == rv)
 	{
 		++m_nContiAF;
@@ -1569,16 +1476,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 		if (pAFImageBuffer && AFImageBufferSize)
 		{
 			ImageViewer(0, "AF", m_nContiAF, SET, pAFImageBuffer);
-#if defined(USE_SDOAQ_API_2_4_0)
-			if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-			{
-				Log(FString(_T("\t>> Best focus step : %.4lf, Score : %.4lf, Matched step : %d"), dbBestFocusStep, dbScore, (int)(dbMatchedFocusStep + 0.5)));
-			}
-			else
-#endif
-			{
-				Log(FString(_T("\t>> Best focus step : %.4lf, Score : %.4lf"), dbBestFocusStep, dbScore));
-			}
+			Log(FString(_T("\t>> Best focus step : %.4lf, Score : %.4lf, Matched step : %d"), dbBestFocusStep, dbScore, (int)(dbMatchedFocusStep + 0.5)));
 		}
 		else
 		{
@@ -1633,35 +1531,16 @@ void CSDOAQ_Dlg::OnSdoaqPlayAF()
 		uidx++;
 	}
 
-	eErrorCode rv;
-	LPCTSTR sz_api;
-#if defined(USE_SDOAQ_API_2_4_0)
-	if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-	{
-		AFP.callbackUserData = (void*)::GetTickCount64();
-		sz_api = _T("SDOAQ_PlayAFEx");
-		rv = ::SDOAQ_PlayAFEx(
-			&AFP,
-			g_PlayAFCallbackEx2,
-			pPositions, (int)FOCUS.numsFocus,
-			m_nRingBufferSize,
-			SET.rb.ppBuf,
-			SET.rb.pSizes
-		);
-	}
-	else
-#endif
-	{
-		sz_api = _T("SDOAQ_PlayAF");
-		rv = ::SDOAQ_PlayAF(
-			(AcquisitionFixedParameters*)&AFP,
-			g_PlayAFCallback,
-			pPositions, (int)FOCUS.numsFocus,
-			m_nRingBufferSize,
-			SET.rb.ppBuf,
-			SET.rb.pSizes
-		);
-	}
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	const LPCTSTR sz_api = _T("SDOAQ_PlayAFEx");
+	const eErrorCode rv = ::SDOAQ_PlayAFEx(
+		&AFP,
+		g_PlayAFCallbackEx2,
+		pPositions, (int)FOCUS.numsFocus,
+		m_nRingBufferSize,
+		SET.rb.ppBuf,
+		SET.rb.pSizes
+	);
 	if (ecNoError == rv)
 	{
 		SET.rb.active = true;
@@ -1693,14 +1572,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wErrorCode, LPARAM lMsgParaReceiveAf)
 
 	if (ecNoError != wErrorCode)
 	{
-		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-		{
-			ApiError(_T("SDOAQ_PlayAfCallbackEx2"), (int)wErrorCode);
-		}
-		else
-		{
-			ApiError(_T("SDOAQ_PlayAfCallback"), (int)wErrorCode);
-		}
+		ApiError(_T("SDOAQ_PlayAfCallbackEx2"), (int)wErrorCode);
 	}
 	else if (SET.rb.active)
 	{
@@ -1752,17 +1624,8 @@ void CSDOAQ_Dlg::OnSdoaqSnap()
 		snap_para.v2.sConfigFilename = NULL;
 		snap_para.v2.sConfigData = NULL;
 
-#if defined(USE_SDOAQ_API_2_4_0)
-		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-		{
-			const auto callbackUserData = (void*)::GetTickCount64();
-			::SDOAQ_PlaySnapEx(g_SnapCallbackEx, callbackUserData, pPositions, (int)nFocusNums, &snap_para);
-		}
-		else
-#endif
-		{
-			::SDOAQ_PlaySnap(g_SnapCallback, pPositions, (int)nFocusNums, &snap_para);
-		}
+		const auto callbackUserData = (void*)::GetTickCount64();
+		::SDOAQ_PlaySnapEx(g_SnapCallbackEx, callbackUserData, pPositions, (int)nFocusNums, &snap_para);
 
 		delete[] pPositions;
 	}
@@ -1777,14 +1640,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveSnap(WPARAM wErrorCode, LPARAM lLastFilledRingBuffe
 {
 	if (ecNoError != wErrorCode)
 	{
-		if (IS_HIGHER_or_EQUAL_VERSION(2, 4, 0))
-		{
-			ApiError(_T("SDOAQ_SnapCallbackEx"), (int)wErrorCode);
-		}
-		else
-		{
-			ApiError(_T("SDOAQ_SnapCallback"), (int)wErrorCode);
-		}
+		ApiError(_T("SDOAQ_SnapCallbackEx"), (int)wErrorCode);
 	}
 	else if (SET.rb.active)
 	{
@@ -1795,9 +1651,9 @@ LRESULT CSDOAQ_Dlg::OnReceiveSnap(WPARAM wErrorCode, LPARAM lLastFilledRingBuffe
 }
 
 //----------------------------------------------------------------------------
-// !!! set up the calibration file after initialization is complete
+// Note: Set up the calibration file after initialization is complete
 //----------------------------------------------------------------------------
-void CSDOAQ_Dlg::OnSdoaqSetCalibrationFile(void)
+void CSDOAQ_Dlg::OnSdoaqSetCalibrationFile()
 {
 	CString sFilter = _T("calibration file (*.csv)|*.csv|");
 	CFileDialog dlg(TRUE, _T("cvs"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, sFilter);
@@ -1805,19 +1661,19 @@ void CSDOAQ_Dlg::OnSdoaqSetCalibrationFile(void)
 	if (dlg.DoModal() == IDOK)
 	{
 		(void)::SDOAQ_SetCalibrationFile(CT2A(dlg.GetPathName().GetBuffer()));
-		Log(FString(_T("Calibration file [%s] is set."), dlg.GetPathName()));
+		Log(FString(_T(">> Calibration file [%s] is set."), dlg.GetPathName()));
 	}
 }
 
 //----------------------------------------------------------------------------
-// !!! set up the calibration file after initialization is complete
+// Note: Set up the calibration file after initialization is complete
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqComboObjective()
 {
 	CString sObjective;
 	((CComboBox*)GetDlgItem(IDC_COMBO_OBJECTIVE))->GetLBText(((CComboBox*)GetDlgItem(IDC_COMBO_OBJECTIVE))->GetCurSel(), sObjective);
 
-	// set calibration data of the selected objective
+	// Set calibration data of the selected objective lens
 	for (auto it_data = m_calFile.calibData.begin(); it_data != m_calFile.calibData.end(); it_data++)
 	{
 		auto& list = *it_data;

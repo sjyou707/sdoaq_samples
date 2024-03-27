@@ -1,0 +1,32 @@
+
+### OPERATION
+ Product ID = wisescope
+ Number of WSM = 2
+ Image Manager Size GB = 8
+
+### MALS
+ wsi_1 MALS Device = { Auto , Auto , 1.8 , 1.0 }
+ wsi_2 MALS Device = { Auto , Simul , 1.8 , 1.0 }
+
+
+### CAMERA
+ wsi_1 Camera Model (V2) = { Pylon-USB , -1 }
+ wsi_1 Camera Trigger Method = TPSU
+ wsi_1 Camera Reverse X = false
+ wsi_1 Camera Reverse Y = true
+ wsi_1 Pylon USB Line Number = Line2
+ wsi_1 Full Focus Simul Image = C:\Simul.Zstack
+
+ wsi_2 Camera Model (V2) = { Simul-2040-1086-color , -1 }
+ wsi_2 Camera Trigger Method = Software
+ wsi_2 Full Focus Simul Image = C:\\Simul.Zstack
+
+
+### LIGHTING
+ wsi_1 Lighting Device (V3) 1 = { GROUP , SDZEISS , UI , 8 }
+ wsi_1 Lighting Device (V3) 1-1 = { SDZEISS-NOSTROBE , Sub^m , auto , 0 , 0 , -2 , -1 , 1000000 }
+
+ wsi_2 Lighting Device (V3) 1 = { LCBPWM , L , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
+ wsi_2 Lighting Device (V3) 1 attributes = { strobe = on }
+
+ 

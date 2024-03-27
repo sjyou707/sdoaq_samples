@@ -546,6 +546,8 @@ static void g_SDOAQ_FrameCallback(eErrorCode errorCode, unsigned char* pBuffer, 
 		{
 			++nums_skip_to_display;
 		}
+
+		//::SDOAQ_ExecCameraSoftwareTrigger();
 	}
 }
 
