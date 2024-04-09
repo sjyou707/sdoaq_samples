@@ -286,24 +286,25 @@ namespace SDOAQ_App_CS
 										var Parameters = new[]
 										{								
 											new{ Name = "piCameraExposureTime", Value = ((int)eParameterId.piCameraExposureTime).ToString() },
+											new{ Name = "piDataExposureTime", Value = ((int)eParameterId.piDataExposureTime).ToString() },
 											new{ Name = "piCameraFullFrameSizeX", Value = ((int)eParameterId.piCameraFullFrameSizeX).ToString() },
 											new{ Name = "piCameraFullFrameSizeY", Value = ((int)eParameterId.piCameraFullFrameSizeY).ToString() },
 											new{ Name = "piCameraPixelSizeX", Value = ((int)eParameterId.piCameraPixelSizeX).ToString() },
 											new{ Name = "piCameraPixelSizeY", Value = ((int)eParameterId.piCameraPixelSizeY).ToString() },
 											new{ Name = "piCameraBinning", Value = ((int)eParameterId.piCameraBinning).ToString() },
 											new{ Name = "piCameraGain", Value = ((int)eParameterId.piCameraGain).ToString() },
+											new{ Name = "piDataGain", Value = ((int)eParameterId.piDataGain).ToString() },
 											new{ Name = "piCameraColor", Value = ((int)eParameterId.piCameraColor).ToString() },
 											new{ Name = "piWhiteBalanceRed", Value = ((int)eParameterId.piWhiteBalanceRed).ToString() },
 											new{ Name = "piWhiteBalanceGreen", Value = ((int)eParameterId.piWhiteBalanceGreen).ToString() },
 											new{ Name = "piWhiteBalanceBlue", Value = ((int)eParameterId.piWhiteBalanceBlue).ToString() },
 
 											new{ Name = "piFocusPosition", Value = ((int)eParameterId.piFocusPosition).ToString() },
+											new{ Name = "piSingleFocus", Value = ((int)eParameterId.piSingleFocus).ToString() },
 											new{ Name = "piSaveFileFormat", Value = ((int)eParameterId.piSaveFileFormat).ToString() },
-											new{ Name = "piSavePixelBits - not supported yet", Value = ((int)eParameterId.piSavePixelBits).ToString() },
 											new{ Name = "piFocusLeftTop", Value = ((int)eParameterId.piFocusLeftTop).ToString() },
 											new{ Name = "piFocusRightBottom", Value = ((int)eParameterId.piFocusRightBottom).ToString() },
-											new{ Name = "piFocusMeasureMethod", Value = ((int)eParameterId.piFocusMeasureMethod).ToString() },
-											new{ Name = "piSingleFocus", Value = ((int)eParameterId.piSingleFocus).ToString() },
+											new{ Name = "piFocusMeasureMethod", Value = ((int)eParameterId.piFocusMeasureMethod).ToString() },											
 											new{ Name = "piObjectiveId", Value = ((int)eParameterId.piObjectiveId).ToString() },
 
 											new{ Name = "piReflexCorrectionAlgorithm", Value = ((int)eParameterId.piReflexCorrectionAlgorithm).ToString() },
@@ -329,6 +330,9 @@ namespace SDOAQ_App_CS
 											new{ Name = "piSimulMalsHighestStep", Value = ((int)eParameterId.piSimulMalsHighestStep).ToString() },
 											new{ Name = "piSimulMalsLowestStep", Value = ((int)eParameterId.piSimulMalsLowestStep).ToString() },
 
+											new{ Name = "piLightingList", Value = ((int)eParameterId.piLightingList).ToString() },
+											new{ Name = "piActiveLightingList", Value = ((int)eParameterId.piActiveLightingList).ToString() },
+											new{ Name = "piSelectSettingLighting", Value = ((int)eParameterId.piSelectSettingLighting).ToString() },
 											new{ Name = "piInnerRingIntensity", Value = ((int)eParameterId.piInnerRingIntensity).ToString() },
 											new{ Name = "piMiddleRingIntensity", Value = ((int)eParameterId.piMiddleRingIntensity).ToString() },
 											new{ Name = "piOuterRingIntensity", Value = ((int)eParameterId.piOuterRingIntensity).ToString() },
@@ -340,7 +344,11 @@ namespace SDOAQ_App_CS
 											new{ Name = "piIntensityGeneralChannel_5", Value = ((int)eParameterId.piIntensityGeneralChannel_5).ToString() },
 											new{ Name = "piIntensityGeneralChannel_6", Value = ((int)eParameterId.piIntensityGeneralChannel_6).ToString() },
 											new{ Name = "piIntensityGeneralChannel_7", Value = ((int)eParameterId.piIntensityGeneralChannel_7).ToString() },
-											new{ Name = "piIntensityGeneralChannel_8", Value = ((int)eParameterId.piIntensityGeneralChannel_8).ToString() }
+											new{ Name = "piIntensityGeneralChannel_8", Value = ((int)eParameterId.piIntensityGeneralChannel_8).ToString() },
+
+											new{ Name = "piFeatureAutoExposure", Value = ((int)eParameterId.piFeatureAutoExposure).ToString() },
+											new{ Name = "piFeatureAutoWhiteBalance", Value = ((int)eParameterId.piFeatureAutoWhiteBalance).ToString() },
+											new{ Name = "piFeatureAutoIlluminate", Value = ((int)eParameterId.piFeatureAutoIlluminate).ToString() },
 										};
 
 										comboParam.DisplayMember = "Name";
@@ -1248,7 +1256,7 @@ namespace SDOAQ_App_CS
                             }
                             var a = ppFocusImages[pos];
 
-                            var title = string.Format("Zstack(%0)", pPositions[pos]);
+                            var title = string.Format("Zstack({0})", pPositions[pos]);
                             ImageViewer(uid, title, m_nContiStack, SET, bData[pos]);
                         }
                         else
@@ -2101,7 +2109,7 @@ namespace SDOAQ_App_CS
 				if (AFImageBufferSize > 0)
 				{
 					ConvertByteArrayToBitmap(pAFImageBuffer, Convert.ToInt32(AFImageBufferSize), 0, string.Format("AF({0})", m_nContiAF), AFP[0].cameraRoiWidth, AFP[0].cameraRoiHeight);
-					ShowLog(string.Format("\t>> BEST FOCUS STEP : {0}, SCORE : {1:N4}", dbBestFocusStep[0], dbScore[0]));
+					ShowLog(string.Format(">> BEST FOCUS STEP : {0}, SCORE : {1:N4}", dbBestFocusStep[0], dbScore[0]));
 				}
 				else
 				{
@@ -2111,7 +2119,7 @@ namespace SDOAQ_App_CS
 				if (pAFImageBuffer != null && AFImageBufferSize > 0)
 				{
                     ImageViewer(0, "AF", m_nContiAF, SET, pAFImageBuffer);
-                    WriteLog(LogLevel.Info, "\t>> BEST FOCUS STEP : {0}, SCORE : {1:N4}", dbBestFocusStep[0], dbScore[0]);
+                    WriteLog(LogLevel.Info, ">> BEST FOCUS STEP : {0}, SCORE : {1:N4}", dbBestFocusStep[0], dbScore[0]);
 				}
 				else
 				{

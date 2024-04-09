@@ -218,7 +218,11 @@ void CSdoaqMultiCameraFrameCallbackDlg::UpdateWsSelection(int newWSId)
 	if (m_cur_ws != newWSId)
 	{
 		m_cur_ws = newWSId;
-		::SDOAQ_SelectMultiWs(newWSId);
+		eErrorCode rv_sdoaq = ::SDOAQ_SelectMultiWs(newWSId);
+		if (ecNoError != rv_sdoaq)
+		{
+			g_LogLine(_T("SDOAQ_SelectMultiWs(%d) returns error(%d)."), newWSId, rv_sdoaq);
+		}
 	}
 }
 
@@ -252,30 +256,45 @@ void CSdoaqMultiCameraFrameCallbackDlg::OnSetFov_ws1()
 	nHeight = _ttoi(sHeight);
 	nOffsetX = _ttoi(sOffsetX);
 	nOffsetY = _ttoi(sOffsetY);
-	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
-	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
 
-	if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
+	eErrorCode rv1 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
+	eErrorCode rv2 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
+	if (ecNoError == rv1 && ecNoError == rv2)
 	{
-		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraRoiParameter(nWidth, nHeight, nOffsetX, nOffsetY, 1);
-		if (ecNoError == rv_sdoaq)
+		if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
 		{
-			int nBinning;
-			::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
-			SetDlgItemText(IDC_EDIT_FOV_WIDTH_WS1, FString(_T("%d"), nWidth));
-			SetDlgItemText(IDC_EDIT_FOV_HEIGHT_WS1, FString(_T("%d"), nHeight));
-			SetDlgItemText(IDC_EDIT_FOV_OFFSETX_WS1, FString(_T("%d"), nOffsetX));
-			SetDlgItemText(IDC_EDIT_FOV_OFFSETY_WS1, FString(_T("%d"), nOffsetY));
-			g_LogLine(_T("set %dWS ROI (l:%d, t:%d, w:%d, h:%d)"), m_cur_ws, nOffsetX, nOffsetY, nWidth, nHeight);
+			eErrorCode rv_sdoaq = ::SDOAQ_SetCameraRoiParameter(nWidth, nHeight, nOffsetX, nOffsetY, 1);
+			if (ecNoError == rv_sdoaq)
+			{
+				int nBinning;
+				rv_sdoaq = ::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
+				if (ecNoError == rv_sdoaq)
+				{
+					SetDlgItemText(IDC_EDIT_FOV_WIDTH_WS1, FString(_T("%d"), nWidth));
+					SetDlgItemText(IDC_EDIT_FOV_HEIGHT_WS1, FString(_T("%d"), nHeight));
+					SetDlgItemText(IDC_EDIT_FOV_OFFSETX_WS1, FString(_T("%d"), nOffsetX));
+					SetDlgItemText(IDC_EDIT_FOV_OFFSETY_WS1, FString(_T("%d"), nOffsetY));
+					g_LogLine(_T("set %dWS ROI (l:%d, t:%d, w:%d, h:%d)"), m_cur_ws, nOffsetX, nOffsetY, nWidth, nHeight);
+				}
+				else
+				{
+					g_LogLine(_T("SDOAQ_GetCameraRoiParameter() returns error(%d)."), rv_sdoaq);
+				}
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_SetCameraParameter() returns error(%d)."), rv_sdoaq);
+			}
 		}
 		else
 		{
-			g_LogLine(_T("SDOAQ_SetCameraParameter(rv_sdoaq) returns error(%d)."), rv_sdoaq);
+			g_LogLine(_T("SDOAQ_SetCameraParameter(FOV) value is out of range."));
 		}
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_SetCameraParameter(FOV) value is out of range."));
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX) returns error(%d)."), rv1);
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY) returns error(%d)."), rv2);
 	}
 }
 
@@ -289,23 +308,29 @@ void CSdoaqMultiCameraFrameCallbackDlg::OnSetExposureTime_ws1()
 
 	int nMin, nMax, nValue;
 	nValue = _ttoi(sValue);
-	::SDOAQ_GetIntParameterRange(piCameraExposureTime, &nMin, &nMax);
-
-	if (nMin <= nValue && nValue <= nMax)
+	eErrorCode rv_sdoaq = ::SDOAQ_GetIntParameterRange(piCameraExposureTime, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
-		eErrorCode rv_sdoaq = ::SDOAQ_SetIntParameterValue(piCameraExposureTime, nValue);
-		if (ecNoError == rv_sdoaq)
+		if (nMin <= nValue && nValue <= nMax)
 		{
-			g_LogLine(_T("set %dWS camera exposure time: %d"), m_cur_ws, nValue);
+			rv_sdoaq = ::SDOAQ_SetIntParameterValue(piCameraExposureTime, nValue);
+			if (ecNoError == rv_sdoaq)
+			{
+				g_LogLine(_T("set %dWS camera exposure time: %d"), m_cur_ws, nValue);
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_SetIntParameterValue(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
+			}
 		}
 		else
 		{
-			g_LogLine(_T("SDOAQ_SetIntParameterValue(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
+			g_LogLine(_T("CameraExposureTime value is out of range (%d ~ %d)."), nMin, nMax);
 		}
 	}
 	else
 	{
-		g_LogLine(_T("CameraExposureTime value is out of range (%d ~ %d)."), nMin, nMax);
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
 	}
 }
 
@@ -413,30 +438,45 @@ void CSdoaqMultiCameraFrameCallbackDlg::OnSetFov_ws2()
 	nHeight = _ttoi(sHeight);
 	nOffsetX = _ttoi(sOffsetX);
 	nOffsetY = _ttoi(sOffsetY);
-	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
-	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
 
-	if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
+	eErrorCode rv1 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
+	eErrorCode rv2 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
+	if (ecNoError == rv1 && ecNoError == rv2)
 	{
-		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraRoiParameter(nWidth, nHeight, nOffsetX, nOffsetY, 1);
-		if (ecNoError == rv_sdoaq)
+		if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
 		{
-			int nBinning;
-			::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
-			SetDlgItemText(IDC_EDIT_FOV_WIDTH_WS2, FString(_T("%d"), nWidth));
-			SetDlgItemText(IDC_EDIT_FOV_HEIGHT_WS2, FString(_T("%d"), nHeight));
-			SetDlgItemText(IDC_EDIT_FOV_OFFSETX_WS2, FString(_T("%d"), nOffsetX));
-			SetDlgItemText(IDC_EDIT_FOV_OFFSETY_WS2, FString(_T("%d"), nOffsetY));
-			g_LogLine(_T("set %dWS ROI (l:%d, t:%d, w:%d, h:%d)"), m_cur_ws, nOffsetX, nOffsetY, nWidth, nHeight);
+			eErrorCode rv_sdoaq = ::SDOAQ_SetCameraRoiParameter(nWidth, nHeight, nOffsetX, nOffsetY, 1);
+			if (ecNoError == rv_sdoaq)
+			{
+				int nBinning;
+				rv_sdoaq = ::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
+				if (ecNoError == rv_sdoaq)
+				{
+					SetDlgItemText(IDC_EDIT_FOV_WIDTH_WS2, FString(_T("%d"), nWidth));
+					SetDlgItemText(IDC_EDIT_FOV_HEIGHT_WS2, FString(_T("%d"), nHeight));
+					SetDlgItemText(IDC_EDIT_FOV_OFFSETX_WS2, FString(_T("%d"), nOffsetX));
+					SetDlgItemText(IDC_EDIT_FOV_OFFSETY_WS2, FString(_T("%d"), nOffsetY));
+					g_LogLine(_T("set %dWS ROI (l:%d, t:%d, w:%d, h:%d)"), m_cur_ws, nOffsetX, nOffsetY, nWidth, nHeight);
+				}
+				else
+				{
+					g_LogLine(_T("SDOAQ_GetCameraRoiParameter() returns error(%d)."), rv_sdoaq);
+				}
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_SetCameraParameter() returns error(%d)."), rv_sdoaq);
+			}
 		}
 		else
 		{
-			g_LogLine(_T("SDOAQ_SetCameraParameter(rv_sdoaq) returns error(%d)."), rv_sdoaq);
+			g_LogLine(_T("SDOAQ_SetCameraParameter(FOV) value is out of range."));
 		}
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_SetCameraParameter(FOV) value is out of range."));
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX) returns error(%d)."), rv1);
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY) returns error(%d)."), rv2);
 	}
 }
 
@@ -450,23 +490,30 @@ void CSdoaqMultiCameraFrameCallbackDlg::OnSetExposureTime_ws2()
 
 	int nMin, nMax, nValue;
 	nValue = _ttoi(sValue);
-	::SDOAQ_GetIntParameterRange(piCameraExposureTime, &nMin, &nMax);
 
-	if (nMin <= nValue && nValue <= nMax)
+	eErrorCode rv_sdoaq = ::SDOAQ_GetIntParameterRange(piCameraExposureTime, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
-		eErrorCode rv_sdoaq = ::SDOAQ_SetIntParameterValue(piCameraExposureTime, nValue);
-		if (ecNoError == rv_sdoaq)
+		if (nMin <= nValue && nValue <= nMax)
 		{
-			g_LogLine(_T("set %dWS camera exposure time: %d"), m_cur_ws, nValue);
+			rv_sdoaq = ::SDOAQ_SetIntParameterValue(piCameraExposureTime, nValue);
+			if (ecNoError == rv_sdoaq)
+			{
+				g_LogLine(_T("set %dWS camera exposure time: %d"), m_cur_ws, nValue);
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_SetIntParameterValue(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
+			}
 		}
 		else
 		{
-			g_LogLine(_T("SDOAQ_SetIntParameterValue(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
+			g_LogLine(_T("CameraExposureTime value is out of range (%d ~ %d)."), nMin, nMax);
 		}
 	}
 	else
 	{
-		g_LogLine(_T("CameraExposureTime value is out of range (%d ~ %d)."), nMin, nMax);
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
 	}
 }
 
@@ -558,14 +605,31 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 
 		// You can also register a separate callback function for each wisescope.
 		g_LogLine(_T("register the same frame callback func for multi wisescopes"));
-		::SDOAQ_SelectMultiWs(MULTI_WS_ALL);
-		(void)::SDOAQ_SetFrameCallback(g_SDOAQ_FrameCallback);
+		eErrorCode rv_sdoaq = ::SDOAQ_SelectMultiWs(MULTI_WS_ALL);
+		if (ecNoError != rv_sdoaq)
+		{
+			g_LogLine(_T("SDOAQ_SelectMultiWs(%d) returns error(%d)."), MULTI_WS_ALL, rv_sdoaq);
+			return;
+		}
+
+		rv_sdoaq = ::SDOAQ_SetFrameCallback(g_SDOAQ_FrameCallback);
+		if (ecNoError != rv_sdoaq)
+		{
+			g_LogLine(_T("SDOAQ_SetFrameCallback() returns error(%d)."), rv_sdoaq);
+			return;
+		}
 
 		if (theApp.m_pMainWnd)
 		{
 			//----------------------------------------------------------------------------
 			// wisescope 1
-			::SDOAQ_SelectMultiWs(1);
+			rv_sdoaq = ::SDOAQ_SelectMultiWs(1);
+			if (ecNoError != rv_sdoaq)
+			{
+				g_LogLine(_T("SDOAQ_SelectMultiWs(1) returns error(%d)."), rv_sdoaq);
+				return;
+			}
+
 			theApp.m_pMainWnd->GetDlgItem(IDC_SW_TRIGGER_WS1)->EnableWindow(TRUE);
 			g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
 
@@ -603,7 +667,13 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 
 			//----------------------------------------------------------------------------
 			// wisescope 2
-			::SDOAQ_SelectMultiWs(2);
+			rv_sdoaq = ::SDOAQ_SelectMultiWs(2);
+			if (ecNoError != rv_sdoaq)
+			{
+				g_LogLine(_T("SDOAQ_SelectMultiWs(2) returns error(%d)."), rv_sdoaq);
+				return;
+			}
+
 			theApp.m_pMainWnd->GetDlgItem(IDC_SW_TRIGGER_WS2)->EnableWindow(TRUE);
 			g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
 

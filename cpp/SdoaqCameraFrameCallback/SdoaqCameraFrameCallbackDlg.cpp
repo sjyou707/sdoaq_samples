@@ -276,30 +276,45 @@ void CSdoaqCameraFrameCallbackDlg::OnSetFov()
 	nHeight = _ttoi(sHeight);
 	nOffsetX = _ttoi(sOffsetX);
 	nOffsetY = _ttoi(sOffsetY);
-	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
-	::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
 
-	if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
+	eErrorCode rv1 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
+	eErrorCode rv2 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
+	if (ecNoError == rv1 && ecNoError == rv2)
 	{
-		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraRoiParameter(nWidth, nHeight, nOffsetX, nOffsetY, 1);
-		if (ecNoError == rv_sdoaq)
+		if (nWidth <= nMaxWidth && nHeight <= nMaxHeight)
 		{
-			int nBinning;
-			::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
-			SetDlgItemText(IDC_EDIT_FOV_WIDTH, FString(_T("%d"), nWidth));
-			SetDlgItemText(IDC_EDIT_FOV_HEIGHT, FString(_T("%d"), nHeight));
-			SetDlgItemText(IDC_EDIT_FOV_OFFSETX, FString(_T("%d"), nOffsetX));
-			SetDlgItemText(IDC_EDIT_FOV_OFFSETY, FString(_T("%d"), nOffsetY));
-			g_LogLine(_T("Set ROI (l:%d, t:%d, w:%d, h:%d)"), nOffsetX, nOffsetY, nWidth, nHeight);
+			eErrorCode rv_sdoaq = ::SDOAQ_SetCameraRoiParameter(nWidth, nHeight, nOffsetX, nOffsetY, 1);
+			if (ecNoError == rv_sdoaq)
+			{
+				int nBinning;
+				rv_sdoaq = ::SDOAQ_GetCameraRoiParameter(&nWidth, &nHeight, &nOffsetX, &nOffsetY, &nBinning);
+				if (ecNoError == rv_sdoaq)
+				{
+					SetDlgItemText(IDC_EDIT_FOV_WIDTH, FString(_T("%d"), nWidth));
+					SetDlgItemText(IDC_EDIT_FOV_HEIGHT, FString(_T("%d"), nHeight));
+					SetDlgItemText(IDC_EDIT_FOV_OFFSETX, FString(_T("%d"), nOffsetX));
+					SetDlgItemText(IDC_EDIT_FOV_OFFSETY, FString(_T("%d"), nOffsetY));
+					g_LogLine(_T("Set ROI (l:%d, t:%d, w:%d, h:%d)"), nOffsetX, nOffsetY, nWidth, nHeight);
+				}
+				else
+				{
+					g_LogLine(_T("SDOAQ_GetCameraRoiParameter() returns error(%d)."), rv_sdoaq);
+				}
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_SetCameraRoiParameter() returns error(%d)."), rv_sdoaq);
+			}
 		}
 		else
 		{
-			g_LogLine(_T("SDOAQ_SetCameraParameter(rv_sdoaq) returns error(%d)."), rv_sdoaq);
+			g_LogLine(_T("SDOAQ_SetCameraParameter(FOV) value is out of range."));
 		}
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_SetCameraParameter(FOV) value is out of range."));
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX) returns error(%d)."), rv1);
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY) returns error(%d)."), rv2);
 	}
 }
 
@@ -311,23 +326,30 @@ void CSdoaqCameraFrameCallbackDlg::OnSetExposureTime()
 
 	int nMin, nMax, nValue;
 	nValue = _ttoi(sValue);
-	::SDOAQ_GetIntParameterRange(piCameraExposureTime, &nMin, &nMax);
 
-	if (nMin <= nValue && nValue <= nMax)
+	eErrorCode rv_sdoaq = ::SDOAQ_GetIntParameterRange(piCameraExposureTime, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
-		eErrorCode rv_sdoaq = ::SDOAQ_SetIntParameterValue(piCameraExposureTime, nValue);
-		if (ecNoError == rv_sdoaq)
+		if (nMin <= nValue && nValue <= nMax)
 		{
-			g_LogLine(_T("Set camera exposure time: %d"), nValue);
+			rv_sdoaq = ::SDOAQ_SetIntParameterValue(piCameraExposureTime, nValue);
+			if (ecNoError == rv_sdoaq)
+			{
+				g_LogLine(_T("Set camera exposure time: %d"), nValue);
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_SetIntParameterValue(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
+			}
 		}
 		else
 		{
-			g_LogLine(_T("SDOAQ_SetIntParameterValue(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
+			g_LogLine(_T("CameraExposureTime value is out of range (%d ~ %d)."), nMin, nMax);
 		}
 	}
 	else
 	{
-		g_LogLine(_T("CameraExposureTime value is out of range (%d ~ %d)."), nMin, nMax);
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraExposureTime) returns error(%d)."), rv_sdoaq);
 	}
 }
 
@@ -408,6 +430,10 @@ void CSdoaqCameraFrameCallbackDlg::OnSetStringRegister()
 	GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
 	GetDlgItemText(IDC_EDIT_REG_STRING, sValue);
 	eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterString(CT2CA(sRegister), CT2CA(sValue));
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_SetCameraParameterString(%s:%s) returns error(%d)."), sRegister, sValue, rv_sdoaq);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -425,14 +451,27 @@ void CSdoaqCameraFrameCallbackDlg::OnSetIntegerRegister()
 		if (cgsOnGrabbing == cgs)
 		{
 			rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgsOffGrabbing);
+			if (ecNoError != rv_sdoaq)
+			{
+				g_LogLine(_T("SDOAQ_SetCameraGrabbingStatus() returns error(%d)."), rv_sdoaq);
+				return;
+			}
 		}
 
 		CString sRegister, sValue;
 		GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
 		GetDlgItemText(IDC_EDIT_REG_INT, sValue);
 		eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterInteger(CT2CA(sRegister), _ttoi(sValue));
+		if (ecNoError != rv_sdoaq)
+		{
+			g_LogLine(_T("SDOAQ_SetCameraParameterInteger(%s:%s) returns error(%d)."), sRegister, sValue, rv_sdoaq);
+		}
 
 		rv_sdoaq = ::SDOAQ_SetCameraGrabbingStatus(cgs);
+		if (ecNoError != rv_sdoaq)
+		{
+			g_LogLine(_T("SDOAQ_SetCameraGrabbingStatus() returns error(%d)."), rv_sdoaq);
+		}
 	}
 	else
 	{
@@ -447,6 +486,10 @@ void CSdoaqCameraFrameCallbackDlg::OnSetDoubleRegister()
 	GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
 	GetDlgItemText(IDC_EDIT_REG_DOUBLE, sValue);
 	eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterDouble(CT2CA(sRegister), _ttof(sValue));
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_SetCameraParameterDouble(%s:%s) returns error(%d)."), sRegister, sValue, rv_sdoaq);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -456,6 +499,10 @@ void CSdoaqCameraFrameCallbackDlg::OnSetBoolRegister()
 	GetDlgItemText(IDC_EDIT_REGISTER, sRegister);
 	GetDlgItemText(IDC_EDIT_REG_BOOL, sValue);
 	eErrorCode rv_sdoaq = ::SDOAQ_SetCameraParameterBool(CT2CA(sRegister), _ttoi(sValue));
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_SetCameraParameterBool(%s:%s) returns error(%d)."), sRegister, sValue, rv_sdoaq);
+	}
 }
 
 //============================================================================
@@ -546,8 +593,6 @@ static void g_SDOAQ_FrameCallback(eErrorCode errorCode, unsigned char* pBuffer, 
 		{
 			++nums_skip_to_display;
 		}
-
-		//::SDOAQ_ExecCameraSoftwareTrigger();
 	}
 }
 

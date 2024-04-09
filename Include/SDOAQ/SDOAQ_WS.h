@@ -117,9 +117,12 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.5.1  2024.03.26	YoungJu Lee		- Apply the maximum size of the image manager specified in the script
 										  (The size of image manager is calculated based on the size of all raw images and resulting data)
-										- Add APIs that specify the script file and camfile folders
+										- Add APIs that specify the script file and camfiles folder
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 2.6.0  2024.03.19  YoungJu Lee     - Supports multiple WiseScopes
+	 2.6.0  2024.04.05  YoungJu Lee     - Support multiple WiseScopes
+										- Support multiple light controllers
+										- Add piSaveOnlyResult parameter that specifies whether to save the raw images when snapping
+										- Add piFeatureBinning parameter that check whether binning feature is supported
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -166,6 +169,9 @@ extern "C"
 		/// <summary>This error occurs if a write access to an readonly device parameter was requested.</summary>
 		ecParameterIsNotWritable = 7,
 
+		/// <summary>This error occurs if the parameter value has never been set.</summary>
+		ecParameterIsNotSet = 14,
+
 		/// <summary>This error occurs if a auto adjustment function e.g. SDOAQ_AutoExposure() failed to reach the given target value.</summary>
 		ecAutoAdjustTargetNotReached = 8,
 
@@ -181,7 +187,11 @@ extern "C"
 		/// <summary>This error occurs when given wisescope is not exist.</summary>
 		ecNoWisescope = 12,
 
+		/// <summary>This error occurs when given lighting is not exist.</summary>
+		ecNoLighting = 13,
+
 		/// <summary>ToDo: Further values have to be defined ...</summary>
+		//ec_next = 15,
 	};
 
 	/// <summary>
@@ -423,7 +433,15 @@ extern "C"
 
 	enum eParameterId
 	{
+		/// <summary> The exposure time on the camera. After setting the value, the command is immediately sent to the camera.</summary>
 		piCameraExposureTime = 0,				// I - R/W  (microseconds)
+		/// <summary>
+		/// Data on exposure time. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataExposureTime = 85,				// I - R/W  (microseconds)
+
 		piCameraFullFrameSizeX = 1,				// I -  R	(pixels)
 		piCameraFullFrameSizeY = 2,				// I -  R	(pixels)
 		piCameraPixelSizeX = 3,					// I -  R	(nanometers)
@@ -434,21 +452,43 @@ extern "C"
 		/// with AcquisitionFixedParametersEx because it affects image buffer sizes.
 		/// </summary>
 		piCameraBinning = 5,					// I -  R   (matrix size)
+
+		/// <summary> The gain value on the camera. After setting the value, the command is immediately sent to the camera.</summary>
 		piCameraGain = 6,						// D - R/W
+		/// <summary>
+		/// Data on gain. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataGain = 86,						// D - R/W
+
 		piWhiteBalanceRed = 7,					// D - R/W
 		piWhiteBalanceGreen = 8,				// D - R/W
 		piWhiteBalanceBlue = 9,					// D - R/W
 
-		/// <summary>Sets the intensity of ring illumination 1 (inner ring).</summary>
+		/// <summary>
+		/// Sets the intensity of ring illumination 1 (inner ring).
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piInnerRingIntensity = 10,				// D - R/W	 (%)
-
-		/// <summary>Sets the intensity of ring illumination 2 (middle ring).</summary>
+		/// <summary>
+		/// Sets the intensity of ring illumination 2 (middle ring).
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piMiddleRingIntensity = 11,				// D - R/W	 (%)
-
-		/// <summary>Sets the intensity of ring illumination 3 (outer ring).</summary>
+		/// <summary>
+		/// Sets the intensity of ring illumination 3 (outer ring).
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piOuterRingIntensity = 12,				// D - R/W	 (%)
-
-		/// <summary>Sets the intensity of coax illumination.</summary>
+		/// <summary>
+		/// Sets the intensity of coax illumination.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piCoaxIntensity = 13,					// D - R/W	 (%)
 
 		/// <summary>Gets the minimum and maximum focus position of the MALS controller.</summary>
@@ -461,10 +501,30 @@ extern "C"
 		piReflexCorrectionAlgorithm = 15,		// I - R/W
 
 		/// <summary>
-		/// Defines which illumination pattern is used for reflex correction.
-		/// refer to 16bit-PatternID
+		/// Defines which illumination pattern is used for reflex correction. Refer to 16bit-PatternID
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
 		/// </summary>
 		piReflexCorrectionPattern = 16,			// I - R/W
+
+		/// <summary> A list of the names of all installed lights.</summary>
+		piLightingList = 82,					// S - R
+		/// <summary> 
+		/// Name of the active light. Activated lighting is used when taking images.
+		/// If there is only one light, it works without specifying 'piActiveLightingList',
+		/// but if multiple lights are installed, it must be selected.
+		/// </summary>
+		piActiveLightingList = 83,				// S - R/W
+		/// <summary>
+		/// This is the name of the light to be set when making lighting-related settings.
+		/// The lighting name must be one of the name list received as the 'piLightingList' parameter.
+		/// The setting items below are affected:
+		/// light intensity: piInnerRingIntensity, piMiddleRingIntensity, piOuterRingIntensity, piCoaxIntensity,
+		///                  piIntensityGeneralChannel_1 ~ piIntensityGeneralChannel_32
+		/// light pattern: piReflexCorrectionPattern
+		/// camera brightness related items: piDataExposureTime, piDataGain
+		/// </summary>
+		piSelectSettingLighting = 84,			// S - R/W
 
 		/// <summary>
 		/// Maybe we need to reduce system load on weak computers. Therefore we need the possibility to 
@@ -586,6 +646,11 @@ extern "C"
 		/// </summary>
 		piSavePixelBits = 28,					// I - R/W
 
+		/// <summary>
+		/// Specifies whether to save the raw images when snapping.
+		/// </summary>
+		piSaveOnlyResult = 81,					// I - R/W
+
 		/// <summary>left and top point of focus ROI
 		/// The upper 16 bits are left and lower 16 bits are top position. 0xAAAABBBB
 		/// </summary>
@@ -605,7 +670,11 @@ extern "C"
 		/// <summary>Defines a single focus for continuous single focus acqisition.</summary>
 		piSingleFocus = 33,						// I - R/W	 (MALS step)
 
-		/// <summary>Sets the intensity of general channel 1~8. These values are all consecutive integer values. We reserve a range of values for 32 channels.</summary>
+		/// <summary>
+		/// Sets the intensity of general channel 1~8. These values are all consecutive integer values. We reserve a range of values for 32 channels.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piIntensityGeneralChannel_1 = 34,		// D - R/W	 (%)
 		piIntensityGeneralChannel_2 = 35,		// D - R/W	 (%)
 		piIntensityGeneralChannel_3 = 36,		// D - R/W	 (%)
@@ -635,8 +704,10 @@ extern "C"
 		piFeatureAutoWhiteBalance = 79,			// I - R
 		/// <summary>Gets whether auto-illuminate function is supported.</summary>
 		piFeatureAutoIlluminate = 80,			// I - R
+		/// <summary>Gets whether binning feature is supported.</summary>
+		piFeatureBinning = 87,					// I - R
 
-		//piNextParameterValue = 81,
+		//piNextParameterValue = 88,
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -703,10 +774,11 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_SetDblParameterValue(eParameterId parameterId, double value);
 
 	// manages string value parameters	
-	// Read the parameterId value of string type and save it in the memory pointed to by ¡®pString¡¯ having the size of the value indicated by ¡®pSize¡¯.
-	// Write the size of the saved string in ¡®pSize¡¯ again.
+	/// Reads the parameterId value of string type and save it in the memory pointed to by ¡®pString¡¯, which has the size of the value indicated by ¡®pSize¡¯.
+	/// Updates the actual size of the saved string to ¡®pSize¡¯, not including the terminating null character.
 	__declspec(dllexport) eErrorCode SDOAQ_GetStringParameterValue(eParameterId parameterId, char* pString, int* pSize);
-	// Set up to NULL in the memory pointed to by ¡®pString¡¯.
+	/// Sets the value of parameterId with the data in the memory pointed to by ¡®pString¡¯.
+	/// ¡®pString¡¯ must include the terminating null character and cannot be null.
 	__declspec(dllexport) eErrorCode SDOAQ_SetStringParameterValue(eParameterId parameterId, const char* pString);
 
 	// manages camera parameter

@@ -173,47 +173,59 @@ LRESULT CSdoaqMultiFocusDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 		// ROI: image size to capture
 		//----------------------------------------------------------------------------
 		int nWidth, nHeight, nDummy;
-		eErrorCode rv;
-		rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nWidth);
-		rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nHeight);
-
-		AcquisitionFixedParametersEx AFP;
-		AFP.cameraRoiTop = 0;
-		AFP.cameraRoiLeft = 0;
-		AFP.cameraRoiWidth = nWidth;
-		AFP.cameraRoiHeight = nHeight;
-		AFP.cameraBinning = 1;
-		if (!SET.rb.active)
+		eErrorCode rv1 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nWidth);
+		eErrorCode rv2 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nHeight);
+		if (ecNoError == rv1 && ecNoError == rv2)
 		{
-			SET.afp = AFP;
+			AcquisitionFixedParametersEx AFP;
+			AFP.cameraRoiTop = 0;
+			AFP.cameraRoiLeft = 0;
+			AFP.cameraRoiWidth = nWidth;
+			AFP.cameraRoiHeight = nHeight;
+			AFP.cameraBinning = 1;
+			if (!SET.rb.active)
+			{
+				SET.afp = AFP;
+			}
+
+			//----------------------------------------------------------------------------
+			// FOCUS SET: scan image scan range
+			//----------------------------------------------------------------------------
+			m_vFocusSet.clear();
+			int nLowFocus, nHighFocus;
+			eErrorCode rv_sdoaq = ::SDOAQ_GetIntParameterRange(piFocusPosition, &nLowFocus, &nHighFocus);
+			if (ecNoError == rv_sdoaq)
+			{
+				// nLowFocus: Low dof of the image to be scanned.
+				// nHighFocus: High dof of the image to be scanned.
+				// nInterval: Adjust the gap between images to be scanned. If you narrow the gap, you can get a more accurate image.
+				int nInterval = 32;
+				for (int nFocus = nLowFocus; nFocus <= nHighFocus; nFocus += nInterval)
+				{
+					m_vFocusSet.push_back(nFocus);
+				}
+
+				SetDlgItemText(IDC_STATIC_SCRIPT, _T("Script (id, func, focus, left, top, width, height)"
+					"\r   * id (unique number)"
+					"\r   * func (1: auto-focus, 2: fixed-focus)"
+					"\r   * focus (focus step for fixed-focus roi)"
+					"\r   * left,top,width,height (multi-foucs roi)"));
+				SetDlgItemText(IDC_EDIT_SCRIPT, _T("1,1,160,1700,700,256,256"));
+				OnSdoaqAddMFScript();
+
+				SetDlgItemText(IDC_EDIT_BLANK_STEP, _T("160"));
+				OnSdoaqSetOutsideFocusStep();
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_GetIntParameterRange(piFocusPosition) returns error(%d)."), rv_sdoaq);
+			}
 		}
-
-		//----------------------------------------------------------------------------
-		// FOCUS SET: scan image scan range
-		//----------------------------------------------------------------------------
-		m_vFocusSet.clear();
-		int nLowFocus, nHighFocus;
-		rv = ::SDOAQ_GetIntParameterRange(piFocusPosition, &nLowFocus, &nHighFocus);
-
-		// nLowFocus: Low dof of the image to be scanned.
-		// nHighFocus: High dof of the image to be scanned.
-		// nInterval: Adjust the gap between images to be scanned. If you narrow the gap, you can get a more accurate image.
-		int nInterval = 32;
-		for (int nFocus = nLowFocus; nFocus <= nHighFocus; nFocus += nInterval)
+		else
 		{
-			m_vFocusSet.push_back(nFocus);
+			g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX) returns error(%d)."), rv1);
+			g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY) returns error(%d)."), rv2);
 		}
-
-		SetDlgItemText(IDC_STATIC_SCRIPT, _T("Script (id, func, focus, left, top, width, height)"
-			"\r   * id (unique number)"
-			"\r   * func (1: auto-focus, 2: fixed-focus)"
-			"\r   * focus (focus step for fixed-focus roi)"
-			"\r   * left,top,width,height (multi-foucs roi)"));
-		SetDlgItemText(IDC_EDIT_SCRIPT, _T("1,1,160,1700,700,256,256"));
-		OnSdoaqAddMFScript();
-
-		SetDlgItemText(IDC_EDIT_BLANK_STEP, _T("160"));
-		OnSdoaqSetOutsideFocusStep();
 	}
 	else
 	{
@@ -309,17 +321,23 @@ void CSdoaqMultiFocusDlg::OnSdoaqSetOutsideFocusStep()
 	GetDlgItemText(IDC_EDIT_BLANK_STEP, sValue);
 
 	int nMin, nMax;
-	eErrorCode rv = ::SDOAQ_GetIntParameterRange(piSingleFocus, &nMin, &nMax);
-
-	int nValue = _ttoi(sValue);
-	if (nValue >= nMin && nValue <= nMax)
+	eErrorCode rv_sdoaq = ::SDOAQ_GetIntParameterRange(piSingleFocus, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
-		(void)::SDOAQ_SetIntParameterValue(piSingleFocus, nValue);
-		g_LogLine(_T("set the outside focus value to %d."), nValue);
+		int nValue = _ttoi(sValue);
+		if (nValue >= nMin && nValue <= nMax)
+		{
+			(void)::SDOAQ_SetIntParameterValue(piSingleFocus, nValue);
+			g_LogLine(_T("set the outside focus value to %d."), nValue);
+		}
+		else
+		{
+			g_LogLine(_T("focus value is out of range[%d ~ %d]"), nMin, nMax);
+		}
 	}
 	else
 	{
-		g_LogLine(_T("focus value is out of range[%d ~ %d]"), nMin, nMax);
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piSingleFocus) returns error(%d)."), rv_sdoaq);
 	}
 }
 
@@ -361,7 +379,7 @@ void CSdoaqMultiFocusDlg::OnSdoaqPlayMF()
 	}
 
 	AFP.callbackUserData = (void*)::GetTickCount64();
-	eErrorCode rv = ::SDOAQ_PlayMFEx(
+	eErrorCode rv_sdoaq = ::SDOAQ_PlayMFEx(
 		&AFP,
 		g_PlayMFCallbackEx,
 		pPositions, (int)FOCUS.numsFocus,
@@ -370,14 +388,13 @@ void CSdoaqMultiFocusDlg::OnSdoaqPlayMF()
 		SET.rb.ppBuf,
 		SET.rb.pSizes
 	);
-	if (ecNoError == rv)
+	if (ecNoError == rv_sdoaq)
 	{
 		SET.rb.active = true;
-		g_LogLine(_T("PlayMFEx()"));
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_PlayMFEx() returns error(%d)."), rv);
+		g_LogLine(_T("SDOAQ_PlayMFEx() returns error(%d)."), rv_sdoaq);
 	}
 
 	delete[] pPositions;
@@ -388,7 +405,11 @@ void CSdoaqMultiFocusDlg::OnSdoaqUpdateScript()
 {
 	g_LogLine(_T("UpdatePlayMF() script = %s"), (CString)GetFunctionScript());
 
-	(void)::SDOAQ_UpdatePlayMF(GetFunctionScript());
+	const eErrorCode rv_sdoaq = ::SDOAQ_UpdatePlayMF(GetFunctionScript());
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_UpdatePlayMF() returns error(%d)."), rv_sdoaq);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -399,16 +420,23 @@ void CSdoaqMultiFocusDlg::OnSdoaqClearScript()
 
 	g_LogLine(_T("UpdatePlayMF() script = %s"), (CString)GetFunctionScript());
 
-	(void)::SDOAQ_UpdatePlayMF(GetFunctionScript());
+	const eErrorCode rv_sdoaq = ::SDOAQ_UpdatePlayMF(GetFunctionScript());
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_UpdatePlayMF() returns error(%d)."), rv_sdoaq);
+	}
 }
 
 //----------------------------------------------------------------------------
 void CSdoaqMultiFocusDlg::OnSdoaqStopMF()
 {
 	SET.rb.active = false;
-	(void)::SDOAQ_StopMF();
 
-	g_LogLine(_T("StopMF()"));
+	const eErrorCode rv_sdoaq = ::SDOAQ_StopMF();
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_StopMF() returns error(%d)."), rv_sdoaq);
+	}
 
 	SET.ClearBuffer();
 }

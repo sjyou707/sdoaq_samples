@@ -1,6 +1,6 @@
 ﻿//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++에서 생성한 포함 파일입니다.
-// SdoaqMultiCameraFrameCallback.rc에서 사용되고 있습니다.
+// Microsoft Visual C++ generated include file.
+// Used by SdoaqMultiCameraFrameCallback.rc
 //
 #define IDD_SDOAQMULTICAMERAFRAMECALLBACK_DIALOG 102
 #define IDR_MAINFRAME                   128

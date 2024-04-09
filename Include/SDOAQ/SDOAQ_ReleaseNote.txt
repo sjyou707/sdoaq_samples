@@ -112,8 +112,10 @@
  SDOAQ_v2.5.1  2024.03.26  YoungJu Lee     - The image buffer is released immediately when the callback function registered in the SDOAQ_SetFrameCallback is completed
                                            - Apply the maximum size of the image manager specified in the script
                                              (The size of image manager is calculated based on the size of all raw images and resulting data)
-                                           - Add APIs that specify the script file and camfile folders
+                                           - Add APIs that specify the script file and camfiles folder
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
- SDOAQ_v2.6.0  2024.03.19  YoungJu Lee     - Support multiple wisescope
-                                           - Add APIs that specify the script file and camfile folders
+ SDOAQ_v2.6.0  2024.04.05  YoungJu Lee     - Support multiple WiseScopes
+                                           - Support multiple light controllers
+                                           - Add piSaveOnlyResult parameter that specifies whether to save the raw images when snapping
+                                           - Add piFeatureBinning parameter that check whether binning feature is supported
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
