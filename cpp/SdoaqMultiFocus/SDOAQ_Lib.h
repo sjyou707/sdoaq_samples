@@ -31,6 +31,53 @@ inline bool IsMonoCameraInstalled()
 }
 
 //----------------------------------------------------------------------------
+inline bool GetIntParameterValue(eParameterId pi, int* pvalue)
+{
+	bool available;
+	return true
+		&& ecNoError == ::SDOAQ_IsParameterAvailable(pi, &available)
+		&& available
+		&& (pvalue == NULL || ecNoError == ::SDOAQ_GetIntParameterValue(pi, pvalue))
+		;
+}
+
+inline bool IsSupportAutoExposure(void)
+{
+	return GetIntParameterValue(piFeatureAutoExposure, NULL);
+}
+
+inline bool IsSupportAutoWB(void)
+{
+	return GetIntParameterValue(piFeatureAutoWhiteBalance, NULL);
+}
+
+inline bool IsSupportAutoIlluminate(void)
+{
+	return GetIntParameterValue(piFeatureAutoIlluminate, NULL);
+}
+
+inline bool IsSupportBinning(void)
+{
+	return GetIntParameterValue(piFeatureBinning, NULL);
+}
+
+//----------------------------------------------------------------------------
+inline eErrorCode SetSdoaqFocusRect(const CRect& rc)
+{
+	const auto rv1 = ::SDOAQ_SetIntParameterValue(piFocusLeftTop, ((rc.left & 0x0000FFFF) << 16) | (rc.top & 0x0000FFFF) << 0);
+	const auto rv2 = ::SDOAQ_SetIntParameterValue(piFocusRightBottom, ((rc.right & 0x0000FFFF) << 16) | (rc.bottom & 0x0000FFFF) << 0);
+	if (rv1 != ecNoError)
+	{
+		return rv1;
+	}
+	if (rv2 != ecNoError)
+	{
+		return rv2;
+	}
+	return ecNoError;
+}
+
+//----------------------------------------------------------------------------
 inline LPCTSTR GetSdoaqErrorString(int eCode)
 {
 	switch (eCode)
@@ -43,8 +90,14 @@ inline LPCTSTR GetSdoaqErrorString(int eCode)
 	case ecInvalidParameter: return _T("ecInvalidParameter");
 	case ecTimeoutOccurred: return _T("ecTimeoutOccurred");
 	case ecParameterIsNotWritable: return _T("ecParameterIsNotWritable");
+	case ecParameterIsNotSet: return _T("ecParameterIsNotSet");
 	case ecAutoAdjustTargetNotReached: return _T("ecAutoAdjustTargetNotReached");
 	case ecNotImplemented: return _T("ecNotImplemented");
+	case ecNotSupported: return _T("ecNotSupported");
+	case ecNoAuthorization: return _T("ecNoAuthorization");
+	case ecNoWisescope: return _T("ecNoWisescope");
+	case ecNoLighting: return _T("ecNoLighting");
+
 	default: return _T("Invalid");
 	}
 }

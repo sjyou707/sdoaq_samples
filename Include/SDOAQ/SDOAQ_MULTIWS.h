@@ -1,7 +1,7 @@
 /* SDOAQ_MULTIWS.h
 
 	Comments : This file exports all types and functions required to access the SDO acquisition engine configured with multiple WiseScopes.
-	Date     : 2024/03/19
+	Date     : 2024/04/05
 	Author   : YoungJu Lee
 	Copyright (c) 2019 SD Optics,Inc. All rights reserved.
 
@@ -10,7 +10,7 @@
 	========================================================================================================================================================
 	Version     date      Author         Descriptions
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 2.6.0  2024.03.19  YoungJu Lee     - Init
+	 2.6.0  2024.04.05  YoungJu Lee     - Init
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 

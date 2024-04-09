@@ -5,16 +5,20 @@
  Image Manager Size GB = 8
 
 ### MALS
- wsi_1 MALS Device = { Auto , Auto , 1.8 , 1.0 }
+ wsi_1 MALS Device = { Auto , Simul , 1.8 , 1.0 }
  wsi_2 MALS Device = { Auto , Simul , 1.8 , 1.0 }
 
 
 ### CAMERA
- wsi_1 Camera Model (V2) = { Pylon-USB , -1 }
- wsi_1 Camera Trigger Method = TPSU
- wsi_1 Camera Reverse X = false
- wsi_1 Camera Reverse Y = true
- wsi_1 Pylon USB Line Number = Line2
+ # if_name(string)   : Simul / Simul-width-height-(color|bw)
+ #                   : GigE: Basler(Pylon-GigE) / Vieworks(Vis-GigE) / HIK(Mvs) / IMI(Neptune) / Flir(Spinnaker) / Others(EBUS)
+ #                   : USB: Basler(Pylon-USB) / HIK(Mvs) / IMI(Neptune) / Raytrix(Raycam) / PCO(Pco)
+ #                   : CLink+Euresys: Basler(Multicam-ACA) / Sentech(Multicam-STC) / CIS(Multicam-CIS) / VIEWORKS(Multicam-VW) / HIKROBOT(Multicam-HIK)
+ #                   : CLink+Matrox: Basler(Milx-ACA) / Sentech(Milx-STC) / CIS(Milx-CIS) / VIEWORKS(Milx-VW) / HIKROBOT(Milx-HIK)
+ #                   : CoaXPress: Euresys(Coaxlink) / Matrox(Milx)
+
+ wsi_1 Camera Model (V2) = { Simul-2040-1086-color , -1 }
+ wsi_1 Camera Trigger Method = Software
  wsi_1 Full Focus Simul Image = C:\Simul.Zstack
 
  wsi_2 Camera Model (V2) = { Simul-2040-1086-color , -1 }
@@ -23,8 +27,15 @@
 
 
 ### LIGHTING
+ # Lighting (V3) record format SINGLE  : {model, name, device, source, intensity, lighting_cam_exposure, lighting_cam_gain, max_exposure_time}
+ # Lighting (V3) record format GROUP   : {GROUP, name, group-algo, item-nums}
+ # Lighting (V3) record format GR.ITEM : {model, item-name, device, source, intensity, lighting_cam_exposure, lighting_cam_gain, max_exposure_time}
+ # model(string)                       : Null(External controlled)
+ #                                     : SDZEISS / SDZEISS-NOSTROBE
+ #                                     : LCBPWM / TPSU
+
  wsi_1 Lighting Device (V3) 1 = { GROUP , SDZEISS , UI , 8 }
- wsi_1 Lighting Device (V3) 1-1 = { SDZEISS-NOSTROBE , Sub^m , auto , 0 , 0 , -2 , -1 , 1000000 }
+ wsi_1 Lighting Device (V3) 1-1 = { SDZEISS-NOSTROBE , Sub^m , Simul , 0 , 0 , -2 , -1 , 1000000 }
 
  wsi_2 Lighting Device (V3) 1 = { LCBPWM , L , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
  wsi_2 Lighting Device (V3) 1 attributes = { strobe = on }
