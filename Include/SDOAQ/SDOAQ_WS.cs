@@ -192,10 +192,10 @@ namespace SDOAQ
 			/// <summary>This error occurs when there is no authorization.</summary>
 			ecNoAuthorization = 11,
 
-			/// <summary>This error occurs when given wisescope is not exist.</summary>
+			/// <summary>This error occurs when given wisescope does not exist.</summary>
 			ecNoWisescope = 12,
 
-			/// <summary>This error occurs when given lighting is not exist.</summary>
+			/// <summary>This error occurs when given lighting does not exist.</summary>
 			ecNoLighting = 13,
 
 			/// <summary>ToDo: Further values have to be defined ...</summary>
