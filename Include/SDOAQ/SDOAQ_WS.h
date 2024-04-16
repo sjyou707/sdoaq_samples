@@ -123,6 +123,10 @@
 										- Support multiple light controllers
 										- Add piSaveOnlyResult parameter that specifies whether to save the raw images when snapping
 										- Add piFeatureBinning parameter that check whether binning feature is supported
+										- Update sdaf v0.21 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.6.1  2024.04.16  YoungJu Lee     - Support Teledyne FLIR camera BFS-U3-16S7M
+	 									- Update sdaf v0.22 library
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 

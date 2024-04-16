@@ -10,7 +10,12 @@
  Camera TPSU Trigger Delay = 30000
 
 ### CAMERA
+
+ ####################################################
+ ###   !!! UPDATE CAMERA TYPE !!!
+ ####################################################
  Camera Model(V2) = { pylon-usb , -1 }
+
  Camera Trigger Method = External # tpsu #software
  Camera Reverse X = false
  Camera Reverse Y = false

@@ -12,6 +12,11 @@
 
 
 ### CAMERA
+
+ ####################################################
+ ###   !!! UPDATE CAMERA TYPE AND SERIAL NUMBER !!!
+ ####################################################
+
  wsi_1 Camera Model(V2) = { pylon-usb , -1 }
  wsi_1 Camera Trigger Method = software
 

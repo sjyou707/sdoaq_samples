@@ -1,25 +1,24 @@
 
-
 ### OPERATION
  Product ID = wisescope
+ Number of WSM = 1
  Image Manager Size GB = 0.5
 
 
 ### MALS
- MALS Device = { Auto , Simul , 11.8 , 1.0 } 
+ wsi_1 MALS Device = { Auto , Simul , 11.8 , 1.0 } 
 
 
 ### CAMERA
- Camera Model (V2) = { Simul-2040-1086-color , -1 }
- Camera Trigger Method = software
- 
- Full Focus Simul Image = C:\\Simul.Zstack
+ wsi_1 Camera Model (V2) = { Simul-2040-1086-color , -1 }
+ wsi_1 Camera Trigger Method = software
+ wsi_1 Full Focus Simul Image = C:\\Simul.Zstack
+
 
 ### LIGHTING
- Lighting Device (V3) 1 = { TPSU , L11 , simul ,  103 ,  1 , -2 , -1 , 1000000 }
- Lighting Device (V3) 1 attributes = { strobe = off }
- Lighting Device (V3) 2 = { LCBPWM , L12 , simul ,  0 ,  0 , -2 , -1 , 1000000 } 
- Lighting Device (V3) 2 attributes = { strobe = on }
- Lighting Device (V3) 3 = { GROUP , L13G , UI , 8 }
- Lighting Device (V3) 3-1 = { SDZEISS , Sub1^m , simul , 0 , 0 , -2 , -1 , 1000000 }
-
+ wsi_1 Lighting Device (V3) 1 = { TPSU , L11 , simul ,  0 ,  1 , -2 , -1 , 1000000 }
+ wsi_1 Lighting Device (V3) 1 attributes = { strobe = off }
+ wsi_1 Lighting Device (V3) 2 = { LCBPWM , L12 , simul ,  0 ,  0 , -2 , -1 , 1000000 } 
+ wsi_1 Lighting Device (V3) 2 attributes = { strobe = on }
+ wsi_1 Lighting Device (V3) 3 = { GROUP , L13G , UI , 8 }
+ wsi_1 Lighting Device (V3) 3-1 = { SDZEISS , Sub1^m , simul , 0 , 0 , -2 , -1 , 1000000 }
