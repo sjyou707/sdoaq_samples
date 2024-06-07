@@ -72,9 +72,16 @@ WSIODLL_API WSIORV			WSGL_StopDisplay(
 			WSGLHANDLE		hd3v
 			);
 
+WSIODLL_API WSIORV			WSGL_Build_Welcome(
+			WSGLHANDLE		hd3v,
+			WSIOCSTR		file_name_str,
+			int				mode,
+			float			speed
+			);
+
 WSIODLL_API WSIORV			WSGL_Display_Welcome(
 			WSGLHANDLE		hd3v
-			);
+);
 
 WSIODLL_API WSIORV			WSGL_Display_BG(
 			WSGLHANDLE		hd3v

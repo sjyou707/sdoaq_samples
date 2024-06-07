@@ -134,6 +134,9 @@ using System.Text;
 	 2.6.1  2024.04.16  YoungJu Lee     - Support Teledyne FLIR camera BFS-U3-16S7M
 										- Update sdaf v0.22 library
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.0  2024.06.05  YoungJu Lee     - Support FFC(flat field correction)
+										- Update sdedof v0.86 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 
@@ -506,6 +509,24 @@ namespace SDOAQ
 			piWhiteBalanceRed = 7,              // D - R/W
 			piWhiteBalanceGreen = 8,            // D - R/W
 			piWhiteBalanceBlue = 9,             // D - R/W
+
+			/// <summary> FFC ID supported by the camera. After setting the value, the command is immediately sent to the camera.</summary>
+			piCameraFfcId = 88,                     // I - R/W
+			/// <summary>
+			/// FFC ID supported by the camera. It has no default value.
+			/// When multiple lights are used, this data has a value for each light.
+			/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+			/// </summary>
+			piDataCamFfcId = 89,                    // I - R/W
+
+			/// <summary> FFC ID supported by software.</summary>
+			piSoftwareFfcId = 90,                   // I - R/W
+			/// <summary>
+			/// FFC ID supported by software. It has no default value.
+			/// When multiple lights are used, this data has a value for each light.
+			/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+			/// </summary>
+			piDataSoftwareFfcId = 91,               // I - R/W
 
 			/// <summary>
 			/// Sets the intensity of ring illumination 1 (inner ring).
@@ -972,6 +993,20 @@ namespace SDOAQ
 		/// </param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_AutoWhiteBalance(int roiLeft, int roiTop, int roiWidth, int roiHeight);
+
+		/// Generates camera FFC data, assigns it to the camera's 'api_ffcid', and applies it immediately.
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_GenerateCameraFFC(int api_ffcid);
+		/// <summary>
+		/// Generates SW FFC data, assigns it to 'api_ffcid', applies it immediately, and saves it as a 'filename' file.
+		/// This function operates when the camera is running. Therefore, call it during free-run or stack images acquisition.
+		/// FFC data must be generated with full ROI.
+		/// </summary>
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_GenerateSoftwareFFC(int api_ffcid, [MarshalAs(UnmanagedType.LPStr)] string filename);
+		/// Assigns the file 'filename' to software 'api_ffcid'. If filename is NULL, the corresponding ffc is off.
+		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
+		public static extern eErrorCode SDOAQ_SetSoftwareFFC(int api_ffcid, [MarshalAs(UnmanagedType.LPStr)] string filename);
 
 		/// It is called when image acquisition is completed. 
 		/// User data delivered through the API requesting image acquisition is passed as is.

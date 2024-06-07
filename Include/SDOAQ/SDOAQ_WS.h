@@ -128,6 +128,9 @@
 	 2.6.1  2024.04.16  YoungJu Lee     - Support Teledyne FLIR camera BFS-U3-16S7M
 	 									- Update sdaf v0.22 library
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.0  2024.06.05  YoungJu Lee     - Support FFC(flat field correction)
+										- Update sdedof v0.86 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -470,6 +473,24 @@ extern "C"
 		piWhiteBalanceGreen = 8,				// D - R/W
 		piWhiteBalanceBlue = 9,					// D - R/W
 
+		/// <summary> FFC ID supported by the camera. After setting the value, the command is immediately sent to the camera.</summary>
+		piCameraFfcId = 88,						// I - R/W
+		/// <summary>
+		/// FFC ID supported by the camera. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataCamFfcId = 89,					// I - R/W
+
+		/// <summary> FFC ID supported by software.</summary>
+		piSoftwareFfcId = 90,					// I - R/W
+		/// <summary>
+		/// FFC ID supported by software. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataSoftwareFfcId = 91,				// I - R/W
+
 		/// <summary>
 		/// Sets the intensity of ring illumination 1 (inner ring).
 		/// When multiple lights are used, this data has a value for each light.
@@ -711,7 +732,7 @@ extern "C"
 		/// <summary>Gets whether binning feature is supported.</summary>
 		piFeatureBinning = 87,					// I - R
 
-		//piNextParameterValue = 88,
+		//piNextParameterValue = 92,
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -918,6 +939,18 @@ extern "C"
 	/// These values are defining a ROI to adjust the white balance.
 	/// </param>
 	__declspec(dllexport) eErrorCode SDOAQ_AutoWhiteBalance(int roiLeft, int roiTop, int roiWidth, int roiHeight);
+
+
+	/// Generates camera FFC data, assigns it to the camera's 'api_ffcid', and applies it immediately.
+	__declspec(dllexport) eErrorCode SDOAQ_GenerateCameraFFC(int api_ffcid);
+	/// <summary>
+	/// Generates SW FFC data, assigns it to 'api_ffcid', applies it immediately, and saves it as a 'filename' file.
+	/// This function operates when the camera is running. Therefore, call it during free-run or stack images acquisition.
+	/// FFC data must be generated with full ROI.
+	/// </summary>
+	__declspec(dllexport) eErrorCode SDOAQ_GenerateSoftwareFFC(int api_ffcid, const char* filename);
+	/// Assigns the file 'filename' to software 'api_ffcid'. If filename is NULL, the corresponding ffc is off.
+	__declspec(dllexport) eErrorCode SDOAQ_SetSoftwareFFC(int api_ffcid, const char* filename);
 
 	/// It is called when image acquisition is completed. 
 	/// User data delivered through the API requesting image acquisition is passed as is.

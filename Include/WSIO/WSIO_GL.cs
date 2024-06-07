@@ -249,6 +249,10 @@ namespace SDOWSIO
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+			public static extern WSIORV WSGL_Build_Welcome(IntPtr hd3v, string file_name_str, int mode, float speed);
+
+			//----------------------------------------------------------------------------
+			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSGL_Display_Welcome(IntPtr hd3v);
 
 			//----------------------------------------------------------------------------

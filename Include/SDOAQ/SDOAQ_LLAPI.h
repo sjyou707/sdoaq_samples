@@ -89,6 +89,7 @@ extern "C"
 	};
 
 	__declspec(dllexport) eErrorCode SDOAQ_ExecCameraSoftwareTrigger(void);
+	__declspec(dllexport) eErrorCode SDOAQ_ExecGrabberSoftwareTrigger(void);
 
 	// for CoaXPress, Basler USB, Basler GigE
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameterString(const char* sz_register, const char* sz_value);
