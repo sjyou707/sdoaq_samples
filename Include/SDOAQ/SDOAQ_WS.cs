@@ -137,6 +137,10 @@ using System.Text;
 	 2.7.0  2024.06.05  YoungJu Lee     - Support FFC(flat field correction)
 										- Update sdedof v0.86 library
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.1  2024.06.21  YoungJu Lee		- Support Basler CXP-12 frame grabber
+										- Add timestamps to all types of logs and display the time taken for image acquisition and image processing respectively
+										- Add a parameter to set log level (piLogLevel)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 
@@ -239,7 +243,10 @@ namespace SDOAQ
 			lsInfo = 2,
 
 			/// <summary>The log message has only trace/Verbose level. This is usually used for development and troubleshooting and is only logged in this cases.</summary>
-			lsVerbose = 3
+			lsVerbose = 3,
+
+			/// <summary>The log message has the time taken for image acquisition and image processing respectively.</summary>
+			lsMeasure = 6,
 		};
 
 		/// <summary>
@@ -769,7 +776,10 @@ namespace SDOAQ
 			/// <summary>Gets whether binning feature is supported.</summary>
 			piFeatureBinning = 87,              // I - R
 
-			//piNextParameterValue = 88,
+			/// <summary>By specifying a log level, only log messages with a higher severity level than the specified log level are provided.</summary>
+			piLogLevel = 92,                    // I - R/W	 (log severity)
+
+			//piNextParameterValue = 93, //240618
 
 			/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 			piInvalidParameter = 100

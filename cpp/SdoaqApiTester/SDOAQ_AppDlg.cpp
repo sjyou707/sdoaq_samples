@@ -181,6 +181,10 @@ void CSDOAQ_Dlg::BuildParameterID_Combobox(void)
 		ADD_PI(_T("WhiteBalanceRed"), piWhiteBalanceRed);
 		ADD_PI(_T("WhiteBalanceGreen"), piWhiteBalanceGreen);
 		ADD_PI(_T("WhiteBalanceBlue"), piWhiteBalanceBlue);
+		ADD_PI(_T("CameraFfcId"), piCameraFfcId);
+		ADD_PI(_T("DataCamFfcId"), piDataCamFfcId);
+		ADD_PI(_T("SoftwareFfcId"), piSoftwareFfcId);
+		ADD_PI(_T("DataSoftwareFfcId"), piDataSoftwareFfcId);
 		ADD_PI(_T("CameraColor"), piCameraColor);
 		//
 		ADD_PI(_T("FocusPosition"), piFocusPosition);
@@ -193,6 +197,7 @@ void CSDOAQ_Dlg::BuildParameterID_Combobox(void)
 		ADD_PI(_T("FocusLeftTop"), piFocusLeftTop);
 		ADD_PI(_T("FocusRightBottom"), piFocusRightBottom);
 		ADD_PI(_T("SaveFileFormat"), piSaveFileFormat);
+		ADD_PI(_T("SaveOnlyResult"), piSaveOnlyResult);
 		ADD_PI(_T("VpsReportCycleSeconds"), piVpsReportCycleSeconds);
 		ADD_PI(_T("VpsReportTimeSeconds"), piVpsReportTimeSeconds);
 		ADD_PI(_T("SimulMalsHighestStep"), piSimulMalsHighestStep);
@@ -236,9 +241,10 @@ void CSDOAQ_Dlg::BuildParameterID_Combobox(void)
 		ADD_PI(_T("af_stability_method"), pi_af_stability_method);
 		ADD_PI(_T("af_stability_debounce_count"), pi_af_stability_debounce_count);
 		// auto function
-		ADD_PI(_T("piFeatureAutoExposure"), piFeatureAutoExposure);
-		ADD_PI(_T("piFeatureAutoWhiteBalance"), piFeatureAutoWhiteBalance);
-		ADD_PI(_T("piFeatureAutoIlluminate"), piFeatureAutoIlluminate);
+		ADD_PI(_T("FeatureAutoExposure"), piFeatureAutoExposure);
+		ADD_PI(_T("FeatureAutoWhiteBalance"), piFeatureAutoWhiteBalance);
+		ADD_PI(_T("FeatureAutoIlluminate"), piFeatureAutoIlluminate);
+		ADD_PI(_T("LogLevel"), piLogLevel);
 		//p_combo->SetCurSel(0);
 	}
 }
@@ -505,11 +511,12 @@ LRESULT CSDOAQ_Dlg::OnUmLog(WPARAM wSeverity, LPARAM lpMessage)
 		LPCTSTR sSeverity;
 		switch ((eLogSeverity)wSeverity)
 		{
-		case lsError: sSeverity = _T("Error"); break;
-		case lsWarning: sSeverity = _T("Warning"); break;
-		case lsInfo: sSeverity = _T("Info"); break;
-		case lsVerbose: sSeverity = _T("Verbose"); break;
-		default: sSeverity = _T("Unknown"); break;
+		case lsError:	sSeverity = _T("Error"); break;
+		case lsWarning:	sSeverity = _T("Warning"); break;
+		case lsInfo:	sSeverity = _T("Info"); break;
+		case lsVerbose:	sSeverity = _T("Verbose"); break;
+		case lsMeasure:	sSeverity = _T("Measure"); break;
+		default:		sSeverity = _T("Unknown"); break;
 		}
 		Log(FString(_T("[LogCallback : %s] %s"), sSeverity, *pMessage));
 		delete pMessage;
@@ -541,8 +548,7 @@ void CSDOAQ_Dlg::BuildEnvironment(void)
 
 	const int nMajorVersion = ::SDOAQ_GetMajorVersion();
 	const int nMinorVersion = ::SDOAQ_GetMinorVersion();
-	const int nPatchVersion = ::SDOAQ_GetPatchVersion();
-	const int nAlgoVersion = ::SDOAQ_GetAlgorithmVersion();
+	const int nPatchVersion = ::SDOAQ_GetPatchVersion();	
 
 	SetWindowText(FString(_T("SDOAQ API TESTER (dll %d.%d.%d)"), nMajorVersion, nMinorVersion, nPatchVersion));
 
@@ -551,7 +557,6 @@ void CSDOAQ_Dlg::BuildEnvironment(void)
 	Log(_T(">> =================================================="));
 
 	Log(FString(_T(">> SDOAQ dll version: %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
-	Log(FString(_T(">> sdedof dll version: %d.%d"), nAlgoVersion / 1000, nAlgoVersion % 1000));
 
 	if (m_sScriptFile.GetLength())
 	{
@@ -576,6 +581,9 @@ LRESULT CSDOAQ_Dlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 
 	if (ecNoError == wErrorCode)
 	{
+		const int nAlgoVersion = ::SDOAQ_GetAlgorithmVersion();
+		Log(FString(_T(">> sdedof dll version: %d.%d"), nAlgoVersion / 1000, nAlgoVersion % 1000));
+
 		GetDlgItem(IDC_INITIALIZE)->SetWindowText(_T("Initialized"));
 		GetDlgItem(IDC_INITIALIZE)->EnableWindow(FALSE);
 
@@ -1117,7 +1125,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 	if (ecNoError == rv_sdoaq)
 	{
 		const auto tick_end = GetTickCount64();
-		Log(FString(_T(">> %s() takes : %llu ms / %d imgs"), sz_api, tick_end - tick_begin, FOCUS.numsFocus));
+		//Log(FString(_T(">> %s() takes : %llu ms / %d imgs"), sz_api, tick_end - tick_begin, FOCUS.numsFocus));
 
 		++m_nContiStack;
 		for (size_t uid = 0; uid < m_vhwndIV.size(); uid++)
@@ -1341,14 +1349,14 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 		pQualityMapBuffer, qualityMapBufferSize,
 		pHeightMapBuffer, heightMapBufferSize,
 		pPointCloudBuffer, pointCloudBufferSize
-	);
-	const auto tick_end = GetTickCount64();
-	Log(FString(_T(">> %s() takes : %llu ms / %d imgs"), sz_api, tick_end - tick_begin, FOCUS.numsFocus));
+	);	
 
 	if (ecNoError == rv_sdoaq)
 	{
-		++m_nContiEdof;
+		const auto tick_end = GetTickCount64();
+		//Log(FString(_T(">> %s() takes : %llu ms / %d imgs"), sz_api, tick_end - tick_begin, FOCUS.numsFocus));
 
+		++m_nContiEdof;
 		if (pEdofImageBuffer && edofImageBufferSize)
 		{
 			ImageViewer(0, "EDoF", m_nContiEdof, SET, pEdofImageBuffer);

@@ -559,7 +559,7 @@ void CSdoaqEdofDlg::OnSdoaqSingleShotEdof()
 	if (ecNoError == rv_sdoaq)
 	{
 		const auto tick_end = GetTickCount64();
-		g_LogLine(_T("SDOAQ_SingleShotEdofEx() takes : %llu ms / %d imgs"), tick_end - tick_begin, FOCUS.numsFocus);
+		//g_LogLine(_T("SDOAQ_SingleShotEdofEx() takes : %llu ms / %d imgs"), tick_end - tick_begin, FOCUS.numsFocus);
 
 		++m_nContiEdof;
 

@@ -19,7 +19,7 @@
  SDOAQ_v1.30   2020.06.29    YoungJu Lee    - Fix an issue that dll locks up when the USB port is detached after SDOAQ_Initialize
                                             - Fix an issue that dll locks up when the acquisition starts after the USB port is re-attached
                                             - Return low-memory error if there is not enough memory to proceed by checking the physical memory
-                                            - Remove unused SW triggering when acqusition fails
+                                            - Remove unused SW triggering when acquisition fails
                                             - Change the capture waiting time 3000 to 1000
                                             - Fix intermittent capture timeout issue
                                             - Update the latest standard calibration table
@@ -125,4 +125,8 @@
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
  SDOAQ_v2.7.0  2024.06.05  YoungJu Lee     - Support FFC(flat field correction)
                                            - Update sdedof v0.86 library
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.7.1  2024.06.21  YoungJu Lee     - Support Basler CXP-12 frame grabber
+                                           - Add timestamps to all types of logs and display the time taken for image acquisition and image processing respectively
+                                           - Add a parameter to set log level (piLogLevel)
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
