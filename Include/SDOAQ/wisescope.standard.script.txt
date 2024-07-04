@@ -34,10 +34,12 @@
 
  WSI_1 Camera Model (V2) = { Pylon-USB , -1 }
  WSI_1 Camera Trigger Method = TPSU # DV=Software, Software / TPSU
+ # WSI_1 Camera TPSU Trigger Delay = -1
+ # WSI_1 Camera SW Trigger Delay   = -1
  WSI_1 Camera Reverse X = false
  WSI_1 Camera Reverse Y = false
  WSI_1 Camera Gain = 0
- WSI_1 Pylon USB Line Number = Line2 # none / Line2 / Line3 / both
+ WSI_1 Pylon USB Line Number = Line2 # none / Line2 / Line3 / both 
 
 
 ### LIGHTING

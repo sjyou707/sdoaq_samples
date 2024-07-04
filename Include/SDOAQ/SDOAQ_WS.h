@@ -135,6 +135,11 @@
 										- Add timestamps to all types of logs and display the time taken for image acquisition and image processing respectively
 										- Add a parameter to set log level (piLogLevel)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.2  2024.06.27  YoungJu Lee		- Fix active child lighting parameter issue
+										- Update sdedof v0.861 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.3  2024.07.04  YoungJu Lee		- Support Basler Pylon 7.5.0.15658
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
