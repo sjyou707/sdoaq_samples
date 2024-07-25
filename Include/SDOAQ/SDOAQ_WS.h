@@ -140,6 +140,10 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.7.3  2024.07.04  YoungJu Lee		- Support Basler Pylon 7.5.0.15658
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.4  2024.07.24  YoungJu Lee		- Check MALS license
+										- Support automatic detection for LCBPWM and SDZEISS light without specifying the light model name
+										- Fix an issue that callback functions for some cameras would be skipped when playing or snapping from multiple cameras simultaneously
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once

@@ -16,6 +16,8 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.5.1  2024.03.26	YoungJu Lee		- The image buffer is released immediately when the callback function registered in the SDOAQ_SetFrameCallback is completed
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.4  2024.07.24	YoungJu Lee		- Trigger mode is subdivided into camera mode and grabber mode
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -58,12 +60,25 @@ extern "C"
 	// Registers a callback function that receives frame data : Callback is not accepted when 'singleFrameCb' is NULL. Allow MULTI_WS_ALL in multiWS selection.
 	__declspec(dllexport) eErrorCode SDOAQ_SetFrameCallback(SDOAQ_FrameCallback singleFrameCb);
 
-
+	
 	enum eCameraTriggerMode
 	{
+		// The three modes below are for backward compatibility and are NOT RECOMMENDED for use.
+		// Set to camera or grabber according to the method specified in the script.
 		ctmFreerun = 1,
 		ctmSoftware = 2,
-		ctmExternal = 3
+		ctmExternal = 3,
+
+		// The six modes below may not work perfectly depending on the camera or grabber.		
+		// Set to camera.
+		ctmCameraFreerun = 0x11,
+		ctmCameraSoftware = 0x12,
+		ctmCameraExternal = 0x13,
+		
+		// Set to grabber. The camera operates under the control of the grabber.
+		ctmGrabberFreerun = 0x21,
+		ctmGrabberSoftware = 0x22,
+		ctmGrabberExternal = 0x23,
 	};
 	// Sets the camera trigger mode.
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm);

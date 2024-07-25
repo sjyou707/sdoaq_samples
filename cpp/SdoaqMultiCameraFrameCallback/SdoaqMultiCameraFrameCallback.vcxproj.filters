@@ -67,6 +67,9 @@
     <Image Include="res\SdoaqMultiCameraFrameCallback.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\SD.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SdoaqMultiCameraFrameCallback.rc">

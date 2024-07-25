@@ -138,6 +138,7 @@
     <Text Include="wisescope.script.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\SD.ico" />
     <Image Include="res\SdoaqMultiCameraFrameCallback.ico" />
   </ItemGroup>
   <ItemGroup>

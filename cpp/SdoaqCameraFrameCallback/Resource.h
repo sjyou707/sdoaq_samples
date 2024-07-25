@@ -39,6 +39,12 @@
 #define IDC_EDIT_FOV_OFFSETX            1032
 #define IDC_EDIT_FOV_HEIGHT2            1033
 #define IDC_EDIT_FOV_OFFSETY            1033
+#define IDC_TRIGGER_CAMERA_FREERUN      1034
+#define IDC_TRIGGER_CAMERA_SOFTWARE     1035
+#define IDC_TRIGGER_CAMERA_EXTERNAL     1036
+#define IDC_TRIGGER_GRABBER_FREERUN     1037
+#define IDC_TRIGGER_GRABBER_SOFTWARE    1038
+#define IDC_TRIGGER_GRABBER_EXTERNAL    1039
 
 // Next default values for new objects
 // 

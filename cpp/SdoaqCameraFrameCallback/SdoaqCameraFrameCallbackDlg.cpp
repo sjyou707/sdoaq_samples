@@ -77,9 +77,7 @@ BEGIN_MESSAGE_MAP(CSdoaqCameraFrameCallbackDlg, CDialogEx)
 	ON_WM_SIZE()
 	ON_COMMAND(IDC_CHECK_FRAME_CALLBACK, &OnBnClickedCheckFrameCallback)
 	ON_COMMAND(IDC_SW_TRIGGER, &OnBnClickedSwTrigger)
-	ON_COMMAND(IDC_TRIGGER_FREERUN, &OnBnClickedTriggerFreerun)
-	ON_COMMAND(IDC_TRIGGER_SOFTWARE, &OnBnClickedTriggerSoftware)
-	ON_COMMAND(IDC_TRIGGER_EXTERNAL, &OnBnClickedTriggerExternal)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_TRIGGER_CAMERA_FREERUN, IDC_TRIGGER_GRABBER_EXTERNAL, &OnBnClickedTriggerMode)
 	ON_BN_CLICKED(IDC_BTN_SET_FOV, OnSetFov)
 	ON_BN_CLICKED(IDC_BTN_SET_EXPOSURE, OnSetExposureTime)
 	ON_BN_CLICKED(IDC_BTN_SET_GAIN, OnSetGain)
@@ -230,31 +228,29 @@ void CSdoaqCameraFrameCallbackDlg::OnBnClickedSwTrigger()
 }
 
 //----------------------------------------------------------------------------
-void CSdoaqCameraFrameCallbackDlg::OnBnClickedTriggerFreerun()
+void CSdoaqCameraFrameCallbackDlg::OnBnClickedTriggerMode(UINT uID)
 {
-	g_SDOAQ_SetCameraTriggerMode(ctmFreerun);
-
-	if (((CButton*)theApp.m_pMainWnd->GetDlgItem(IDC_CHECK_FRAME_CALLBACK))->GetCheck() != BST_CHECKED)
+	switch (uID)
 	{
-		g_LogLine(_T(">>> You must check \"camera frame callback\" to receive frames!"));
+	case IDC_TRIGGER_CAMERA_FREERUN:
+		g_SDOAQ_SetCameraTriggerMode(ctmCameraFreerun);
+		break;
+	case IDC_TRIGGER_CAMERA_SOFTWARE:
+		g_SDOAQ_SetCameraTriggerMode(ctmCameraSoftware);
+		break;
+	case IDC_TRIGGER_CAMERA_EXTERNAL:
+		g_SDOAQ_SetCameraTriggerMode(ctmCameraExternal);
+		break;
+	case IDC_TRIGGER_GRABBER_FREERUN:
+		g_SDOAQ_SetCameraTriggerMode(ctmGrabberFreerun);
+		break;
+	case IDC_TRIGGER_GRABBER_SOFTWARE:
+		g_SDOAQ_SetCameraTriggerMode(ctmGrabberSoftware);
+		break;
+	case IDC_TRIGGER_GRABBER_EXTERNAL:
+		g_SDOAQ_SetCameraTriggerMode(ctmGrabberExternal);
+		break;
 	}
-}
-
-//----------------------------------------------------------------------------
-void CSdoaqCameraFrameCallbackDlg::OnBnClickedTriggerSoftware()
-{
-	g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
-
-	if (((CButton*)theApp.m_pMainWnd->GetDlgItem(IDC_CHECK_FRAME_CALLBACK))->GetCheck() != BST_CHECKED)
-	{
-		g_LogLine(_T(">>> You must check \"camera frame callback\" to receive frames!"));
-	}
-}
-
-//----------------------------------------------------------------------------
-void CSdoaqCameraFrameCallbackDlg::OnBnClickedTriggerExternal()
-{
-	g_SDOAQ_SetCameraTriggerMode(ctmExternal);
 
 	if (((CButton*)theApp.m_pMainWnd->GetDlgItem(IDC_CHECK_FRAME_CALLBACK))->GetCheck() != BST_CHECKED)
 	{
@@ -521,8 +517,8 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 		{
 			theApp.m_pMainWnd->GetDlgItem(IDC_CHECK_FRAME_CALLBACK)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_SW_TRIGGER)->EnableWindow(TRUE);
-			((CButton*)theApp.m_pMainWnd->GetDlgItem(IDC_TRIGGER_SOFTWARE))->SetCheck(TRUE);
-			g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
+			((CButton*)theApp.m_pMainWnd->GetDlgItem(IDC_TRIGGER_CAMERA_SOFTWARE))->SetCheck(TRUE);
+			g_SDOAQ_SetCameraTriggerMode(ctmCameraSoftware);
 
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_WIDTH)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_HEIGHT)->EnableWindow(TRUE);
@@ -602,9 +598,17 @@ static void g_SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm)
 	LPCTSTR sz;
 	switch (ctm)
 	{
+	// The three modes below are for backward compatibility and are not recommended for use.
 	case ctmFreerun: sz = _T("Freerun"); break;
 	case ctmSoftware: sz = _T("Software"); break;
-	case ctmExternal: sz = _T("Eexternal"); break;
+	case ctmExternal: sz = _T("External"); break;
+	// The six modes below may not work perfectly depending on the camera or grabber.
+	case ctmCameraFreerun: sz = _T("Camera Freerun"); break;
+	case ctmCameraSoftware: sz = _T("Camera Software"); break;
+	case ctmCameraExternal: sz = _T("Camera External"); break;
+	case ctmGrabberFreerun: sz = _T("Grabber Freerun"); break;
+	case ctmGrabberSoftware: sz = _T("Grabber Software"); break;
+	case ctmGrabberExternal: sz = _T("Grabber External"); break;
 	default: sz = _T("invalid"); break;
 	}
 

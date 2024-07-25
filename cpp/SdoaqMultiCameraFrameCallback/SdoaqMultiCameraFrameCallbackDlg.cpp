@@ -631,7 +631,7 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 			}
 
 			theApp.m_pMainWnd->GetDlgItem(IDC_SW_TRIGGER_WS1)->EnableWindow(TRUE);
-			g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
+			g_SDOAQ_SetCameraTriggerMode(ctmCameraSoftware);
 
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_WIDTH_WS1)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_HEIGHT_WS1)->EnableWindow(TRUE);
@@ -675,7 +675,7 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 			}
 
 			theApp.m_pMainWnd->GetDlgItem(IDC_SW_TRIGGER_WS2)->EnableWindow(TRUE);
-			g_SDOAQ_SetCameraTriggerMode(ctmSoftware);
+			g_SDOAQ_SetCameraTriggerMode(ctmCameraSoftware);
 
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_WIDTH_WS2)->EnableWindow(TRUE);
 			theApp.m_pMainWnd->GetDlgItem(IDC_EDIT_FOV_HEIGHT_WS2)->EnableWindow(TRUE);
@@ -746,9 +746,17 @@ static void g_SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm)
 	LPCTSTR sz;
 	switch (ctm)
 	{
+	// The three modes below are for backward compatibility and are not recommended for use.
 	case ctmFreerun: sz = _T("Freerun"); break;
 	case ctmSoftware: sz = _T("Software"); break;
-	case ctmExternal: sz = _T("Eexternal"); break;
+	case ctmExternal: sz = _T("External"); break;
+	// The six modes below may not work perfectly depending on the camera or grabber.
+	case ctmCameraFreerun: sz = _T("Camera Freerun"); break;
+	case ctmCameraSoftware: sz = _T("Camera Software"); break;
+	case ctmCameraExternal: sz = _T("Camera External"); break;
+	case ctmGrabberFreerun: sz = _T("Grabber Freerun"); break;
+	case ctmGrabberSoftware: sz = _T("Grabber Software"); break;
+	case ctmGrabberExternal: sz = _T("Grabber External"); break;
 	default: sz = _T("invalid"); break;
 	}
 
