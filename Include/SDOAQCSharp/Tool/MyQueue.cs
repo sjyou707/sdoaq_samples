@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace SDOAQCSharpTool
+namespace SDOAQCSharp.Tool
 {
     public class MyQueue<T> : IDisposable
     {
