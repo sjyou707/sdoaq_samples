@@ -76,20 +76,20 @@
     <Compile Include="..\..\Include\SDOAQ\SDOAQ_WS.cs">
       <Link>SDOAQ\SDOAQ_WS.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\Logger.cs">
-      <Link>SDOAQCSharpTool\Logger.cs</Link>
+    <Compile Include="..\..\Include\SDOAQ\SDOAQ_MULTIWS.cs">
+      <Link>SDOAQ\SDOAQ_MULTIWS.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\MyManualResetEvent.cs">
-      <Link>SDOAQCSharpTool\MyManualResetEvent.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\Logger.cs">
+      <Link>SDOAQCSharp\Tool\Logger.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\MyQueue.cs">
-      <Link>SDOAQCSharpTool\MyQueue.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\MyManualResetEvent.cs">
+      <Link>SDOAQCSharp\Tool\MyManualResetEvent.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\SdoaqImageInfo.cs">
-      <Link>SDOAQCSharpTool\SdoaqImageInfo.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\MyQueue.cs">
+      <Link>SDOAQCSharp\Tool\MyQueue.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\Utils.cs">
-      <Link>SDOAQCSharpTool\Utils.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqImageInfo.cs">
+      <Link>SDOAQCSharp\MySdoaq\SdoaqImageInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\WSIO\WSIO.cs">
       <Link>WSIO\WSIO.cs</Link>
@@ -100,7 +100,64 @@
     <Compile Include="..\..\Include\WSIO\WSIO_UTIL.cs">
       <Link>WSIO\WSIO_UTIL.cs</Link>
     </Compile>
-    <Compile Include="SDOAQ_TEST_SET.cs" />
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\FocusLHU.cs">
+		<Link>SDOAQCSharp\Tool\FocusLHU.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\RingBuffer.cs">
+		<Link>SDOAQCSharp\Tool\RingBuffer.cs</Link>
+    </Compile>
+	<Compile Include="..\..\Include\SDOAQCSharp\Tool\WinFormControlExtention.cs">
+		<Link>SDOAQCSharp\Tool\WinFormControlExtention.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\MathExtention.cs">
+		<Link>SDOAQCSharp\Tool\MathExtention.cs</Link>
+    </Compile>
+	<Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqCamInfo.cs">
+		<Link>SDOAQCSharp\MySdoaq\SdoaqCamInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqPointCloudInfo.cs">
+		<Link>SDOAQCSharp\MySdoaq\SdoaqPointCloudInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqEventArgs.cs">
+		<Link>SDOAQCSharp\MySdoaq\SdoaqEventArgs.cs</Link>
+    </Compile>
+	<Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq.cs">
+	<Link>SDOAQCSharp\MySdoaq\MySdoaq.cs</Link>
+    </Compile>
+	<Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Static.cs">
+		<Link>SDOAQCSharp\MySdoaq\MySdoaq_Static.cs</Link>
+    </Compile> 
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Acquisition.cs">
+		<Link>SDOAQCSharp\MySdoaq\MySdoaq_Acquisition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Params.cs">
+		<Link>SDOAQCSharp\MySdoaq\MySdoaq_Params.cs</Link>
+    </Compile>
+    
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoLabel.cs">
+		<Link>SDOAQCSharp\Component\SdoLabel.cs</Link>
+		<SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoPanel.cs">
+		<Link>SDOAQCSharp\Component\SdoPanel.cs</Link>
+		<SubType>Component</SubType>
+    </Compile> 
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqParams.cs">
+		<Link>SDOAQCSharp\Component\SdoaqParams.cs</Link>
+		<SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqParams.Designer.cs">
+		<Link>SDOAQCSharp\Component\SdoaqParams.Designer.cs</Link>
+		<DependentUpon>SdoaqParams.cs</DependentUpon>
+    </Compile>
+	 <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.cs">
+		<Link>SDOAQCSharp\Component\SdoaqImageViewr.cs</Link>
+		<SubType>UserControl</SubType>
+    </Compile>
+	<Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.Designer.cs">
+		<Link>SDOAQCSharp\Component\SdoaqImageViewr.Designer.cs</Link>
+		<DependentUpon>SdoaqImageViewr.cs</DependentUpon>
+    </Compile>	
     <Compile Include="SDOAQ_APP_CS.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,6 +166,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    
     <EmbeddedResource Include="SDOAQ_APP_CS.resx">
       <DependentUpon>SDOAQ_APP_CS.cs</DependentUpon>
     </EmbeddedResource>
@@ -122,6 +180,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+	<EmbeddedResource Include="..\..\Include\SDOAQCSharp\Component\SdoaqParams.resx">
+		<Link>SDOAQCSharp\Component\SdoaqParams.resx</Link>
+		<DependentUpon>SdoaqParams.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.resx">
+		<Link>SDOAQCSharp\Component\SdoaqImageViewr.resx</Link>
+		<DependentUpon>SdoaqImageViewr.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

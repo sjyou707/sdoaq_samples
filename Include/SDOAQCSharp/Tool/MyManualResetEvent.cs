@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SDOAQCSharpTool
+namespace SDOAQCSharp.Tool
 {
     public class MyManualResetEvent<T> : IDisposable
     {

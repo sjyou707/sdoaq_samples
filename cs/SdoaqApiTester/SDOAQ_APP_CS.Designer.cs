@@ -29,936 +29,403 @@ namespace SDOAQ_App_CS
         /// </summary>
         private void InitializeComponent()
         {
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SDOAQ_APP_CS));
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-			this.panel2 = new System.Windows.Forms.Panel();
-			this.rtbLOG = new System.Windows.Forms.RichTextBox();
-			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-			this.lbViewer4 = new System.Windows.Forms.Label();
-			this.lbViewer3 = new System.Windows.Forms.Label();
-			this.lbViewer2 = new System.Windows.Forms.Label();
-			this.pnlViewer1 = new System.Windows.Forms.Panel();
-			this.pbViewer1 = new System.Windows.Forms.PictureBox();
-			this.pnlViewer2 = new System.Windows.Forms.Panel();
-			this.pbViewer2 = new System.Windows.Forms.PictureBox();
-			this.pnlViewer3 = new System.Windows.Forms.Panel();
-			this.pbViewer3 = new System.Windows.Forms.PictureBox();
-			this.pnlViewer4 = new System.Windows.Forms.Panel();
-			this.pbViewer4 = new System.Windows.Forms.PictureBox();
-			this.lbViewer1 = new System.Windows.Forms.Label();
-			this.panel1 = new System.Windows.Forms.Panel();
-			this.gb_calibration = new System.Windows.Forms.GroupBox();
-			this.btnSetCalFile = new System.Windows.Forms.Button();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.label5 = new System.Windows.Forms.Label();
-			this.tbAFROI = new System.Windows.Forms.TextBox();
-			this.btnSetAFROI = new System.Windows.Forms.Button();
-			this.btnSnap = new System.Windows.Forms.Button();
-			this.checkPointCloud = new System.Windows.Forms.CheckBox();
-			this.label12 = new System.Windows.Forms.Label();
-			this.tbSnapFocusSet = new System.Windows.Forms.TextBox();
-			this.btnSetSnapFocus = new System.Windows.Forms.Button();
-			this.btnAcqAF = new System.Windows.Forms.Button();
-			this.btnStopAF = new System.Windows.Forms.Button();
-			this.btnAcqEdof = new System.Windows.Forms.Button();
-			this.btnStopEdof = new System.Windows.Forms.Button();
-			this.btnAcqStack = new System.Windows.Forms.Button();
-			this.btnContiAF = new System.Windows.Forms.Button();
-			this.btnStopStack = new System.Windows.Forms.Button();
-			this.btnContiEdof = new System.Windows.Forms.Button();
-			this.label4 = new System.Windows.Forms.Label();
-			this.btnContiStack = new System.Windows.Forms.Button();
-			this.tbEdofRatio = new System.Windows.Forms.TextBox();
-			this.label3 = new System.Windows.Forms.Label();
-			this.checkHeightMap = new System.Windows.Forms.CheckBox();
-			this.checkQualityMap = new System.Windows.Forms.CheckBox();
-			this.btnEdofRatio = new System.Windows.Forms.Button();
-			this.checkEdof = new System.Windows.Forms.CheckBox();
-			this.checkStepMap = new System.Windows.Forms.CheckBox();
-			this.tbFocusSet = new System.Windows.Forms.TextBox();
-			this.btnSetFocus = new System.Windows.Forms.Button();
-			this.label2 = new System.Windows.Forms.Label();
-			this.tbRingBSize = new System.Windows.Forms.TextBox();
-			this.btnSetRingBSize = new System.Windows.Forms.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.tbROI = new System.Windows.Forms.TextBox();
-			this.btnSetROI = new System.Windows.Forms.Button();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.tbParamValue = new System.Windows.Forms.TextBox();
-			this.comboParam = new System.Windows.Forms.ComboBox();
-			this.btnSetParam = new System.Windows.Forms.Button();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.btnInit = new System.Windows.Forms.Button();
-			this.btnFinal = new System.Windows.Forms.Button();
-			this.tableLayoutPanel1.SuspendLayout();
-			this.tableLayoutPanel2.SuspendLayout();
-			this.panel2.SuspendLayout();
-			this.tableLayoutPanel3.SuspendLayout();
-			this.pnlViewer1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer1)).BeginInit();
-			this.pnlViewer2.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer2)).BeginInit();
-			this.pnlViewer3.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer3)).BeginInit();
-			this.pnlViewer4.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer4)).BeginInit();
-			this.panel1.SuspendLayout();
-			this.gb_calibration.SuspendLayout();
-			this.groupBox3.SuspendLayout();
-			this.groupBox2.SuspendLayout();
-			this.groupBox1.SuspendLayout();
-			this.SuspendLayout();
-			// 
-			// tableLayoutPanel1
-			// 
-			this.tableLayoutPanel1.ColumnCount = 2;
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 400F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
-			this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
-			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-			this.tableLayoutPanel1.RowCount = 1;
-			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(1211, 1058);
-			this.tableLayoutPanel1.TabIndex = 0;
-			// 
-			// tableLayoutPanel2
-			// 
-			this.tableLayoutPanel2.ColumnCount = 1;
-			this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel2.Controls.Add(this.panel2, 0, 0);
-			this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 0, 1);
-			this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel2.Location = new System.Drawing.Point(403, 3);
-			this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-			this.tableLayoutPanel2.RowCount = 2;
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 27.22821F));
-			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 72.77179F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(805, 1052);
-			this.tableLayoutPanel2.TabIndex = 0;
-			// 
-			// panel2
-			// 
-			this.panel2.Controls.Add(this.rtbLOG);
-			this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel2.Location = new System.Drawing.Point(3, 3);
-			this.panel2.Name = "panel2";
-			this.panel2.Size = new System.Drawing.Size(799, 280);
-			this.panel2.TabIndex = 0;
-			// 
-			// rtbLOG
-			// 
-			this.rtbLOG.BackColor = System.Drawing.SystemColors.Control;
-			this.rtbLOG.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.rtbLOG.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.rtbLOG.Font = new System.Drawing.Font("Verdana", 8F);
-			this.rtbLOG.Location = new System.Drawing.Point(0, 0);
-			this.rtbLOG.MaxLength = 262144;
-			this.rtbLOG.Name = "rtbLOG";
-			this.rtbLOG.Size = new System.Drawing.Size(799, 280);
-			this.rtbLOG.TabIndex = 1;
-			this.rtbLOG.Text = "";
-			// 
-			// tableLayoutPanel3
-			// 
-			this.tableLayoutPanel3.ColumnCount = 2;
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Controls.Add(this.lbViewer4, 1, 2);
-			this.tableLayoutPanel3.Controls.Add(this.lbViewer3, 0, 2);
-			this.tableLayoutPanel3.Controls.Add(this.lbViewer2, 1, 0);
-			this.tableLayoutPanel3.Controls.Add(this.pnlViewer1, 0, 1);
-			this.tableLayoutPanel3.Controls.Add(this.pnlViewer2, 1, 1);
-			this.tableLayoutPanel3.Controls.Add(this.pnlViewer3, 0, 3);
-			this.tableLayoutPanel3.Controls.Add(this.pnlViewer4, 1, 3);
-			this.tableLayoutPanel3.Controls.Add(this.lbViewer1, 0, 0);
-			this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 289);
-			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-			this.tableLayoutPanel3.RowCount = 4;
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(799, 760);
-			this.tableLayoutPanel3.TabIndex = 1;
-			// 
-			// lbViewer4
-			// 
-			this.lbViewer4.AutoSize = true;
-			this.lbViewer4.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.lbViewer4.Font = new System.Drawing.Font("Verdana", 8F);
-			this.lbViewer4.Location = new System.Drawing.Point(402, 380);
-			this.lbViewer4.Name = "lbViewer4";
-			this.lbViewer4.Size = new System.Drawing.Size(394, 22);
-			this.lbViewer4.TabIndex = 7;
-			this.lbViewer4.Text = "Viewer #4";
-			this.lbViewer4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
-			// lbViewer3
-			// 
-			this.lbViewer3.AutoSize = true;
-			this.lbViewer3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.lbViewer3.Font = new System.Drawing.Font("Verdana", 8F);
-			this.lbViewer3.Location = new System.Drawing.Point(3, 380);
-			this.lbViewer3.Name = "lbViewer3";
-			this.lbViewer3.Size = new System.Drawing.Size(393, 22);
-			this.lbViewer3.TabIndex = 6;
-			this.lbViewer3.Text = "Viewer #3";
-			this.lbViewer3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
-			// lbViewer2
-			// 
-			this.lbViewer2.AutoSize = true;
-			this.lbViewer2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.lbViewer2.Font = new System.Drawing.Font("Verdana", 8F);
-			this.lbViewer2.Location = new System.Drawing.Point(402, 0);
-			this.lbViewer2.Name = "lbViewer2";
-			this.lbViewer2.Size = new System.Drawing.Size(394, 22);
-			this.lbViewer2.TabIndex = 5;
-			this.lbViewer2.Text = "Viewer #2";
-			this.lbViewer2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
-			// pnlViewer1
-			// 
-			this.pnlViewer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pnlViewer1.Controls.Add(this.pbViewer1);
-			this.pnlViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pnlViewer1.Location = new System.Drawing.Point(3, 25);
-			this.pnlViewer1.Name = "pnlViewer1";
-			this.pnlViewer1.Size = new System.Drawing.Size(393, 352);
-			this.pnlViewer1.TabIndex = 0;
-			// 
-			// pbViewer1
-			// 
-			this.pbViewer1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pbViewer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pbViewer1.Location = new System.Drawing.Point(0, 0);
-			this.pbViewer1.Name = "pbViewer1";
-			this.pbViewer1.Size = new System.Drawing.Size(391, 350);
-			this.pbViewer1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.pbViewer1.TabIndex = 0;
-			this.pbViewer1.TabStop = false;
-			// 
-			// pnlViewer2
-			// 
-			this.pnlViewer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pnlViewer2.Controls.Add(this.pbViewer2);
-			this.pnlViewer2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pnlViewer2.Location = new System.Drawing.Point(402, 25);
-			this.pnlViewer2.Name = "pnlViewer2";
-			this.pnlViewer2.Size = new System.Drawing.Size(394, 352);
-			this.pnlViewer2.TabIndex = 1;
-			// 
-			// pbViewer2
-			// 
-			this.pbViewer2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pbViewer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbViewer2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pbViewer2.Location = new System.Drawing.Point(0, 0);
-			this.pbViewer2.Name = "pbViewer2";
-			this.pbViewer2.Size = new System.Drawing.Size(392, 350);
-			this.pbViewer2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.pbViewer2.TabIndex = 1;
-			this.pbViewer2.TabStop = false;
-			// 
-			// pnlViewer3
-			// 
-			this.pnlViewer3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pnlViewer3.Controls.Add(this.pbViewer3);
-			this.pnlViewer3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pnlViewer3.Location = new System.Drawing.Point(3, 405);
-			this.pnlViewer3.Name = "pnlViewer3";
-			this.pnlViewer3.Size = new System.Drawing.Size(393, 352);
-			this.pnlViewer3.TabIndex = 2;
-			// 
-			// pbViewer3
-			// 
-			this.pbViewer3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pbViewer3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbViewer3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pbViewer3.Location = new System.Drawing.Point(0, 0);
-			this.pbViewer3.Name = "pbViewer3";
-			this.pbViewer3.Size = new System.Drawing.Size(391, 350);
-			this.pbViewer3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.pbViewer3.TabIndex = 1;
-			this.pbViewer3.TabStop = false;
-			// 
-			// pnlViewer4
-			// 
-			this.pnlViewer4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pnlViewer4.Controls.Add(this.pbViewer4);
-			this.pnlViewer4.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pnlViewer4.Location = new System.Drawing.Point(402, 405);
-			this.pnlViewer4.Name = "pnlViewer4";
-			this.pnlViewer4.Size = new System.Drawing.Size(394, 352);
-			this.pnlViewer4.TabIndex = 3;
-			// 
-			// pbViewer4
-			// 
-			this.pbViewer4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.pbViewer4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pbViewer4.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pbViewer4.Location = new System.Drawing.Point(0, 0);
-			this.pbViewer4.Name = "pbViewer4";
-			this.pbViewer4.Size = new System.Drawing.Size(392, 350);
-			this.pbViewer4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.pbViewer4.TabIndex = 1;
-			this.pbViewer4.TabStop = false;
-			// 
-			// lbViewer1
-			// 
-			this.lbViewer1.AutoSize = true;
-			this.lbViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.lbViewer1.Font = new System.Drawing.Font("Verdana", 8F);
-			this.lbViewer1.Location = new System.Drawing.Point(3, 0);
-			this.lbViewer1.Name = "lbViewer1";
-			this.lbViewer1.Size = new System.Drawing.Size(393, 22);
-			this.lbViewer1.TabIndex = 4;
-			this.lbViewer1.Text = "Viewer #1";
-			this.lbViewer1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
-			// panel1
-			// 
-			this.panel1.Controls.Add(this.gb_calibration);
-			this.panel1.Controls.Add(this.groupBox3);
-			this.panel1.Controls.Add(this.groupBox2);
-			this.panel1.Controls.Add(this.groupBox1);
-			this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panel1.Location = new System.Drawing.Point(3, 3);
-			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(394, 1052);
-			this.panel1.TabIndex = 1;
-			// 
-			// gb_calibration
-			// 
-			this.gb_calibration.Controls.Add(this.btnSetCalFile);
-			this.gb_calibration.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.gb_calibration.Font = new System.Drawing.Font("Verdana", 8F);
-			this.gb_calibration.Location = new System.Drawing.Point(10, 679);
-			this.gb_calibration.Name = "gb_calibration";
-			this.gb_calibration.Size = new System.Drawing.Size(371, 67);
-			this.gb_calibration.TabIndex = 3;
-			this.gb_calibration.TabStop = false;
-			// 
-			// btnSetCalFile
-			// 
-			this.btnSetCalFile.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSetCalFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSetCalFile.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSetCalFile.Location = new System.Drawing.Point(12, 23);
-			this.btnSetCalFile.Name = "btnSetCalFile";
-			this.btnSetCalFile.Size = new System.Drawing.Size(346, 29);
-			this.btnSetCalFile.TabIndex = 12;
-			this.btnSetCalFile.Text = "Set calibration file";
-			this.btnSetCalFile.UseVisualStyleBackColor = true;
-			this.btnSetCalFile.Click += new System.EventHandler(this.btnSetCalibrationFile);
-			// 
-			// groupBox3
-			// 
-			this.groupBox3.Controls.Add(this.label5);
-			this.groupBox3.Controls.Add(this.tbAFROI);
-			this.groupBox3.Controls.Add(this.btnSetAFROI);
-			this.groupBox3.Controls.Add(this.btnSnap);
-			this.groupBox3.Controls.Add(this.checkPointCloud);
-			this.groupBox3.Controls.Add(this.label12);
-			this.groupBox3.Controls.Add(this.tbSnapFocusSet);
-			this.groupBox3.Controls.Add(this.btnSetSnapFocus);
-			this.groupBox3.Controls.Add(this.btnAcqAF);
-			this.groupBox3.Controls.Add(this.btnStopAF);
-			this.groupBox3.Controls.Add(this.btnAcqEdof);
-			this.groupBox3.Controls.Add(this.btnStopEdof);
-			this.groupBox3.Controls.Add(this.btnAcqStack);
-			this.groupBox3.Controls.Add(this.btnContiAF);
-			this.groupBox3.Controls.Add(this.btnStopStack);
-			this.groupBox3.Controls.Add(this.btnContiEdof);
-			this.groupBox3.Controls.Add(this.label4);
-			this.groupBox3.Controls.Add(this.btnContiStack);
-			this.groupBox3.Controls.Add(this.tbEdofRatio);
-			this.groupBox3.Controls.Add(this.label3);
-			this.groupBox3.Controls.Add(this.checkHeightMap);
-			this.groupBox3.Controls.Add(this.checkQualityMap);
-			this.groupBox3.Controls.Add(this.btnEdofRatio);
-			this.groupBox3.Controls.Add(this.checkEdof);
-			this.groupBox3.Controls.Add(this.checkStepMap);
-			this.groupBox3.Controls.Add(this.tbFocusSet);
-			this.groupBox3.Controls.Add(this.btnSetFocus);
-			this.groupBox3.Controls.Add(this.label2);
-			this.groupBox3.Controls.Add(this.tbRingBSize);
-			this.groupBox3.Controls.Add(this.btnSetRingBSize);
-			this.groupBox3.Controls.Add(this.label1);
-			this.groupBox3.Controls.Add(this.tbROI);
-			this.groupBox3.Controls.Add(this.btnSetROI);
-			this.groupBox3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.groupBox3.Font = new System.Drawing.Font("Verdana", 8F);
-			this.groupBox3.Location = new System.Drawing.Point(10, 180);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(371, 485);
-			this.groupBox3.TabIndex = 2;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Non-live-compatible parameters";
-			// 
-			// label5
-			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(11, 74);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(101, 13);
-			this.label5.TabIndex = 19;
-			this.label5.Text = "AF ROI (L,T,W,H)";
-			// 
-			// tbAFROI
-			// 
-			this.tbAFROI.Location = new System.Drawing.Point(127, 72);
-			this.tbAFROI.Name = "tbAFROI";
-			this.tbAFROI.Size = new System.Drawing.Size(165, 20);
-			this.tbAFROI.TabIndex = 18;
-			this.tbAFROI.Text = "956,479,128,128";
-			// 
-			// btnSetAFROI
-			// 
-			this.btnSetAFROI.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSetAFROI.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSetAFROI.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSetAFROI.Location = new System.Drawing.Point(299, 69);
-			this.btnSetAFROI.Name = "btnSetAFROI";
-			this.btnSetAFROI.Size = new System.Drawing.Size(56, 29);
-			this.btnSetAFROI.TabIndex = 17;
-			this.btnSetAFROI.Text = "Set";
-			this.btnSetAFROI.UseVisualStyleBackColor = true;
-			this.btnSetAFROI.Click += new System.EventHandler(this.btnSetAFROI_Click);
-			// 
-			// btnSnap
-			// 
-			this.btnSnap.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSnap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSnap.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSnap.Location = new System.Drawing.Point(7, 439);
-			this.btnSnap.Name = "btnSnap";
-			this.btnSnap.Size = new System.Drawing.Size(113, 29);
-			this.btnSnap.TabIndex = 16;
-			this.btnSnap.Text = "Snap";
-			this.btnSnap.UseVisualStyleBackColor = true;
-			this.btnSnap.Click += new System.EventHandler(this.btnSnap_Click);
-			// 
-			// checkPointCloud
-			// 
-			this.checkPointCloud.AutoSize = true;
-			this.checkPointCloud.Checked = true;
-			this.checkPointCloud.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkPointCloud.Font = new System.Drawing.Font("Verdana", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.checkPointCloud.Location = new System.Drawing.Point(250, 288);
-			this.checkPointCloud.Name = "checkPointCloud";
-			this.checkPointCloud.Size = new System.Drawing.Size(91, 17);
-			this.checkPointCloud.TabIndex = 15;
-			this.checkPointCloud.Text = "Point Cloud";
-			this.checkPointCloud.UseVisualStyleBackColor = true;
-			// 
-			// label12
-			// 
-			this.label12.AutoSize = true;
-			this.label12.Location = new System.Drawing.Point(11, 173);
-			this.label12.Name = "label12";
-			this.label12.Size = new System.Drawing.Size(172, 13);
-			this.label12.TabIndex = 14;
-			this.label12.Text = "Snap Focus set (Low-Hi-Unit)";
-			// 
-			// tbSnapFocusSet
-			// 
-			this.tbSnapFocusSet.Location = new System.Drawing.Point(212, 174);
-			this.tbSnapFocusSet.Name = "tbSnapFocusSet";
-			this.tbSnapFocusSet.Size = new System.Drawing.Size(80, 20);
-			this.tbSnapFocusSet.TabIndex = 13;
-			this.tbSnapFocusSet.Text = "0-319-16";
-			// 
-			// btnSetSnapFocus
-			// 
-			this.btnSetSnapFocus.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSetSnapFocus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSetSnapFocus.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSetSnapFocus.Location = new System.Drawing.Point(299, 171);
-			this.btnSetSnapFocus.Name = "btnSetSnapFocus";
-			this.btnSetSnapFocus.Size = new System.Drawing.Size(56, 29);
-			this.btnSetSnapFocus.TabIndex = 12;
-			this.btnSetSnapFocus.Text = "Set";
-			this.btnSetSnapFocus.UseVisualStyleBackColor = true;
-			this.btnSetSnapFocus.Click += new System.EventHandler(this.btnSetSnapFocus_Click);
-			// 
-			// btnAcqAF
-			// 
-			this.btnAcqAF.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnAcqAF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnAcqAF.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnAcqAF.Location = new System.Drawing.Point(7, 403);
-			this.btnAcqAF.Name = "btnAcqAF";
-			this.btnAcqAF.Size = new System.Drawing.Size(113, 29);
-			this.btnAcqAF.TabIndex = 1;
-			this.btnAcqAF.Text = "Acq. AF";
-			this.btnAcqAF.UseVisualStyleBackColor = true;
-			this.btnAcqAF.Click += new System.EventHandler(this.btnAcqAF_Click);
-			// 
-			// btnStopAF
-			// 
-			this.btnStopAF.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnStopAF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnStopAF.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnStopAF.Location = new System.Drawing.Point(248, 403);
-			this.btnStopAF.Name = "btnStopAF";
-			this.btnStopAF.Size = new System.Drawing.Size(113, 29);
-			this.btnStopAF.TabIndex = 1;
-			this.btnStopAF.Text = "Stop AF";
-			this.btnStopAF.UseVisualStyleBackColor = true;
-			this.btnStopAF.Click += new System.EventHandler(this.btnStopAF_Click);
-			// 
-			// btnAcqEdof
-			// 
-			this.btnAcqEdof.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnAcqEdof.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnAcqEdof.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnAcqEdof.Location = new System.Drawing.Point(7, 367);
-			this.btnAcqEdof.Name = "btnAcqEdof";
-			this.btnAcqEdof.Size = new System.Drawing.Size(113, 29);
-			this.btnAcqEdof.TabIndex = 1;
-			this.btnAcqEdof.Text = "Acq. EDOF";
-			this.btnAcqEdof.UseVisualStyleBackColor = true;
-			this.btnAcqEdof.Click += new System.EventHandler(this.btnAcqEdof_Click);
-			// 
-			// btnStopEdof
-			// 
-			this.btnStopEdof.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnStopEdof.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnStopEdof.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnStopEdof.Location = new System.Drawing.Point(248, 367);
-			this.btnStopEdof.Name = "btnStopEdof";
-			this.btnStopEdof.Size = new System.Drawing.Size(113, 29);
-			this.btnStopEdof.TabIndex = 1;
-			this.btnStopEdof.Text = "Stop EDOF";
-			this.btnStopEdof.UseVisualStyleBackColor = true;
-			this.btnStopEdof.Click += new System.EventHandler(this.btnStopEdof_Click);
-			// 
-			// btnAcqStack
-			// 
-			this.btnAcqStack.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnAcqStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnAcqStack.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnAcqStack.Location = new System.Drawing.Point(7, 332);
-			this.btnAcqStack.Name = "btnAcqStack";
-			this.btnAcqStack.Size = new System.Drawing.Size(113, 29);
-			this.btnAcqStack.TabIndex = 1;
-			this.btnAcqStack.Text = "Acq. STACK";
-			this.btnAcqStack.UseVisualStyleBackColor = true;
-			this.btnAcqStack.Click += new System.EventHandler(this.btnAcqStack_Click);
-			// 
-			// btnContiAF
-			// 
-			this.btnContiAF.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnContiAF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnContiAF.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnContiAF.Location = new System.Drawing.Point(127, 403);
-			this.btnContiAF.Name = "btnContiAF";
-			this.btnContiAF.Size = new System.Drawing.Size(113, 29);
-			this.btnContiAF.TabIndex = 1;
-			this.btnContiAF.Text = "Conti. AF";
-			this.btnContiAF.UseVisualStyleBackColor = true;
-			this.btnContiAF.Click += new System.EventHandler(this.btnContiAF_Click);
-			// 
-			// btnStopStack
-			// 
-			this.btnStopStack.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnStopStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnStopStack.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnStopStack.Location = new System.Drawing.Point(248, 332);
-			this.btnStopStack.Name = "btnStopStack";
-			this.btnStopStack.Size = new System.Drawing.Size(113, 29);
-			this.btnStopStack.TabIndex = 1;
-			this.btnStopStack.Text = "Stop STACK";
-			this.btnStopStack.UseVisualStyleBackColor = true;
-			this.btnStopStack.Click += new System.EventHandler(this.OnSdoaqStopStack);
-			// 
-			// btnContiEdof
-			// 
-			this.btnContiEdof.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnContiEdof.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnContiEdof.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnContiEdof.Location = new System.Drawing.Point(127, 367);
-			this.btnContiEdof.Name = "btnContiEdof";
-			this.btnContiEdof.Size = new System.Drawing.Size(113, 29);
-			this.btnContiEdof.TabIndex = 1;
-			this.btnContiEdof.Text = "Conti. EDOF";
-			this.btnContiEdof.UseVisualStyleBackColor = true;
-			this.btnContiEdof.Click += new System.EventHandler(this.btnContiEdof_Click);
-			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(11, 206);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(195, 13);
-			this.label4.TabIndex = 11;
-			this.label4.Text = "EDoF resize ratio (0.25, 0.5, 1.0)";
-			// 
-			// btnContiStack
-			// 
-			this.btnContiStack.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnContiStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnContiStack.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnContiStack.Location = new System.Drawing.Point(127, 332);
-			this.btnContiStack.Name = "btnContiStack";
-			this.btnContiStack.Size = new System.Drawing.Size(113, 29);
-			this.btnContiStack.TabIndex = 1;
-			this.btnContiStack.Text = "Conti. STACK";
-			this.btnContiStack.UseVisualStyleBackColor = true;
-			this.btnContiStack.Click += new System.EventHandler(this.btnContiStack_Click);
-			// 
-			// tbEdofRatio
-			// 
-			this.tbEdofRatio.Location = new System.Drawing.Point(212, 208);
-			this.tbEdofRatio.Name = "tbEdofRatio";
-			this.tbEdofRatio.Size = new System.Drawing.Size(80, 20);
-			this.tbEdofRatio.TabIndex = 10;
-			this.tbEdofRatio.Text = "0.5";
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(11, 140);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(166, 13);
-			this.label3.TabIndex = 11;
-			this.label3.Text = "Live Focus set (Low-Hi-Unit)";
-			// 
-			// checkHeightMap
-			// 
-			this.checkHeightMap.AutoSize = true;
-			this.checkHeightMap.Checked = true;
-			this.checkHeightMap.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkHeightMap.Font = new System.Drawing.Font("Verdana", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.checkHeightMap.Location = new System.Drawing.Point(135, 287);
-			this.checkHeightMap.Name = "checkHeightMap";
-			this.checkHeightMap.Size = new System.Drawing.Size(89, 17);
-			this.checkHeightMap.TabIndex = 0;
-			this.checkHeightMap.Text = "Height Map";
-			this.checkHeightMap.UseVisualStyleBackColor = true;
-			// 
-			// checkQualityMap
-			// 
-			this.checkQualityMap.AutoSize = true;
-			this.checkQualityMap.Font = new System.Drawing.Font("Verdana", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.checkQualityMap.Location = new System.Drawing.Point(15, 287);
-			this.checkQualityMap.Name = "checkQualityMap";
-			this.checkQualityMap.Size = new System.Drawing.Size(93, 17);
-			this.checkQualityMap.TabIndex = 0;
-			this.checkQualityMap.Text = "Quality Map";
-			this.checkQualityMap.UseVisualStyleBackColor = true;
-			// 
-			// btnEdofRatio
-			// 
-			this.btnEdofRatio.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnEdofRatio.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnEdofRatio.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnEdofRatio.Location = new System.Drawing.Point(299, 205);
-			this.btnEdofRatio.Name = "btnEdofRatio";
-			this.btnEdofRatio.Size = new System.Drawing.Size(56, 29);
-			this.btnEdofRatio.TabIndex = 9;
-			this.btnEdofRatio.Text = "Set";
-			this.btnEdofRatio.UseVisualStyleBackColor = true;
-			this.btnEdofRatio.Click += new System.EventHandler(this.btnEdofRatio_Click);
-			// 
-			// checkEdof
-			// 
-			this.checkEdof.AutoSize = true;
-			this.checkEdof.Checked = true;
-			this.checkEdof.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkEdof.Font = new System.Drawing.Font("Verdana", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.checkEdof.Location = new System.Drawing.Point(135, 263);
-			this.checkEdof.Name = "checkEdof";
-			this.checkEdof.Size = new System.Drawing.Size(92, 17);
-			this.checkEdof.TabIndex = 0;
-			this.checkEdof.Text = "Edof Image";
-			this.checkEdof.UseVisualStyleBackColor = true;
-			// 
-			// checkStepMap
-			// 
-			this.checkStepMap.AutoSize = true;
-			this.checkStepMap.Checked = true;
-			this.checkStepMap.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkStepMap.Font = new System.Drawing.Font("Verdana", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.checkStepMap.Location = new System.Drawing.Point(15, 263);
-			this.checkStepMap.Name = "checkStepMap";
-			this.checkStepMap.Size = new System.Drawing.Size(79, 17);
-			this.checkStepMap.TabIndex = 0;
-			this.checkStepMap.Text = "Step Map";
-			this.checkStepMap.UseVisualStyleBackColor = true;
-			// 
-			// tbFocusSet
-			// 
-			this.tbFocusSet.Location = new System.Drawing.Point(212, 140);
-			this.tbFocusSet.Name = "tbFocusSet";
-			this.tbFocusSet.Size = new System.Drawing.Size(80, 20);
-			this.tbFocusSet.TabIndex = 10;
-			this.tbFocusSet.Text = "0-319-32";
-			// 
-			// btnSetFocus
-			// 
-			this.btnSetFocus.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSetFocus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSetFocus.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSetFocus.Location = new System.Drawing.Point(299, 137);
-			this.btnSetFocus.Name = "btnSetFocus";
-			this.btnSetFocus.Size = new System.Drawing.Size(56, 29);
-			this.btnSetFocus.TabIndex = 9;
-			this.btnSetFocus.Text = "Set";
-			this.btnSetFocus.UseVisualStyleBackColor = true;
-			this.btnSetFocus.Click += new System.EventHandler(this.btnSetFocus_Click);
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(11, 107);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(96, 13);
-			this.label2.TabIndex = 8;
-			this.label2.Text = "Ring buffer size";
-			// 
-			// tbRingBSize
-			// 
-			this.tbRingBSize.Location = new System.Drawing.Point(212, 106);
-			this.tbRingBSize.Name = "tbRingBSize";
-			this.tbRingBSize.Size = new System.Drawing.Size(80, 20);
-			this.tbRingBSize.TabIndex = 7;
-			this.tbRingBSize.Text = "3";
-			// 
-			// btnSetRingBSize
-			// 
-			this.btnSetRingBSize.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSetRingBSize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSetRingBSize.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSetRingBSize.Location = new System.Drawing.Point(299, 103);
-			this.btnSetRingBSize.Name = "btnSetRingBSize";
-			this.btnSetRingBSize.Size = new System.Drawing.Size(56, 29);
-			this.btnSetRingBSize.TabIndex = 6;
-			this.btnSetRingBSize.Text = "Set";
-			this.btnSetRingBSize.UseVisualStyleBackColor = true;
-			this.btnSetRingBSize.Click += new System.EventHandler(this.btnSetRingBSize_Click);
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(11, 41);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(83, 13);
-			this.label1.TabIndex = 5;
-			this.label1.Text = "ROI (L,T,W,H)";
-			// 
-			// tbROI
-			// 
-			this.tbROI.Location = new System.Drawing.Point(127, 38);
-			this.tbROI.Name = "tbROI";
-			this.tbROI.Size = new System.Drawing.Size(165, 20);
-			this.tbROI.TabIndex = 4;
-			this.tbROI.Text = "0,0,2040,1086";
-			// 
-			// btnSetROI
-			// 
-			this.btnSetROI.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSetROI.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSetROI.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSetROI.Location = new System.Drawing.Point(299, 35);
-			this.btnSetROI.Name = "btnSetROI";
-			this.btnSetROI.Size = new System.Drawing.Size(56, 29);
-			this.btnSetROI.TabIndex = 1;
-			this.btnSetROI.Text = "Set";
-			this.btnSetROI.UseVisualStyleBackColor = true;
-			this.btnSetROI.Click += new System.EventHandler(this.btnSetROI_Click);
-			// 
-			// groupBox2
-			// 
-			this.groupBox2.Controls.Add(this.tbParamValue);
-			this.groupBox2.Controls.Add(this.comboParam);
-			this.groupBox2.Controls.Add(this.btnSetParam);
-			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.groupBox2.Font = new System.Drawing.Font("Verdana", 8F);
-			this.groupBox2.Location = new System.Drawing.Point(10, 95);
-			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(371, 63);
-			this.groupBox2.TabIndex = 2;
-			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Parameters";
-			// 
-			// tbParamValue
-			// 
-			this.tbParamValue.Location = new System.Drawing.Point(221, 22);
-			this.tbParamValue.Name = "tbParamValue";
-			this.tbParamValue.Size = new System.Drawing.Size(71, 20);
-			this.tbParamValue.TabIndex = 4;
-			// 
-			// comboParam
-			// 
-			this.comboParam.FormattingEnabled = true;
-			this.comboParam.Location = new System.Drawing.Point(7, 22);
-			this.comboParam.Name = "comboParam";
-			this.comboParam.Size = new System.Drawing.Size(206, 21);
-			this.comboParam.TabIndex = 3;
-			this.comboParam.SelectedIndexChanged += new System.EventHandler(this.btnSelectedParamIDChanged);
-			// 
-			// btnSetParam
-			// 
-			this.btnSetParam.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnSetParam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnSetParam.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnSetParam.Location = new System.Drawing.Point(299, 18);
-			this.btnSetParam.Name = "btnSetParam";
-			this.btnSetParam.Size = new System.Drawing.Size(56, 29);
-			this.btnSetParam.TabIndex = 1;
-			this.btnSetParam.Text = "Set";
-			this.btnSetParam.UseVisualStyleBackColor = true;
-			this.btnSetParam.Click += new System.EventHandler(this.btnSetParam_Click);
-			// 
-			// groupBox1
-			// 
-			this.groupBox1.Controls.Add(this.btnInit);
-			this.groupBox1.Controls.Add(this.btnFinal);
-			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.groupBox1.Font = new System.Drawing.Font("Verdana", 8F);
-			this.groupBox1.Location = new System.Drawing.Point(10, 16);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(371, 63);
-			this.groupBox1.TabIndex = 2;
-			this.groupBox1.TabStop = false;
-			// 
-			// btnInit
-			// 
-			this.btnInit.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnInit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnInit.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnInit.Location = new System.Drawing.Point(7, 22);
-			this.btnInit.Name = "btnInit";
-			this.btnInit.Size = new System.Drawing.Size(165, 29);
-			this.btnInit.TabIndex = 1;
-			this.btnInit.Text = "Initialize";
-			this.btnInit.UseVisualStyleBackColor = true;
-			this.btnInit.Click += new System.EventHandler(this.btnInit_Click);
-			// 
-			// btnFinal
-			// 
-			this.btnFinal.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
-			this.btnFinal.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnFinal.Font = new System.Drawing.Font("Verdana", 8F);
-			this.btnFinal.Location = new System.Drawing.Point(190, 22);
-			this.btnFinal.Name = "btnFinal";
-			this.btnFinal.Size = new System.Drawing.Size(165, 29);
-			this.btnFinal.TabIndex = 1;
-			this.btnFinal.Text = "Finalize";
-			this.btnFinal.UseVisualStyleBackColor = true;
-			this.btnFinal.Click += new System.EventHandler(this.btnFinal_Click);
-			// 
-			// SDOAQ_APP_CS
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1211, 1058);
-			this.Controls.Add(this.tableLayoutPanel1);
-			this.DoubleBuffered = true;
-			this.Font = new System.Drawing.Font("Verdana", 8F, System.Drawing.FontStyle.Bold);
-			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.KeyPreview = true;
-			this.Name = "SDOAQ_APP_CS";
-			this.Text = "SDOAQ APP CS";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SDOAQ_APP_CS_FormClosing);
-			this.Load += new System.EventHandler(this.SDOAQ_APP_CS_Load);
-			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDownEventHandler);
-			this.Resize += new System.EventHandler(this.SDOAQ_APP_CS_Resize);
-			this.tableLayoutPanel1.ResumeLayout(false);
-			this.tableLayoutPanel2.ResumeLayout(false);
-			this.panel2.ResumeLayout(false);
-			this.tableLayoutPanel3.ResumeLayout(false);
-			this.tableLayoutPanel3.PerformLayout();
-			this.pnlViewer1.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer1)).EndInit();
-			this.pnlViewer2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer2)).EndInit();
-			this.pnlViewer3.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer3)).EndInit();
-			this.pnlViewer4.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.pbViewer4)).EndInit();
-			this.panel1.ResumeLayout(false);
-			this.gb_calibration.ResumeLayout(false);
-			this.groupBox3.ResumeLayout(false);
-			this.groupBox3.PerformLayout();
-			this.groupBox2.ResumeLayout(false);
-			this.groupBox2.PerformLayout();
-			this.groupBox1.ResumeLayout(false);
-			this.ResumeLayout(false);
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SDOAQ_APP_CS));
+            this.rtxb_Log = new System.Windows.Forms.RichTextBox();
+            this.tmr_LogUpdate = new System.Windows.Forms.Timer(this.components);
+            this.pnl_Viewer = new SDOAQCSharp.Component.SdoPanel();
+            this.pnl_Control = new SDOAQCSharp.Component.SdoPanel();
+            this.gr_Acquisition = new System.Windows.Forms.GroupBox();
+            this.btn_Snap = new System.Windows.Forms.Button();
+            this.btn_AcqAF = new System.Windows.Forms.Button();
+            this.btn_StopAF = new System.Windows.Forms.Button();
+            this.btn_AcqEdof = new System.Windows.Forms.Button();
+            this.btn_StopEdof = new System.Windows.Forms.Button();
+            this.btn_AcqStack = new System.Windows.Forms.Button();
+            this.btn_ContiAF = new System.Windows.Forms.Button();
+            this.btn_StopStack = new System.Windows.Forms.Button();
+            this.btn_ContiEdof = new System.Windows.Forms.Button();
+            this.btn_ContiStack = new System.Windows.Forms.Button();
+            this.gr_EdofImgViewOption = new System.Windows.Forms.GroupBox();
+            this.chk_PointCloud = new System.Windows.Forms.CheckBox();
+            this.chk_HeightMap = new System.Windows.Forms.CheckBox();
+            this.chk_QualityMap = new System.Windows.Forms.CheckBox();
+            this.chk_Edof = new System.Windows.Forms.CheckBox();
+            this.chk_StepMap = new System.Windows.Forms.CheckBox();
+            this.cmp_SdoaqParams = new SDOAQ_App_CS.SdoaqParams();
+            this.pnl_Init = new SDOAQCSharp.Component.SdoPanel();
+            this.btn_Init = new System.Windows.Forms.Button();
+            this.btn_Final = new System.Windows.Forms.Button();
+            this.pnl_Control.SuspendLayout();
+            this.gr_Acquisition.SuspendLayout();
+            this.gr_EdofImgViewOption.SuspendLayout();
+            this.pnl_Init.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // rtxb_Log
+            // 
+            this.rtxb_Log.BackColor = System.Drawing.SystemColors.Control;
+            this.rtxb_Log.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.rtxb_Log.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtxb_Log.Location = new System.Drawing.Point(516, 10);
+            this.rtxb_Log.MaxLength = 262144;
+            this.rtxb_Log.Name = "rtxb_Log";
+            this.rtxb_Log.Size = new System.Drawing.Size(490, 174);
+            this.rtxb_Log.TabIndex = 2;
+            this.rtxb_Log.Text = "";
+            // 
+            // tmr_LogUpdate
+            // 
+            this.tmr_LogUpdate.Tick += new System.EventHandler(this.tmr_LogUpdate_Tick);
+            // 
+            // pnl_Viewer
+            // 
+            this.pnl_Viewer.BorderColor = System.Drawing.Color.Black;
+            this.pnl_Viewer.BorderWidth = 1;
+            this.pnl_Viewer.Location = new System.Drawing.Point(516, 190);
+            this.pnl_Viewer.Name = "pnl_Viewer";
+            this.pnl_Viewer.Size = new System.Drawing.Size(218, 174);
+            this.pnl_Viewer.TabIndex = 1;
+            // 
+            // pnl_Control
+            // 
+            this.pnl_Control.BorderColor = System.Drawing.Color.Black;
+            this.pnl_Control.BorderWidth = 1;
+            this.pnl_Control.Controls.Add(this.gr_Acquisition);
+            this.pnl_Control.Controls.Add(this.gr_EdofImgViewOption);
+            this.pnl_Control.Controls.Add(this.cmp_SdoaqParams);
+            this.pnl_Control.Controls.Add(this.pnl_Init);
+            this.pnl_Control.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pnl_Control.Location = new System.Drawing.Point(0, 0);
+            this.pnl_Control.Name = "pnl_Control";
+            this.pnl_Control.Size = new System.Drawing.Size(510, 965);
+            this.pnl_Control.TabIndex = 0;
+            // 
+            // gr_Acquisition
+            // 
+            this.gr_Acquisition.Controls.Add(this.btn_Snap);
+            this.gr_Acquisition.Controls.Add(this.btn_AcqAF);
+            this.gr_Acquisition.Controls.Add(this.btn_StopAF);
+            this.gr_Acquisition.Controls.Add(this.btn_AcqEdof);
+            this.gr_Acquisition.Controls.Add(this.btn_StopEdof);
+            this.gr_Acquisition.Controls.Add(this.btn_AcqStack);
+            this.gr_Acquisition.Controls.Add(this.btn_ContiAF);
+            this.gr_Acquisition.Controls.Add(this.btn_StopStack);
+            this.gr_Acquisition.Controls.Add(this.btn_ContiEdof);
+            this.gr_Acquisition.Controls.Add(this.btn_ContiStack);
+            this.gr_Acquisition.Location = new System.Drawing.Point(12, 607);
+            this.gr_Acquisition.Name = "gr_Acquisition";
+            this.gr_Acquisition.Size = new System.Drawing.Size(486, 202);
+            this.gr_Acquisition.TabIndex = 3;
+            this.gr_Acquisition.TabStop = false;
+            this.gr_Acquisition.Text = "Acquisition";
+            // 
+            // btn_Snap
+            // 
+            this.btn_Snap.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_Snap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_Snap.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_Snap.Location = new System.Drawing.Point(6, 154);
+            this.btn_Snap.Name = "btn_Snap";
+            this.btn_Snap.Size = new System.Drawing.Size(145, 35);
+            this.btn_Snap.TabIndex = 26;
+            this.btn_Snap.Text = "Snap";
+            this.btn_Snap.UseVisualStyleBackColor = true;
+            this.btn_Snap.Click += new System.EventHandler(this.btn_AcqMode_Snap_Click);
+            // 
+            // btn_AcqAF
+            // 
+            this.btn_AcqAF.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_AcqAF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_AcqAF.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_AcqAF.Location = new System.Drawing.Point(6, 110);
+            this.btn_AcqAF.Name = "btn_AcqAF";
+            this.btn_AcqAF.Size = new System.Drawing.Size(145, 35);
+            this.btn_AcqAF.TabIndex = 17;
+            this.btn_AcqAF.Text = "Acq. AF";
+            this.btn_AcqAF.UseVisualStyleBackColor = true;
+            this.btn_AcqAF.Click += new System.EventHandler(this.btn_AcqMode_Af_Click);
+            // 
+            // btn_StopAF
+            // 
+            this.btn_StopAF.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_StopAF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_StopAF.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_StopAF.Location = new System.Drawing.Point(324, 110);
+            this.btn_StopAF.Name = "btn_StopAF";
+            this.btn_StopAF.Size = new System.Drawing.Size(145, 35);
+            this.btn_StopAF.TabIndex = 18;
+            this.btn_StopAF.Text = "Stop AF";
+            this.btn_StopAF.UseVisualStyleBackColor = true;
+            this.btn_StopAF.Click += new System.EventHandler(this.btn_AcqMode_Af_Click);
+            // 
+            // btn_AcqEdof
+            // 
+            this.btn_AcqEdof.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_AcqEdof.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_AcqEdof.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_AcqEdof.Location = new System.Drawing.Point(6, 66);
+            this.btn_AcqEdof.Name = "btn_AcqEdof";
+            this.btn_AcqEdof.Size = new System.Drawing.Size(145, 35);
+            this.btn_AcqEdof.TabIndex = 19;
+            this.btn_AcqEdof.Text = "Acq. EDOF";
+            this.btn_AcqEdof.UseVisualStyleBackColor = true;
+            this.btn_AcqEdof.Click += new System.EventHandler(this.btn_AcqMode_Edof_Click);
+            // 
+            // btn_StopEdof
+            // 
+            this.btn_StopEdof.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_StopEdof.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_StopEdof.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_StopEdof.Location = new System.Drawing.Point(324, 66);
+            this.btn_StopEdof.Name = "btn_StopEdof";
+            this.btn_StopEdof.Size = new System.Drawing.Size(145, 35);
+            this.btn_StopEdof.TabIndex = 20;
+            this.btn_StopEdof.Text = "Stop EDOF";
+            this.btn_StopEdof.UseVisualStyleBackColor = true;
+            this.btn_StopEdof.Click += new System.EventHandler(this.btn_AcqMode_Edof_Click);
+            // 
+            // btn_AcqStack
+            // 
+            this.btn_AcqStack.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_AcqStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_AcqStack.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_AcqStack.Location = new System.Drawing.Point(6, 22);
+            this.btn_AcqStack.Name = "btn_AcqStack";
+            this.btn_AcqStack.Size = new System.Drawing.Size(145, 35);
+            this.btn_AcqStack.TabIndex = 21;
+            this.btn_AcqStack.Text = "Acq. STACK";
+            this.btn_AcqStack.UseVisualStyleBackColor = true;
+            this.btn_AcqStack.Click += new System.EventHandler(this.btn_AcqMode_Stack_Click);
+            // 
+            // btn_ContiAF
+            // 
+            this.btn_ContiAF.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_ContiAF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_ContiAF.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_ContiAF.Location = new System.Drawing.Point(165, 110);
+            this.btn_ContiAF.Name = "btn_ContiAF";
+            this.btn_ContiAF.Size = new System.Drawing.Size(145, 35);
+            this.btn_ContiAF.TabIndex = 22;
+            this.btn_ContiAF.Text = "Conti. AF";
+            this.btn_ContiAF.UseVisualStyleBackColor = true;
+            this.btn_ContiAF.Click += new System.EventHandler(this.btn_AcqMode_Af_Click);
+            // 
+            // btn_StopStack
+            // 
+            this.btn_StopStack.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_StopStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_StopStack.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_StopStack.Location = new System.Drawing.Point(324, 22);
+            this.btn_StopStack.Name = "btn_StopStack";
+            this.btn_StopStack.Size = new System.Drawing.Size(145, 35);
+            this.btn_StopStack.TabIndex = 23;
+            this.btn_StopStack.Text = "Stop STACK";
+            this.btn_StopStack.UseVisualStyleBackColor = true;
+            this.btn_StopStack.Click += new System.EventHandler(this.btn_AcqMode_Stack_Click);
+            // 
+            // btn_ContiEdof
+            // 
+            this.btn_ContiEdof.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_ContiEdof.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_ContiEdof.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_ContiEdof.Location = new System.Drawing.Point(165, 66);
+            this.btn_ContiEdof.Name = "btn_ContiEdof";
+            this.btn_ContiEdof.Size = new System.Drawing.Size(145, 35);
+            this.btn_ContiEdof.TabIndex = 24;
+            this.btn_ContiEdof.Text = "Conti. EDOF";
+            this.btn_ContiEdof.UseVisualStyleBackColor = true;
+            this.btn_ContiEdof.Click += new System.EventHandler(this.btn_AcqMode_Edof_Click);
+            // 
+            // btn_ContiStack
+            // 
+            this.btn_ContiStack.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_ContiStack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_ContiStack.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btn_ContiStack.Location = new System.Drawing.Point(165, 22);
+            this.btn_ContiStack.Name = "btn_ContiStack";
+            this.btn_ContiStack.Size = new System.Drawing.Size(145, 35);
+            this.btn_ContiStack.TabIndex = 25;
+            this.btn_ContiStack.Text = "Conti. STACK";
+            this.btn_ContiStack.UseVisualStyleBackColor = true;
+            this.btn_ContiStack.Click += new System.EventHandler(this.btn_AcqMode_Stack_Click);
+            // 
+            // gr_EdofImgViewOption
+            // 
+            this.gr_EdofImgViewOption.Controls.Add(this.chk_PointCloud);
+            this.gr_EdofImgViewOption.Controls.Add(this.chk_HeightMap);
+            this.gr_EdofImgViewOption.Controls.Add(this.chk_QualityMap);
+            this.gr_EdofImgViewOption.Controls.Add(this.chk_Edof);
+            this.gr_EdofImgViewOption.Controls.Add(this.chk_StepMap);
+            this.gr_EdofImgViewOption.Location = new System.Drawing.Point(12, 414);
+            this.gr_EdofImgViewOption.Name = "gr_EdofImgViewOption";
+            this.gr_EdofImgViewOption.Size = new System.Drawing.Size(486, 187);
+            this.gr_EdofImgViewOption.TabIndex = 3;
+            this.gr_EdofImgViewOption.TabStop = false;
+            this.gr_EdofImgViewOption.Text = "EDOF Image View Option";
+            // 
+            // chk_PointCloud
+            // 
+            this.chk_PointCloud.AutoSize = true;
+            this.chk_PointCloud.Checked = true;
+            this.chk_PointCloud.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk_PointCloud.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.chk_PointCloud.Location = new System.Drawing.Point(6, 158);
+            this.chk_PointCloud.Name = "chk_PointCloud";
+            this.chk_PointCloud.Size = new System.Drawing.Size(271, 19);
+            this.chk_PointCloud.TabIndex = 20;
+            this.chk_PointCloud.Text = "Point Cloud (3D vertex coordinates)";
+            this.chk_PointCloud.UseVisualStyleBackColor = true;
+            // 
+            // chk_HeightMap
+            // 
+            this.chk_HeightMap.AutoSize = true;
+            this.chk_HeightMap.Checked = true;
+            this.chk_HeightMap.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk_HeightMap.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.chk_HeightMap.Location = new System.Drawing.Point(6, 124);
+            this.chk_HeightMap.Name = "chk_HeightMap";
+            this.chk_HeightMap.Size = new System.Drawing.Size(257, 19);
+            this.chk_HeightMap.TabIndex = 16;
+            this.chk_HeightMap.Text = "HeightMap (height for each pixel)";
+            this.chk_HeightMap.UseVisualStyleBackColor = true;
+            // 
+            // chk_QualityMap
+            // 
+            this.chk_QualityMap.AutoSize = true;
+            this.chk_QualityMap.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.chk_QualityMap.Location = new System.Drawing.Point(6, 90);
+            this.chk_QualityMap.Name = "chk_QualityMap";
+            this.chk_QualityMap.Size = new System.Drawing.Size(460, 19);
+            this.chk_QualityMap.TabIndex = 17;
+            this.chk_QualityMap.Text = "QualityMap (the score for each pixel height in the height map)";
+            this.chk_QualityMap.UseVisualStyleBackColor = true;
+            // 
+            // chk_Edof
+            // 
+            this.chk_Edof.AutoSize = true;
+            this.chk_Edof.Checked = true;
+            this.chk_Edof.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk_Edof.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.chk_Edof.Location = new System.Drawing.Point(6, 56);
+            this.chk_Edof.Name = "chk_Edof";
+            this.chk_Edof.Size = new System.Drawing.Size(243, 19);
+            this.chk_Edof.TabIndex = 18;
+            this.chk_Edof.Text = "Edof Image (all-in-focus image)";
+            this.chk_Edof.UseVisualStyleBackColor = true;
+            // 
+            // chk_StepMap
+            // 
+            this.chk_StepMap.AutoSize = true;
+            this.chk_StepMap.Checked = true;
+            this.chk_StepMap.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk_StepMap.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.chk_StepMap.Location = new System.Drawing.Point(6, 22);
+            this.chk_StepMap.Name = "chk_StepMap";
+            this.chk_StepMap.Size = new System.Drawing.Size(271, 19);
+            this.chk_StepMap.TabIndex = 19;
+            this.chk_StepMap.Text = "StepMap (focus step for each pixel)";
+            this.chk_StepMap.UseVisualStyleBackColor = true;
+            // 
+            // cmp_SdoaqParams
+            // 
+            this.cmp_SdoaqParams.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmp_SdoaqParams.Location = new System.Drawing.Point(5, 52);
+            this.cmp_SdoaqParams.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cmp_SdoaqParams.Name = "cmp_SdoaqParams";
+            this.cmp_SdoaqParams.Size = new System.Drawing.Size(500, 355);
+            this.cmp_SdoaqParams.TabIndex = 2;
+            // 
+            // pnl_Init
+            // 
+            this.pnl_Init.BorderColor = System.Drawing.Color.Black;
+            this.pnl_Init.BorderWidth = 1;
+            this.pnl_Init.Controls.Add(this.btn_Init);
+            this.pnl_Init.Controls.Add(this.btn_Final);
+            this.pnl_Init.Location = new System.Drawing.Point(5, 5);
+            this.pnl_Init.Name = "pnl_Init";
+            this.pnl_Init.Size = new System.Drawing.Size(500, 40);
+            this.pnl_Init.TabIndex = 1;
+            // 
+            // btn_Init
+            // 
+            this.btn_Init.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_Init.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_Init.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.btn_Init.Location = new System.Drawing.Point(7, 5);
+            this.btn_Init.Name = "btn_Init";
+            this.btn_Init.Size = new System.Drawing.Size(239, 29);
+            this.btn_Init.TabIndex = 1;
+            this.btn_Init.Text = "Initialize";
+            this.btn_Init.UseVisualStyleBackColor = true;
+            this.btn_Init.Click += new System.EventHandler(this.btn_Init_Click);
+            // 
+            // btn_Final
+            // 
+            this.btn_Final.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ControlLight;
+            this.btn_Final.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btn_Final.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.btn_Final.Location = new System.Drawing.Point(254, 5);
+            this.btn_Final.Name = "btn_Final";
+            this.btn_Final.Size = new System.Drawing.Size(239, 29);
+            this.btn_Final.TabIndex = 1;
+            this.btn_Final.Text = "Finalize";
+            this.btn_Final.UseVisualStyleBackColor = true;
+            this.btn_Final.Click += new System.EventHandler(this.btn_Final_Click);
+            // 
+            // SDOAQ_APP_CS
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1308, 965);
+            this.Controls.Add(this.rtxb_Log);
+            this.Controls.Add(this.pnl_Viewer);
+            this.Controls.Add(this.pnl_Control);
+            this.DoubleBuffered = true;
+            this.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
+            this.Name = "SDOAQ_APP_CS";
+            this.Text = "SDOAQ APP CS";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SDOAQ_APP_CS_FormClosing);
+            this.Load += new System.EventHandler(this.SDOAQ_APP_CS_Load);
+            this.Resize += new System.EventHandler(this.SDOAQ_APP_CS_Resize);
+            this.pnl_Control.ResumeLayout(false);
+            this.gr_Acquisition.ResumeLayout(false);
+            this.gr_EdofImgViewOption.ResumeLayout(false);
+            this.gr_EdofImgViewOption.PerformLayout();
+            this.pnl_Init.ResumeLayout(false);
+            this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.Panel pnlViewer1;
-        private System.Windows.Forms.Panel pnlViewer2;
-        private System.Windows.Forms.Panel pnlViewer3;
-        private System.Windows.Forms.Panel pnlViewer4;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Button btnAcqAF;
-        private System.Windows.Forms.Button btnStopAF;
-        private System.Windows.Forms.Button btnAcqEdof;
-        private System.Windows.Forms.Button btnStopEdof;
-        private System.Windows.Forms.Button btnAcqStack;
-        private System.Windows.Forms.Button btnContiAF;
-        private System.Windows.Forms.Button btnStopStack;
-        private System.Windows.Forms.Button btnContiEdof;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button btnContiStack;
-        private System.Windows.Forms.TextBox tbEdofRatio;
-        private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.CheckBox checkPointCloud;
-		private System.Windows.Forms.CheckBox checkHeightMap;
-        private System.Windows.Forms.CheckBox checkQualityMap;
-        private System.Windows.Forms.Button btnEdofRatio;
-        private System.Windows.Forms.CheckBox checkEdof;
-        private System.Windows.Forms.CheckBox checkStepMap;
-        private System.Windows.Forms.TextBox tbFocusSet;
-        private System.Windows.Forms.Button btnSetFocus;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox tbRingBSize;
-        private System.Windows.Forms.Button btnSetRingBSize;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox tbROI;
-        private System.Windows.Forms.Button btnSetROI;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.TextBox tbParamValue;
-        private System.Windows.Forms.ComboBox comboParam;
-        private System.Windows.Forms.Button btnSetParam;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button btnInit;
-        private System.Windows.Forms.Button btnFinal;
-        private System.Windows.Forms.RichTextBox rtbLOG;
-        private System.Windows.Forms.PictureBox pbViewer1;
-        private System.Windows.Forms.PictureBox pbViewer2;
-        private System.Windows.Forms.PictureBox pbViewer3;
-        private System.Windows.Forms.PictureBox pbViewer4;
-        private System.Windows.Forms.Label lbViewer4;
-        private System.Windows.Forms.Label lbViewer3;
-        private System.Windows.Forms.Label lbViewer2;
-        private System.Windows.Forms.Label lbViewer1;
-		private System.Windows.Forms.Button btnSnap;
-		private System.Windows.Forms.Label label12;
-		private System.Windows.Forms.TextBox tbSnapFocusSet;
-		private System.Windows.Forms.Button btnSetSnapFocus;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.TextBox tbAFROI;
-		private System.Windows.Forms.Button btnSetAFROI;
-		private System.Windows.Forms.GroupBox gb_calibration;
-		private System.Windows.Forms.Button btnSetCalFile;
-	}
+        private SDOAQCSharp.Component.SdoPanel pnl_Control;
+        private SDOAQCSharp.Component.SdoPanel pnl_Viewer;
+        private System.Windows.Forms.RichTextBox rtxb_Log;
+        private SDOAQCSharp.Component.SdoPanel pnl_Init;
+        private System.Windows.Forms.Button btn_Init;
+        private System.Windows.Forms.Button btn_Final;
+        private System.Windows.Forms.Timer tmr_LogUpdate;
+        private SdoaqParams cmp_SdoaqParams;
+        private System.Windows.Forms.GroupBox gr_EdofImgViewOption;
+        private System.Windows.Forms.CheckBox chk_PointCloud;
+        private System.Windows.Forms.CheckBox chk_HeightMap;
+        private System.Windows.Forms.CheckBox chk_QualityMap;
+        private System.Windows.Forms.CheckBox chk_Edof;
+        private System.Windows.Forms.CheckBox chk_StepMap;
+        private System.Windows.Forms.GroupBox gr_Acquisition;
+        private System.Windows.Forms.Button btn_Snap;
+        private System.Windows.Forms.Button btn_AcqAF;
+        private System.Windows.Forms.Button btn_StopAF;
+        private System.Windows.Forms.Button btn_AcqEdof;
+        private System.Windows.Forms.Button btn_StopEdof;
+        private System.Windows.Forms.Button btn_AcqStack;
+        private System.Windows.Forms.Button btn_ContiAF;
+        private System.Windows.Forms.Button btn_StopStack;
+        private System.Windows.Forms.Button btn_ContiEdof;
+        private System.Windows.Forms.Button btn_ContiStack;
+    }
 }
 

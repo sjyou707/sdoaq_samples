@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 
 using SDOWSIO;
-using SDOAQCSharpTool;
+using SDOAQCSharp.Tool;
 
 namespace SdoaqCameraFrameCallback
 {
