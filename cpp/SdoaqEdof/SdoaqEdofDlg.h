@@ -89,7 +89,7 @@ public:
 			}
 		}
 
-		sAcquisitionFixedParameters afp;
+		AcquisitionFixedParametersEx afp;
 
 		inline int PixelSize(void) const { return afp.cameraRoiWidth * afp.cameraRoiHeight; }
 		inline int ImgSize(void) const { return IsMonoCameraInstalled() ? PixelSize() : PixelSize() * COLORBYTES; }

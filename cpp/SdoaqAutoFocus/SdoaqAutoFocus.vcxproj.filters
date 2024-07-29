@@ -36,14 +36,14 @@
     <ClInclude Include="SdoaqAutoFocusDlg.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDOAQ_Lib.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h">
       <Filter>Library Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h">
       <Filter>Library Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDOAQ_Lib.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

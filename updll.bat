@@ -20,13 +20,10 @@
 	goto main
 
 :main
-	time < D:\MySystem\BIN\sub\enter.txt | find "."
 	echo.
-	xcopy Include\SDOAQ\*.dll C:\Windows\System32 /D/Y
-	xcopy Include\WSIO\*.dll C:\Windows\System32 /D/Y
-	echo.    press any key to continue...
-	pause > D:\MySystem\BIN\sub\null.txt
-
+	copy %~dp0\Include\SDOAQ\*.dll C:\Windows\System32 /D/Y
+	copy %~dp0\Include\WSIO\*.dll C:\Windows\System32 /D/Y
+	pause
 	goto exit
 
 :loop

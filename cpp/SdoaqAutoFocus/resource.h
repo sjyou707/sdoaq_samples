@@ -9,9 +9,16 @@
 #define IDC_ACQ_AF                      1025
 #define IDC_CONTI_AF                    1026
 #define IDC_STOP_AF                     1027
-#define IDC_ACQ_AF2                     1028
 #define IDC_EDIT_AFROI                  1033
 #define IDC_SET_AFROI                   1034
+#define IDC_EDIT_SMM                    1035
+#define IDC_SET_SMM                     1036
+#define IDC_EDIT_RM                     1037
+#define IDC_SET_RM                      1038
+#define IDC_EDIT_SM                     1039
+#define IDC_SET_SM                      1040
+#define IDC_EDIT_SDC                    1041
+#define IDC_SET_SDC                     1042
 
 // Next default values for new objects
 // 

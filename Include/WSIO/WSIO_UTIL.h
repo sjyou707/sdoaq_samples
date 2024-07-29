@@ -75,7 +75,8 @@ enum WSUTIVRESOURCE_Enum
 	WSUTIVRESOURCE_MRMULTILINE = 15,
 	WSUTIVRESOURCE_MRMULTIRECT = 18,
 	WSUTIVRESOURCE_MRMULTIELLIPSE = 19,
-	WSUTIVRESOURCE_MRMULTIMEASURE = 20, // MULTILINE, MULTIRECT, MUTIELLIPSE
+	WSUTIVRESOURCE_MRMULTIPOLYGON = 24,
+	WSUTIVRESOURCE_MRMULTIMEASURE = 20, // MULTI line, rect, ellipse, polygon
 	WSUTIVRESOURCE_OSDTEXTCOLOR = 21,
 	WSUTIVRESOURCE_OSDBACKCOLOR = 22,
 	WSUTIVRESOURCE_OSDLINECOLOR = 23,
@@ -85,6 +86,8 @@ enum WSUTIVRESOURCE_Enum
 
 enum WSUTIVGUISHAPE_Enum
 {
+	WSUTIVGUISHAPE_EQUAL = (1 << 15),
+	WSUTIVGUISHAPE_INNER = (1 << 16),
 	WSUTIVGUISHAPE_4D = (1 << 9),
 	WSUTIVGUISHAPE_8D = (1 << 10),
 	WSUTIVGUISHAPE_PERPENDICULAR = (1 << 11),
@@ -124,6 +127,7 @@ enum WSUTIVOBJTYPE_Enum
 	WSUTIVOBJTPYE_MEASURE_LINE = 4,
 	WSUTIVOBJTPYE_MEASURE_RECT = 5,
 	WSUTIVOBJTPYE_MEASURE_ELLIPSE = 6,
+	WSUTIVOBJTPYE_MEASURE_POLYGON = 7,
 };
 
 typedef int WSUTIVIMAGEMODE;
@@ -472,7 +476,7 @@ WSIODLL_API WSIORV			WSUT_IntFromCmdLine(
 // LINE SCRIPT
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_StringFromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOPSTR				value_buffer,
 			WSIOUINT				size_of_value_buffer
@@ -480,21 +484,21 @@ WSIODLL_API WSIORV			WSUT_StringFromLineScript(
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_IntFromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOINT*				ptr_int
 			);
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_Uint64FromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOUINT64*				ptr_uint64
 			);
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_AddressFromLineScript(
-			WSIOCSTR				script_str,
+			WSIOCSTR				data_or_path_str,
 			WSIOCSTR				token_str,
 			WSIOVOID*				ptr_address
 			);
@@ -529,6 +533,10 @@ WSIODLL_API WSIORV			WSUT_GetBmpAttributes(
 	WSIOINT*				ptr_height,
 	WSIOINT*				ptr_pixel_bytes
 );
+
+//----------------------------------------------------------------------------
+WSIODLL_API WSIORV WSUT_GetRainbowBGR(float v255, unsigned char* pbgr);
+WSIODLL_API WSIORV WSUT_GenerateRainbowColorMap(float* pFloat, int stride, size_t pixels, unsigned char* pbgr_map, float lowest, float highest);
 
 //============================================================================
 // LICENSE

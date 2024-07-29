@@ -17,7 +17,7 @@
 static WSIOVOID g_hViewer = NULL;
 //----------------------------------------------------------------------------
 static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage);
-static void g_PlayAFCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
+static void g_PlayAFCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
 //----------------------------------------------------------------------------
 static void g_LogLine(LPCTSTR sFormat, ...)
 {
@@ -58,6 +58,10 @@ BEGIN_MESSAGE_MAP(CSdoaqAutoFocusDlg, CDialogEx)
 	ON_MESSAGE(EUM_INITDONE, OnInitDone)
 	ON_MESSAGE(EUM_RECEIVE_AF, OnReceiveAF)
 	ON_BN_CLICKED(IDC_SET_AFROI, OnSdoaqSetAFRoi)
+	ON_BN_CLICKED(IDC_SET_SMM, OnSdoaqSetSharpnessMeasureMethod)
+	ON_BN_CLICKED(IDC_SET_RM, OnSdoaqSetResamplingMethod)
+	ON_BN_CLICKED(IDC_SET_SM, OnSdoaqSetStabilityMethod)
+	ON_BN_CLICKED(IDC_SET_SDC, OnSdoaqSetStabilityDebounceCount)
 	ON_BN_CLICKED(IDC_ACQ_AF, OnSdoaqSingleShotAF)
 	ON_BN_CLICKED(IDC_CONTI_AF, OnSdoaqPlayAF)
 	ON_BN_CLICKED(IDC_STOP_AF, OnSdoaqStopAF)
@@ -77,7 +81,7 @@ BOOL CSdoaqAutoFocusDlg::OnInitDialog()
 	g_LogLine(_T("================================================"));
 	g_LogLine(_T(" SDOAQ Auto Focus Sample"));
 	g_LogLine(_T("================================================"));
-	
+
 	g_LogLine(_T("start initialization..."));
 	const eErrorCode rv_sdoaq = ::SDOAQ_Initialize(NULL, NULL, g_SDOAQ_InitDoneCallback);
 	if (ecNoError != rv_sdoaq)
@@ -151,7 +155,7 @@ void CSdoaqAutoFocusDlg::OnSize(UINT nType, int cx, int cy)
 LRESULT CSdoaqAutoFocusDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 {
 	CString* pMessage = (CString*)lpMessage;
-	
+
 	if (ecNoError == wErrorCode)
 	{
 		g_LogLine(_T("InitDoneCallback() %s"), pMessage ? *pMessage : _T(""));
@@ -159,7 +163,7 @@ LRESULT CSdoaqAutoFocusDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 		const int ver_major = ::SDOAQ_GetMajorVersion();
 		const int ver_minor = ::SDOAQ_GetMinorVersion();
 		const int ver_patch = ::SDOAQ_GetPatchVersion();
-		g_LogLine(_T("sdoaq dll version is \"%d.%d.%d\""), ver_major, ver_minor, ver_patch);		
+		g_LogLine(_T("sdoaq dll version is \"%d.%d.%d\""), ver_major, ver_minor, ver_patch);
 
 		SET.m_nColorByte = IsMonoCameraInstalled() ? MONOBYTES : COLORBYTES;
 
@@ -167,42 +171,66 @@ LRESULT CSdoaqAutoFocusDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 		// ROI: image size to capture
 		//----------------------------------------------------------------------------
 		int nWidth, nHeight, nDummy;
-		eErrorCode rv;
-		rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nWidth);
-		rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nHeight);
-
-		AcquisitionFixedParameters AFP;
-		AFP.cameraRoiTop = 0;
-		AFP.cameraRoiLeft = 0;
-		AFP.cameraRoiWidth = nWidth;
-		AFP.cameraRoiHeight = nHeight;
-		AFP.cameraBinning = 1;
-		if (!SET.rb.active)
+		eErrorCode rv1 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nWidth);
+		eErrorCode rv2 = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nHeight);
+		if (ecNoError == rv1 && ecNoError == rv2)
 		{
-			SET.afp = AFP;
+			AcquisitionFixedParametersEx AFP;
+			AFP.cameraRoiTop = 0;
+			AFP.cameraRoiLeft = 0;
+			AFP.cameraRoiWidth = nWidth;
+			AFP.cameraRoiHeight = nHeight;
+			AFP.cameraBinning = 1;
+			if (!SET.rb.active)
+			{
+				SET.afp = AFP;
+			}
+
+			//----------------------------------------------------------------------------
+			// FOCUS SET: scan image scan range
+			//----------------------------------------------------------------------------
+			m_vFocusSet.clear();
+			int nLowFocus, nHighFocus;
+			eErrorCode rv_sdoaq = ::SDOAQ_GetIntParameterRange(piFocusPosition, &nLowFocus, &nHighFocus);
+			if (ecNoError == rv_sdoaq)
+			{
+				// nLowFocus: Low dof of the image to be scanned.
+				// nHighFocus: High dof of the image to be scanned.
+				// nInterval: Adjust the gap between images to be scanned. If you narrow the gap, you can get a more accurate image.
+				int nInterval = 10;
+				for (int nFocus = nLowFocus; nFocus <= nHighFocus; nFocus += nInterval)
+				{
+					m_vFocusSet.push_back(nFocus);
+				}
+
+				//----------------------------------------------------------------------------
+				// SET AUTO-FOCUS AREA: left, top, width, height
+				//----------------------------------------------------------------------------
+				SetDlgItemText(IDC_EDIT_AFROI, FString(_T("%d,%d,128,128"), nWidth / 2, nHeight / 2));
+				OnSdoaqSetAFRoi();
+
+				SetDlgItemText(IDC_EDIT_SMM, _T("0"));
+				OnSdoaqSetSharpnessMeasureMethod();
+
+				SetDlgItemText(IDC_EDIT_RM, _T("1"));
+				OnSdoaqSetResamplingMethod();
+
+				SetDlgItemText(IDC_EDIT_SM, _T("1"));
+				OnSdoaqSetStabilityMethod();
+
+				SetDlgItemText(IDC_EDIT_SDC, _T("4"));
+				OnSdoaqSetStabilityDebounceCount();
+			}
+			else
+			{
+				g_LogLine(_T("SDOAQ_GetIntParameterRange(piFocusPosition) returns error(%d)."), rv_sdoaq);
+			}
 		}
-
-		//----------------------------------------------------------------------------
-		// FOCUS SET: scan image scan range
-		//----------------------------------------------------------------------------
-		m_vFocusSet.clear();
-		int nLowFocus, nHighFocus;
-		rv = ::SDOAQ_GetIntParameterRange(piFocusPosition, &nLowFocus, &nHighFocus);
-
-		// nLowFocus: Low dof of the image to be scanned.
-		// nHighFocus: High dof of the image to be scanned.
-		// nInterval: Adjust the gap between images to be scanned. If you narrow the gap, you can get a more accurate image.
-		int nInterval = 10;
-		for (int nFocus = nLowFocus; nFocus <= nHighFocus; nFocus += nInterval)
+		else
 		{
-			m_vFocusSet.push_back(nFocus);
+			g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX) returns error(%d)."), rv1);
+			g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY) returns error(%d)."), rv2);
 		}
-
-		//----------------------------------------------------------------------------
-		// SET AUTO-FOCUS AREA: left, top, width, height
-		//----------------------------------------------------------------------------
-		SetDlgItemText(IDC_EDIT_AFROI, _T("956,479,128,128"));
-		OnSdoaqSetAFRoi();
 	}
 	else
 	{
@@ -259,16 +287,79 @@ void CSdoaqAutoFocusDlg::OnSdoaqSetAFRoi()
 	AfxExtractSubString(sHeight, sROI, 3, ',');
 
 	CRect recAF(_ttoi(sLeft), _ttoi(sTop), _ttoi(sLeft) + _ttoi(sWidth), _ttoi(sTop) + _ttoi(sHeight));
-	const auto rv1 = ::SDOAQ_SetIntParameterValue(piFocusLeftTop, ((recAF.left & 0x0000FFFF) << 16) | (recAF.top & 0x0000FFFF) << 0);
-	const auto rv2 = ::SDOAQ_SetIntParameterValue(piFocusRightBottom, ((recAF.right & 0x0000FFFF) << 16) | (recAF.bottom & 0x0000FFFF) << 0);
-	if (rv1 != ecNoError)
+	eErrorCode rv_sdoaq = SetSdoaqFocusRect(recAF);
+	if (ecNoError != rv_sdoaq)
 	{
-		g_LogLine(_T("Set AF roi (piFocusLeftTop) returns error(%d)."), rv1);
+		g_LogLine(_T("SDOAQ_SetIntParameterValue[ParamID-%d,%d] returns error(%d)."), piFocusLeftTop, piFocusRightBottom, rv_sdoaq);
 	}
-	if (rv2 != ecNoError)
+}
+
+//----------------------------------------------------------------------------
+eErrorCode CSdoaqAutoFocusDlg::SetIntTypeParaValue(eParameterId paraID, int nValue)
+{
+	int nMin, nMax;
+	eErrorCode rv_sdoaq = ::SDOAQ_GetIntParameterRange(paraID, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
-		g_LogLine(_T("Set AF roi (piFocusRightBottom) returns error(%d)."), rv2);
+		if (nValue >= nMin && nValue <= nMax)
+		{
+			return ::SDOAQ_SetIntParameterValue(paraID, nValue);
+		}
+		else
+		{
+			g_LogLine(_T("[ParamID-%d] : value is out of range[%d ~ %d]"), paraID, nMin, nMax);
+			return ecInvalidParameter;
+		}
 	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetIntParameterRange[ParamID-%d] returns error(%d)."), paraID, rv_sdoaq);
+		return rv_sdoaq;
+	}
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetSharpnessMeasureMethod()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_SMM, sValue);
+
+	// focus measure (sharpness measure) method (0: Modified Laplacian, 1: Gradient(Sobel), 2: Graylevel local variance)
+	if (ecNoError != SetIntTypeParaValue(pi_af_sharpness_measure_method, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_SMM, _T("0"));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetResamplingMethod()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_RM, sValue);
+
+	// image processing resolution(0: full, 1: half, 2: quarter)
+	if (ecNoError != SetIntTypeParaValue(pi_af_resampling_method, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_RM, _T("1"));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetStabilityMethod()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_SM, sValue);
+
+	// range = { 1(None) , 2(stability-fullstep), 3(stability-halfstep), 4(stability-onestep) }
+	if (ecNoError != SetIntTypeParaValue(pi_af_stability_method, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_SM, _T("1"));
+}
+
+//----------------------------------------------------------------------------
+void CSdoaqAutoFocusDlg::OnSdoaqSetStabilityDebounceCount()
+{
+	CString sValue;
+	GetDlgItemText(IDC_EDIT_SDC, sValue);
+
+	// range = {0 ~ 10}
+	if (ecNoError != SetIntTypeParaValue(pi_af_stability_debounce_count, _ttoi(sValue)))
+		SetDlgItemText(IDC_EDIT_SDC, _T("4"));
 }
 
 //----------------------------------------------------------------------------
@@ -298,7 +389,8 @@ void CSdoaqAutoFocusDlg::OnSdoaqSingleShotAF()
 	double dbBestScore;
 	double dbMatchedFocusStep;
 
-	eErrorCode rv = ::SDOAQ_SingleShotAF_Ex(
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv_sdoaq = ::SDOAQ_SingleShotAFEx(
 		&AFP,
 		pPositions, (int)FOCUS.numsFocus,
 		pAFImageBuffer,
@@ -307,7 +399,7 @@ void CSdoaqAutoFocusDlg::OnSdoaqSingleShotAF()
 		&dbBestScore,
 		&dbMatchedFocusStep
 	);
-	if (ecNoError == rv)
+	if (ecNoError == rv_sdoaq)
 	{
 		++m_nContiAF;
 
@@ -324,7 +416,7 @@ void CSdoaqAutoFocusDlg::OnSdoaqSingleShotAF()
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_SingleShotAF_Ex() returns error(%d)."), rv);
+		g_LogLine(_T("SDOAQ_SingleShotAFEx() returns error(%d)."), rv_sdoaq);
 	}
 
 	delete[] pAFImageBuffer;
@@ -368,21 +460,22 @@ void CSdoaqAutoFocusDlg::OnSdoaqPlayAF()
 		uidx++;
 	}
 
-	eErrorCode rv = ::SDOAQ_PlayAF_Ex(
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv_sdoaq = ::SDOAQ_PlayAFEx(
 		&AFP,
-		g_PlayAFCallback,
+		g_PlayAFCallbackEx,
 		pPositions, (int)FOCUS.numsFocus,
 		m_nRingBufferSize,
 		SET.rb.ppBuf,
 		SET.rb.pSizes
 	);
-	if (ecNoError == rv)
+	if (ecNoError == rv_sdoaq)
 	{
 		SET.rb.active = true;
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_PlayAF_Ex() returns error(%d)."), rv);
+		g_LogLine(_T("SDOAQ_PlayAFEx() returns error(%d)."), rv_sdoaq);
 	}
 
 	delete[] pPositions;
@@ -392,7 +485,12 @@ void CSdoaqAutoFocusDlg::OnSdoaqPlayAF()
 void CSdoaqAutoFocusDlg::OnSdoaqStopAF()
 {
 	SET.rb.active = false;
-	(void)::SDOAQ_StopAF();
+
+	const eErrorCode rv_sdoaq = ::SDOAQ_StopAF();
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_StopAF() returns error(%d)."), rv_sdoaq);
+	}
 
 	SET.ClearBuffer();
 }
@@ -430,7 +528,7 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 }
 
 //----------------------------------------------------------------------------
-static void g_PlayAFCallback(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep)
+static void g_PlayAFCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep)
 {
 	if (theApp.m_pMainWnd)
 	{
@@ -440,5 +538,7 @@ static void g_PlayAFCallback(eErrorCode errorCode, int lastFilledRingBufferEntry
 		pcPara->dbBestScore = dbBestScore;
 		pcPara->dbMatchedFocusStep = dbMatchedFocusStep;
 		theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_AF, (WPARAM)errorCode, (LPARAM)pcPara);
+
+		static void* g_prev = NULL; if (g_prev != callbackUserData) { g_prev = callbackUserData; g_LogLine(_T("AF callback 0x%I64X"), (unsigned long long)callbackUserData); }
 	}
 }

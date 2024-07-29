@@ -71,6 +71,9 @@
     <Image Include="res\SdoaqCameraFrameCallback.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\SD.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Text Include="wisescope.script.txt" />

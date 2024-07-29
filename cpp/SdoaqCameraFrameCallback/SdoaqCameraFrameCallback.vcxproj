@@ -135,6 +135,7 @@
     <None Include="res\SdoaqCameraFrameCallback.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\SD.ico" />
     <Image Include="res\SdoaqCameraFrameCallback.ico" />
   </ItemGroup>
   <ItemGroup>

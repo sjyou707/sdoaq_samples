@@ -24,17 +24,9 @@ namespace SDOWSIO
 	public static partial class WSIO
 	{
 #if X86
-#if DEBUG
-		private const string WSIO_DLL = "WSIODLL_D32.dll";
-#else
 		private const string WSIO_DLL = "WSIODLL_R32.dll";
-#endif
-#else
-#if DEBUG
-		private const string WSIO_DLL = "WSIODLL_D64.dll";
 #else
 		private const string WSIO_DLL = "WSIODLL_R64.dll";
-#endif
 #endif
 
 		//------------------------------------------------------------------------------------------------------------------------------------

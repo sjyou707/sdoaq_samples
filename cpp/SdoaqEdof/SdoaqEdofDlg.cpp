@@ -17,7 +17,7 @@
 static WSIOVOID g_hViewer = NULL;
 //----------------------------------------------------------------------------
 static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage);
-static void g_PlayEdofCallback(eErrorCode errorCode, int lastFilledRingBufferEntry);
+static void g_PlayEdofCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData);
 //----------------------------------------------------------------------------
 static void g_LogLine(LPCTSTR sFormat, ...)
 {
@@ -267,8 +267,14 @@ void CSdoaqEdofDlg::OnSdoaqSetCalibrationFile(void)
 	CFileDialog dlg(TRUE, _T("cvs"), NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, sFilter);
 	if (dlg.DoModal() == IDOK)
 	{
-		(void)::SDOAQ_SetCalibrationFile(CT2A(dlg.GetPathName().GetBuffer()));
-		g_LogLine((_T("calibration file (%s) is set.")), dlg.GetFileName());
+		eErrorCode rv_sdoaq = ::SDOAQ_SetCalibrationFile(CT2A(dlg.GetPathName().GetBuffer()));
+		if (ecNoError != rv_sdoaq)
+		{
+			g_LogLine(_T("SDOAQ_SetCalibrationFile() returns error(%d)."), rv_sdoaq);
+			return;
+		}
+
+		g_LogLine(_T("calibration file (%s) is set"), dlg.GetFileName());
 	}
 }
 
@@ -284,16 +290,17 @@ void CSdoaqEdofDlg::OnSdoaqSetROI()
 	AfxExtractSubString(sWidth, sParameters, 2, ',');
 	AfxExtractSubString(sHeight, sParameters, 3, ',');
 
-	AcquisitionFixedParameters AFP;
+	AcquisitionFixedParametersEx AFP;
 	AFP.cameraRoiTop = _ttoi(sTop);
 	AFP.cameraRoiLeft = _ttoi(sLeft);
 	AFP.cameraRoiWidth = (_ttoi(sWidth) / 4) * 4;
 	AFP.cameraRoiHeight = _ttoi(sHeight);
 	AFP.cameraBinning = 1;
+	AFP.callbackUserData = NULL;
 
 	int nDummy, nMaxWidth, nMaxHeight;
-	auto rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
-	if (ecNoError == rv)
+	auto rv_sdoaq = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX, &nDummy, &nMaxWidth);
+	if (ecNoError == rv_sdoaq)
 	{
 		if (AFP.cameraRoiLeft < 0 || AFP.cameraRoiLeft > nMaxWidth)
 		{
@@ -306,9 +313,14 @@ void CSdoaqEdofDlg::OnSdoaqSetROI()
 			return;
 		}
 	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeX) returns error(%d)."), rv_sdoaq);
+		return;
+	}
 
-	rv = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
-	if (ecNoError == rv)
+	rv_sdoaq = ::SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY, &nDummy, &nMaxHeight);
+	if (ecNoError == rv_sdoaq)
 	{
 		if (AFP.cameraRoiTop < 0 || AFP.cameraRoiTop > nMaxHeight)
 		{
@@ -320,6 +332,11 @@ void CSdoaqEdofDlg::OnSdoaqSetROI()
 			g_LogLine(_T("Set cameraRoiHeight : value is out of range( ~ %d)"), nMaxHeight);
 			return;
 		}
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(piCameraFullFrameSizeY) returns error(%d)."), rv_sdoaq);
+		return;
 	}
 
 	if (!SET.rb.active)
@@ -381,8 +398,8 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofResize()
 	auto resize_ratio = _ttof(sEdofResize);
 
 	double dbMin, dbMax;
-	auto rv = SDOAQ_GetDblParameterRange(pi_edof_calc_resize_ratio, &dbMin, &dbMax);
-	if (ecNoError == rv)
+	auto rv_sdoaq = ::SDOAQ_GetDblParameterRange(pi_edof_calc_resize_ratio, &dbMin, &dbMax);
+	if (ecNoError == rv_sdoaq)
 	{
 		if (resize_ratio >= dbMin && resize_ratio <= dbMax)
 		{
@@ -392,6 +409,10 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofResize()
 		{
 			g_LogLine(_T("set EDoF resize ratio: value is out of range(%.2lf ~ %.2lf)"), dbMin, dbMax);
 		}
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(pi_edof_calc_resize_ratio) returns error(%d)."), rv_sdoaq);
 	}
 }
 
@@ -404,8 +425,8 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofKernelSize()
 	auto KernelSize = _ttoi(sEdofKernelSize);
 
 	int nMin, nMax;
-	auto rv = SDOAQ_GetIntParameterRange(pi_edof_calc_pixelwise_kernel_size, &nMin, &nMax);
-	if (ecNoError == rv)
+	auto rv_sdoaq = ::SDOAQ_GetIntParameterRange(pi_edof_calc_pixelwise_kernel_size, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
 		if (KernelSize >= nMin && KernelSize <= nMax)
 		{
@@ -415,6 +436,10 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofKernelSize()
 		{
 			g_LogLine(_T("set EDoF pixelwise kernel size: value is out of range(%d ~ %d)"), nMin, nMax);
 		}
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(pi_edof_calc_pixelwise_kernel_size) returns error(%d)."), rv_sdoaq);
 	}
 }
 
@@ -427,8 +452,8 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofIteration()
 	auto iteration = _ttoi(sIteration);
 
 	int nMin, nMax;
-	auto rv = SDOAQ_GetIntParameterRange(pi_edof_calc_pixelwise_iteration, &nMin, &nMax);
-	if (ecNoError == rv)
+	auto rv_sdoaq = ::SDOAQ_GetIntParameterRange(pi_edof_calc_pixelwise_iteration, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
 		if (iteration >= nMin && iteration <= nMax)
 		{
@@ -438,6 +463,10 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofIteration()
 		{
 			g_LogLine(_T("set EDoF pixelwise iteration: value is out of range(%d ~ %d)"), nMin, nMax);
 		}
+	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(pi_edof_calc_pixelwise_iteration) returns error(%d)."), rv_sdoaq);
 	}
 }
 
@@ -450,8 +479,8 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofThreshold()
 	auto threshold = _ttof(sEdofThreshold);
 
 	double dbMin, dbMax;
-	auto rv = SDOAQ_GetDblParameterRange(pi_edof_depth_quality_th, &dbMin, &dbMax);
-	if (ecNoError == rv)
+	auto rv_sdoaq = SDOAQ_GetDblParameterRange(pi_edof_depth_quality_th, &dbMin, &dbMax);
+	if (ecNoError == rv_sdoaq)
 	{
 		if (threshold >= dbMin && threshold <= dbMax)
 		{
@@ -470,11 +499,11 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofScaleStep()
 	CString sEdofScaleStep;
 	GetDlgItemText(IDC_EDIT_EDOF_SCALE_STEP, sEdofScaleStep);
 
-	auto scaleReferStep= _ttoi(sEdofScaleStep);
+	auto scaleReferStep = _ttoi(sEdofScaleStep);
 
 	int nMin, nMax;
-	auto rv = SDOAQ_GetIntParameterRange(pi_edof_scale_correction_dst_step, &nMin, &nMax);
-	if (ecNoError == rv)
+	auto rv_sdoaq = ::SDOAQ_GetIntParameterRange(pi_edof_scale_correction_dst_step, &nMin, &nMax);
+	if (ecNoError == rv_sdoaq)
 	{
 		if (scaleReferStep >= nMin && scaleReferStep <= nMax)
 		{
@@ -485,6 +514,10 @@ void CSdoaqEdofDlg::OnSdoaqSetEdofScaleStep()
 			g_LogLine(_T("set EDoF scale correction dst step: value is out of range(%d ~ %d)"), nMin, nMax);
 		}
 	}
+	else
+	{
+		g_LogLine(_T("SDOAQ_GetIntParameterRange(pi_edof_scale_correction_dst_step) returns error(%d)."), rv_sdoaq);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -494,8 +527,6 @@ void CSdoaqEdofDlg::OnSdoaqSingleShotEdof()
 	{
 		return;
 	}
-
-	g_LogLine(_T("SDOAQ_SingleShotEdof()"));
 
 	auto& AFP = SET.afp;
 	auto& FOCUS = SET.focus;
@@ -513,7 +544,9 @@ void CSdoaqEdofDlg::OnSdoaqSingleShotEdof()
 	unsigned char* pEdofImageBuffer = new unsigned char[SET.ImgSize()];
 	size_t edofImageBufferSize = SET.ImgSize();
 
-	eErrorCode rv = ::SDOAQ_SingleShotEdof(
+	const auto tick_begin = GetTickCount64();
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv_sdoaq = ::SDOAQ_SingleShotEdofEx(
 		&AFP,
 		pPositions, (int)FOCUS.numsFocus,
 		NULL, 0,
@@ -522,8 +555,12 @@ void CSdoaqEdofDlg::OnSdoaqSingleShotEdof()
 		NULL, 0,
 		NULL, 0
 	);
-	if (ecNoError == rv)
+
+	if (ecNoError == rv_sdoaq)
 	{
+		const auto tick_end = GetTickCount64();
+		//g_LogLine(_T("SDOAQ_SingleShotEdofEx() takes : %llu ms / %d imgs"), tick_end - tick_begin, FOCUS.numsFocus);
+
 		++m_nContiEdof;
 
 		if (pEdofImageBuffer && edofImageBufferSize)
@@ -537,7 +574,7 @@ void CSdoaqEdofDlg::OnSdoaqSingleShotEdof()
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_SingleShotEdof() returns error(%d)."), rv);
+		g_LogLine(_T("SDOAQ_SingleShotEdofEx() returns error(%d)."), rv_sdoaq);
 	}
 
 	delete[] pEdofImageBuffer;
@@ -552,17 +589,15 @@ void CSdoaqEdofDlg::OnSdoaqPlayEdof()
 		return;
 	}
 
-	g_LogLine(_T("SDOAQ_PlayEdof()"));
-
 	auto& AFP = SET.afp;
 	auto& FOCUS = SET.focus;
 
-	auto nFocusNums = m_vFocusSet.size();
+	FOCUS.numsFocus = m_vFocusSet.size();
 	FOCUS.vFocusSet.resize(FOCUS.numsFocus);
 	copy(m_vFocusSet.begin(), m_vFocusSet.end(), FOCUS.vFocusSet.begin());
 
-	int* pPositions = new int[nFocusNums];
-	for (int pos = 0; pos < nFocusNums; pos++)
+	int* pPositions = new int[FOCUS.numsFocus];
+	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		pPositions[pos] = FOCUS.vFocusSet[pos];
 	}
@@ -601,21 +636,22 @@ void CSdoaqEdofDlg::OnSdoaqPlayEdof()
 		uidx++; // PointCloud
 	}
 
-	eErrorCode rv = ::SDOAQ_PlayEdof(
+	AFP.callbackUserData = (void*)::GetTickCount64();
+	eErrorCode rv_sdoaq = ::SDOAQ_PlayEdofEx(
 		&AFP,
-		g_PlayEdofCallback,
-		pPositions, (int)nFocusNums,
+		g_PlayEdofCallbackEx,
+		pPositions, (int)FOCUS.numsFocus,
 		m_nRingBufferSize,
 		SET.rb.ppBuf,
 		SET.rb.pSizes
 	);
-	if (ecNoError == rv)
+	if (ecNoError == rv_sdoaq)
 	{
 		SET.rb.active = true;
 	}
 	else
 	{
-		g_LogLine(_T("SDOAQ_PlayEdof() returns error(%d)."));
+		g_LogLine(_T("SDOAQ_PlayEdofEx() returns error(%d)."), rv_sdoaq);
 	}
 
 	delete[] pPositions;
@@ -628,10 +664,13 @@ void CSdoaqEdofDlg::OnSdoaqPlayEdof()
 //----------------------------------------------------------------------------
 void CSdoaqEdofDlg::OnSdoaqStopEdof()
 {
-	g_LogLine(_T("SDOAQ_StopEdof()"));
-
 	SET.rb.active = false;
-	(void)::SDOAQ_StopEdof();
+
+	const eErrorCode rv_sdoaq = ::SDOAQ_StopEdof();
+	if (ecNoError != rv_sdoaq)
+	{
+		g_LogLine(_T("SDOAQ_StopEdof() returns error(%d)."), rv_sdoaq);
+	}
 
 	SET.ClearBuffer();
 
@@ -676,10 +715,12 @@ static void g_SDOAQ_InitDoneCallback(eErrorCode errorCode, char* pErrorMessage)
 }
 
 //----------------------------------------------------------------------------
-static void g_PlayEdofCallback(eErrorCode errorCode, int lastFilledRingBufferEntry)
+static void g_PlayEdofCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData)
 {
 	if (theApp.m_pMainWnd)
 	{
 		theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_EDOF, (WPARAM)errorCode, (LPARAM)lastFilledRingBufferEntry);
+
+		static void* g_prev = NULL; if (g_prev != callbackUserData) { g_prev = callbackUserData; g_LogLine(_T("EDOF callback 0x%I64X"), (unsigned long long)callbackUserData); }
 	}
 }

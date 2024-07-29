@@ -97,6 +97,53 @@
 	 2.3.1  2023.11.23  YoungJu Lee		- Set Windows periodic timers to 1 millisecond
 										- If the ring buffer size is 1, image acquisition runs only once and then stops
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.0  2023.12.06  YoungJu Lee		- Add API to register Moveok callback (It is called when image acquisition is completed)
+										- Add AcquisitionFixedParametersEx struct with user data
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.1  2024.01.04  YoungJu Lee		- The additional stability feature of auto-focus only applies during continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.2  2024.01.17  YoungJu Lee		- Update matched focus step in real time during auto-focus continuous play
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.4.3  2024.01.29  YoungJu Lee		- Fix an issue that Edof and auto focus algorithm failure depending on memory status
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.5.0  2024.02.20	YoungJu Lee		- Add auto-focus algorithm parameter
+										  (pi_af_sharpness_measure_method, pi_af_resampling_method, pi_af_stability_method, pi_af_stability_debounce_count)
+										- Update sdedof library v0.84 and add sdaf v0.2 library
+										- Add library pseudo-calibration data based on script MALS settings when no calibration file is specified
+										- Supports Sentech camera STC-SPC510PCL (STC-SPC510PCL.cam)
+										- Add parameters to check whether auto-functions are supported
+										  (piFeatureAutoExposure, piFeatureAutoWhiteBalance, piFeatureAutoIlluminate)
+										- Add SDOAQ_Set/GetCameraRoiParameter APIs that specify ROI by applying horizontal and vertical offset
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.5.1  2024.03.26	YoungJu Lee		- Apply the maximum size of the image manager specified in the script
+										  (The size of image manager is calculated based on the size of all raw images and resulting data)
+										- Add APIs that specify the script file and camfiles folder
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.6.0  2024.04.05  YoungJu Lee     - Support multiple WiseScopes
+										- Support multiple light controllers
+										- Add piSaveOnlyResult parameter that specifies whether to save the raw images when snapping
+										- Add piFeatureBinning parameter that check whether binning feature is supported
+										- Update sdaf v0.21 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.6.1  2024.04.16  YoungJu Lee     - Support Teledyne FLIR camera BFS-U3-16S7M
+	 									- Update sdaf v0.22 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.0  2024.06.05  YoungJu Lee     - Support FFC(flat field correction)
+										- Update sdedof v0.86 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.1  2024.06.21  YoungJu Lee		- Support Basler CXP-12 frame grabber
+										- Add timestamps to all types of logs and display the time taken for image acquisition and image processing respectively
+										- Add a parameter to set log level (piLogLevel)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.2  2024.06.27  YoungJu Lee		- Fix active child lighting parameter issue
+										- Update sdedof v0.861 library
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.3  2024.07.04  YoungJu Lee		- Support Basler Pylon 7.5.0.15658
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.4  2024.07.24  YoungJu Lee		- Check MALS license
+										- Support automatic detection for LCBPWM and SDZEISS light without specifying the light model name
+										- Fix an issue that callback functions for some cameras would be skipped when playing or snapping from multiple cameras simultaneously
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -142,10 +189,13 @@ extern "C"
 		/// <summary>This error occurs if a write access to an readonly device parameter was requested.</summary>
 		ecParameterIsNotWritable = 7,
 
+		/// <summary>This error occurs if the parameter value has never been set.</summary>
+		ecParameterIsNotSet = 14,
+
 		/// <summary>This error occurs if a auto adjustment function e.g. SDOAQ_AutoExposure() failed to reach the given target value.</summary>
 		ecAutoAdjustTargetNotReached = 8,
 
-		/// <summary>This error occurs if the function is not implemnted.</summary>
+		/// <summary>This error occurs if the function is not implemented.</summary>
 		ecNotImplemented = 9,
 
 		/// <summary>This error occurs if the function is not supported.</summary>
@@ -154,7 +204,14 @@ extern "C"
 		/// <summary>This error occurs when there is no authorization.</summary>
 		ecNoAuthorization = 11,
 
+		/// <summary>This error occurs when given wisescope does not exist.</summary>
+		ecNoWisescope = 12,
+
+		/// <summary>This error occurs when given lighting does not exist.</summary>
+		ecNoLighting = 13,
+
 		/// <summary>ToDo: Further values have to be defined ...</summary>
+		//ec_next = 15,
 	};
 
 	/// <summary>
@@ -186,12 +243,15 @@ extern "C"
 		lsInfo = 2,
 
 		/// <summary>The log message has only trace/Verbose level. This is usually used for development and troubleshooting and is only logged in this cases.</summary>
-		lsVerbose = 3
+		lsVerbose = 3,
+
+		/// <summary>The log message has the time taken for image acquisition and image processing respectively.</summary>
+		lsMeasure = 6,
 	};
 
 	/// <summary>
-	/// This function is a callback. It is called by SDOAQ and is implemented in the client (ZENService).
-	/// The message should be logged by the client to a window or a file. ZENService currently logs to log4net.
+	/// This function is a callback. It is called by SDOAQ and is implemented in the client.
+	/// The message should be logged by the client to a window or a file.
 	/// The message buffer is allocated by SDOAQ. The client has to process/copy the message before this
 	/// function returns back to SDOAQ, because the message may be allocated on the function stack.
 	/// This callback must be assigned during initialization.
@@ -241,6 +301,9 @@ extern "C"
 		/// <summary>objective 1.0x is is assembled.</summary>
 		oi01_00x = 8,
 
+		/// <summary>Library default objective.</summary>
+		oi_library_default = 99,
+
 		/// <summary>User defined objective.</summary>
 		oi_user_defined = 100
 	};
@@ -248,21 +311,21 @@ extern "C"
 	/// <summary>
 	/// This callback signals the client that a objective has been changed.
 	/// It is called once during initialization to inform about the current objective and whenever objective is changed.
-	/// Basic lens 1.3x objective is always mounted.
+	/// For Visioner 1, basic lens 1.3x objective is always mounted.
 	/// </summary>
 	typedef void(__stdcall* SDOAQ_ObjectiveChanged)(eObjectiveId newObjectiveId);
 
-	/// <summary>This function registers the objectiveChanged callback funtion.</summary>
+	/// <summary>This function registers the objectiveChanged callback funtion.  Allow MULTI_WS_ALL in multiWS selection.</summary>
 	__declspec(dllexport) eErrorCode SDOAQ_RegisterObjectiveChangedCallback(SDOAQ_ObjectiveChanged cbf);
 
 	/// <summary>
-	/// The calibration data is read from an external file.
+	/// The calibration data is read from an external file. Set up the calibration file after initialization is done.
 	/// </summary>
 	__declspec(dllexport) eErrorCode SDOAQ_SetCalibrationFile(const char* sFilename);
 
 	/// <summary>
 	/// This function sets the calibration data for objetive that are not defined inside the dll.
-	/// The calibration data is read from an external file.
+	/// The calibration data is read from an external file. Set up the calibration file after initialization is done.
 	/// </summary>
 	__declspec(dllexport) eErrorCode SDOAQ_SetExternalCalibrationTable(
 		int allocatedSize,
@@ -326,8 +389,8 @@ extern "C"
 
 	/// <summary>
 	/// This function starts the initialization of the SDOAQ. The loggingCallback, 
-	/// the errorCallback and the initDoneCallback are given by the client (ZENService).
-	/// This function only kicks of the initialization and returns to the client. 
+	/// the errorCallback and the initDoneCallback are given by the client.
+	/// This function only kicks of the initialization and returns to the client.
 	/// When the initialization is done, "initDoneCallback" is called with the error
 	/// result value.
 	/// </summary>
@@ -363,6 +426,20 @@ extern "C"
 	/// </summary>
 	__declspec(dllexport) int SDOAQ_GetAlgorithmVersion();
 
+	/// <summary>
+	/// This function sets the script data.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetSystemScriptData(const char* sScriptData);
+
+	/// <summary>
+	/// This function specifies the script file by the file name including the absolute path.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetSystemScriptFilename(const char* sScriptFilename);
+
+	/// <summary>
+	/// This function sets the camfile path, not including file name.
+	/// </summary>
+	__declspec(dllexport) void SDOAQ_SetCamfilePath(const char* sCamfilePath);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -379,7 +456,15 @@ extern "C"
 
 	enum eParameterId
 	{
+		/// <summary> The exposure time on the camera. After setting the value, the command is immediately sent to the camera.</summary>
 		piCameraExposureTime = 0,				// I - R/W  (microseconds)
+		/// <summary>
+		/// Data on exposure time. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataExposureTime = 85,				// I - R/W  (microseconds)
+
 		piCameraFullFrameSizeX = 1,				// I -  R	(pixels)
 		piCameraFullFrameSizeY = 2,				// I -  R	(pixels)
 		piCameraPixelSizeX = 3,					// I -  R	(nanometers)
@@ -387,24 +472,64 @@ extern "C"
 
 		/// <summary>
 		/// Gets current binning of the camera. This parameter is readonly because it must only be set
-		/// with sAcquisitionFixedParameters because it affects image buffer sizes.
+		/// with AcquisitionFixedParametersEx because it affects image buffer sizes.
 		/// </summary>
 		piCameraBinning = 5,					// I -  R   (matrix size)
+
+		/// <summary> The gain value on the camera. After setting the value, the command is immediately sent to the camera.</summary>
 		piCameraGain = 6,						// D - R/W
+		/// <summary>
+		/// Data on gain. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataGain = 86,						// D - R/W
+
 		piWhiteBalanceRed = 7,					// D - R/W
 		piWhiteBalanceGreen = 8,				// D - R/W
 		piWhiteBalanceBlue = 9,					// D - R/W
 
-		/// <summary>Sets the intensity of ring illumination 1 (inner ring).</summary>
+		/// <summary> FFC ID supported by the camera. After setting the value, the command is immediately sent to the camera.</summary>
+		piCameraFfcId = 88,						// I - R/W
+		/// <summary>
+		/// FFC ID supported by the camera. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataCamFfcId = 89,					// I - R/W
+
+		/// <summary> FFC ID supported by software.</summary>
+		piSoftwareFfcId = 90,					// I - R/W
+		/// <summary>
+		/// FFC ID supported by software. It has no default value.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
+		piDataSoftwareFfcId = 91,				// I - R/W
+
+		/// <summary>
+		/// Sets the intensity of ring illumination 1 (inner ring).
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piInnerRingIntensity = 10,				// D - R/W	 (%)
-
-		/// <summary>Sets the intensity of ring illumination 2 (middle ring).</summary>
+		/// <summary>
+		/// Sets the intensity of ring illumination 2 (middle ring).
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piMiddleRingIntensity = 11,				// D - R/W	 (%)
-
-		/// <summary>Sets the intensity of ring illumination 3 (outer ring).</summary>
+		/// <summary>
+		/// Sets the intensity of ring illumination 3 (outer ring).
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piOuterRingIntensity = 12,				// D - R/W	 (%)
-
-		/// <summary>Sets the intensity of coax illumination.</summary>
+		/// <summary>
+		/// Sets the intensity of coax illumination.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piCoaxIntensity = 13,					// D - R/W	 (%)
 
 		/// <summary>Gets the minimum and maximum focus position of the MALS controller.</summary>
@@ -417,10 +542,30 @@ extern "C"
 		piReflexCorrectionAlgorithm = 15,		// I - R/W
 
 		/// <summary>
-		/// Defines which illumination pattern is used for reflex correction.
-		/// refer to 16bit-PatternID
+		/// Defines which illumination pattern is used for reflex correction. Refer to 16bit-PatternID
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
 		/// </summary>
 		piReflexCorrectionPattern = 16,			// I - R/W
+
+		/// <summary> A list of the names of all installed lights.</summary>
+		piLightingList = 82,					// S - R
+		/// <summary> 
+		/// Name of the active light. Activated lighting is used when taking images.
+		/// If there is only one light, it works without specifying 'piActiveLightingList',
+		/// but if multiple lights are installed, it must be selected.
+		/// </summary>
+		piActiveLightingList = 83,				// S - R/W
+		/// <summary>
+		/// This is the name of the light to be set when making lighting-related settings.
+		/// The lighting name must be one of the name list received as the 'piLightingList' parameter.
+		/// The setting items below are affected:
+		/// light intensity: piInnerRingIntensity, piMiddleRingIntensity, piOuterRingIntensity, piCoaxIntensity,
+		///                  piIntensityGeneralChannel_1 ~ piIntensityGeneralChannel_32
+		/// light pattern: piReflexCorrectionPattern
+		/// camera brightness related items: piDataExposureTime, piDataGain
+		/// </summary>
+		piSelectSettingLighting = 84,			// S - R/W
 
 		/// <summary>
 		/// Maybe we need to reduce system load on weak computers. Therefore we need the possibility to 
@@ -436,7 +581,7 @@ extern "C"
 		/// For products using a motorized nosepiece controller,
 		/// it is read-write and the objective id is different depending on the device controller.
 		/// </summary>
-		piObjectiveId = 18,						// I - R/W
+		piObjectiveId = 18,						// I - R, R/W
 
 		/// <summary>
 		/// EDoF Algorithm method. Select an algorithm to generate EDoF image, including the built-in sdedof algorithm. 
@@ -508,6 +653,26 @@ extern "C"
 		pi_edof_scale_correction_dst_step = 69,	// I - R/W
 
 		/// <summary>
+		/// focus measure (sharpness measure) method (0: Modified Laplacian, 1: Gradient(Sobel), 2: Graylevel local variance)
+		/// </summary>
+		pi_af_sharpness_measure_method = 76,	// I - R/W
+
+		/// <summary>
+		/// image processing resolution(0: full, 1: half, 2: quarter)
+		/// </summary>
+		pi_af_resampling_method = 77,			// I - R/W
+
+		/// <summary>
+		/// range = { 1(None) , 2(stability-fullstep), 3(stability-halfstep), 4(stability-onestep) }
+		/// </summary>
+		pi_af_stability_method = 74,			// I - R/W
+
+		/// <summary>
+		/// range = {0 ~ 10}
+		/// </summary>
+		pi_af_stability_debounce_count = 75,	// I - R/W
+
+		/// <summary>
 		/// Specifies parameters to pass to the HeliconFocus executable when using the HeliconFocus edof algorithm.
 		/// </summary>
 		piAlgoParamHeliconFocus = 66,			// S - R/W
@@ -517,8 +682,15 @@ extern "C"
 		/// </summary>
 		piSaveFileFormat = 27,					// I - R/W
 
-		/// <summary>pixel size of camera, 8/10/12 bit. This is defined by the pixel format.</summary>
-		piSavePixelBits = 28,					// I - R
+		/// <summary>
+		/// The depth of the pixel in the snap image, 8/10/12 bit. Determines the pixel format of the snap imamge.
+		/// </summary>
+		piSavePixelBits = 28,					// I - R/W
+
+		/// <summary>
+		/// Specifies whether to save the raw images when snapping.
+		/// </summary>
+		piSaveOnlyResult = 81,					// I - R/W
 
 		/// <summary>left and top point of focus ROI
 		/// The upper 16 bits are left and lower 16 bits are top position. 0xAAAABBBB
@@ -539,7 +711,11 @@ extern "C"
 		/// <summary>Defines a single focus for continuous single focus acqisition.</summary>
 		piSingleFocus = 33,						// I - R/W	 (MALS step)
 
-		/// <summary>Sets the intensity of general channel 1~8. These values are all consecutive integer values. We reserve a range of values for 32 channels.</summary>
+		/// <summary>
+		/// Sets the intensity of general channel 1~8. These values are all consecutive integer values. We reserve a range of values for 32 channels.
+		/// When multiple lights are used, this data has a value for each light.
+		/// To set a specific lighting value, you must select a light with the 'piSelectSettingLighting' parameter and then set this data.
+		/// </summary>
 		piIntensityGeneralChannel_1 = 34,		// D - R/W	 (%)
 		piIntensityGeneralChannel_2 = 35,		// D - R/W	 (%)
 		piIntensityGeneralChannel_3 = 36,		// D - R/W	 (%)
@@ -563,7 +739,19 @@ extern "C"
 		/// <summary>Sets MALS lowest step for simulation.</summary>
 		piSimulMalsLowestStep = 73,				// I - R/W	 (MALS step)
 
-		//piNextParameterValue = 74,
+		/// <summary>Gets whether auto-exposure function is supported.</summary>
+		piFeatureAutoExposure = 78,				// I - R
+		/// <summary>Gets whether auto-whitebalance function is supported.</summary>
+		piFeatureAutoWhiteBalance = 79,			// I - R
+		/// <summary>Gets whether auto-illuminate function is supported.</summary>
+		piFeatureAutoIlluminate = 80,			// I - R
+		/// <summary>Gets whether binning feature is supported.</summary>
+		piFeatureBinning = 87,					// I - R
+
+		/// <summary>By specifying a log level, only log messages with a higher severity level than the specified log level are provided.</summary>
+		piLogLevel = 92,						// I - R/W	 (log severity)
+
+		//piNextParameterValue = 93, //240618
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -630,47 +818,64 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_SetDblParameterValue(eParameterId parameterId, double value);
 
 	// manages string value parameters	
-	// Read the parameterId value of string type and save it in the memory pointed to by ¡®pString¡¯ having the size of the value indicated by ¡®pSize¡¯.
-	// Write the size of the saved string in ¡®pSize¡¯ again.
+	/// Reads the parameterId value of string type and save it in the memory pointed to by ¡®pString¡¯, which has the size of the value indicated by ¡®pSize¡¯.
+	/// Updates the actual size of the saved string to ¡®pSize¡¯, not including the terminating null character.
 	__declspec(dllexport) eErrorCode SDOAQ_GetStringParameterValue(eParameterId parameterId, char* pString, int* pSize);
-	// Set up to NULL in the memory pointed to by ¡®pString¡¯.
+	/// Sets the value of parameterId with the data in the memory pointed to by ¡®pString¡¯.
+	/// ¡®pString¡¯ must include the terminating null character and cannot be null.
 	__declspec(dllexport) eErrorCode SDOAQ_SetStringParameterValue(eParameterId parameterId, const char* pString);
 
 	// manages camera parameter
 	/// <summary>
 	/// This function requests the current ROI and binning value of camera.
-	/// The full ROI is changed when binning is applied. Therefore, the size of image to be acquired is adjusted based on the current FOV and the binning value.
+	/// The increments in width and height varies depending on the camera, and the FOV changes when binning is applied.
+	/// Therefore, the size of image to be acquired is adjusted based on the current ROI and the binning value.
 	/// This function should be called to check ROI after calling SDOAQ_SetCameraParameter() function.
 	/// </summary>
 	/// <param name="pWidth, pHeight">
 	/// These values are the current ROI in pixels.
 	/// </param>
+	/// <param name="pOffsetX">
+	/// Horizontal offset from the left of the sensor to the roi in pixels.
+	/// </param>
+	/// <param name="pOffsetY">
+	/// Vertical offset from the top of the sensor to the roi in pixels.
+	/// </param>	
 	/// <param name="pBinning">
 	/// This value will be pass 1 if the camera does not support binning.
 	/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 	/// </param>
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraParameter(int* pWidth, int* pHeight, int* pBinning);
+	__declspec(dllexport) eErrorCode SDOAQ_GetCameraRoiParameter(int* pWidth, int* pHeight, int* pOffsetX, int* pOffsetY, int* pBinning);
 
 	/// <summary>
-	/// Specifies the FOV and binning value.
+	/// Specifies the ROI and binning value.
 	/// This function cannot be called while acquisition is in progress.
 	/// </summary>
-	/// <param name="FovWidth, FovHeight">
-	/// The FovWidth and FovHeight are not the size of the image to be acquired, but the image size in pixels to be scanned by the camera sensor.
+	/// <param name="nWidth, nHeight">
+	/// The nWidth and nHeight are not the size of the image to be acquired, but the image size in pixels to be scanned by the camera sensor.
 	/// </param>
-	/// <param name="binning">
+	/// <param name="pOffsetX">
+	/// Horizontal offset from the left of the sensor to the roi in pixels.
+	/// </param>
+	/// <param name="pOffsetY">
+	/// Vertical offset from the top of the sensor to the roi in pixels.
+	/// </param>
+	/// <param name="nBinning">
 	/// This value is ignored if the camera does not support binning.
 	/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 	/// </param>
-	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameter(int FovWidth, int FovHeight, int binning);
+	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameter(int nWidth, int nHeight, int nBinning);
+	__declspec(dllexport) eErrorCode SDOAQ_SetCameraRoiParameter(int nWidth, int nHeight, int nOffsetX, int nOffsetY, int nBinning);
 
 	/// <summary>
-	/// Parameters of the sAcquisitionFixedParameters-struct must be defined before calling an acquisition function and must
+	/// Parameters of the AcquisitionFixedParametersEx-struct must be defined before calling an acquisition function and must
 	/// not be changed during a running continuous acquisition (preview) because a change will have an impact on the
 	/// size of the predefined memory blocks allocated for the ring buffer.
 	/// </summary>
-	typedef struct sAcquisitionFixedParameters
+	struct AcquisitionFixedParametersEx
 	{
+		int ver = 3;
 		/// <summary>The upper edge of the camera ROI used for acquisition in pixels. This value is 0 if full ROI should be used.</summary>
 		int cameraRoiTop;
 		/// <summary>The left edge of the camera ROI used for acquisition in pixels. This value is 0 if full ROI should be used.</summary>
@@ -684,16 +889,16 @@ extern "C"
 		/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 		///</summary>
 		int cameraBinning;
-	} AcquisitionFixedParameters;
-
-	/* deprecated. Instead, use sAcquisitionFixedParameters */typedef struct sAcquisitionFixedParameters_V2
-	{
-		int cameraRoiTop;
-		int cameraRoiLeft;
-		int cameraRoiWidth;
-		int cameraRoiHeight;
-		int cameraBinning;
-	} AcquisitionFixedParameters_V2;
+		/// <summary>
+		/// User data with a size of 8 bytes.
+		/// User data is passed as is through the registered callback function.
+		/// </summary>
+		void* callbackUserData;
+	};
+	/* deprecated. Instead, use AcquisitionFixedParametersEx */struct sAcquisitionFixedParameters { int cameraRoiTop, cameraRoiLeft, cameraRoiWidth, cameraRoiHeight, cameraBinning; };
+	/* deprecated. Instead, use AcquisitionFixedParametersEx */typedef sAcquisitionFixedParameters AcquisitionFixedParameters;
+	/* deprecated. Instead, use AcquisitionFixedParametersEx */typedef sAcquisitionFixedParameters sAcquisitionFixedParameters_V2;
+	/* deprecated. Instead, use AcquisitionFixedParametersEx */typedef sAcquisitionFixedParameters AcquisitionFixedParameters_V2;
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -754,14 +959,33 @@ extern "C"
 	/// </param>
 	__declspec(dllexport) eErrorCode SDOAQ_AutoWhiteBalance(int roiLeft, int roiTop, int roiWidth, int roiHeight);
 
+
+	/// Generates camera FFC data, assigns it to the camera's 'api_ffcid', and applies it immediately.
+	__declspec(dllexport) eErrorCode SDOAQ_GenerateCameraFFC(int api_ffcid);
 	/// <summary>
-	/// After a call of SDOAQ_PlayFocusStack() or SDOAQ_PlayEdof()
+	/// Generates SW FFC data, assigns it to 'api_ffcid', applies it immediately, and saves it as a 'filename' file.
+	/// This function operates when the camera is running. Therefore, call it during free-run or stack images acquisition.
+	/// FFC data must be generated with full ROI.
+	/// </summary>
+	__declspec(dllexport) eErrorCode SDOAQ_GenerateSoftwareFFC(int api_ffcid, const char* filename);
+	/// Assigns the file 'filename' to software 'api_ffcid'. If filename is NULL, the corresponding ffc is off.
+	__declspec(dllexport) eErrorCode SDOAQ_SetSoftwareFFC(int api_ffcid, const char* filename);
+
+	/// It is called when image acquisition is completed. 
+	/// User data delivered through the API requesting image acquisition is passed as is.
+	typedef void(__stdcall* SDOAQ_MoveokCallback)(eErrorCode errorCode, void* callbackUserData);
+	/// Register a callback function. Allow MULTI_WS_ALL in multiWS selection.
+	__declspec(dllexport) eErrorCode SDOAQ_RegisterMoveokCallback(SDOAQ_MoveokCallback cbf);
+
+	/// <summary>
+	/// After a call of SDOAQ_PlayFocusStackEx() or SDOAQ_PlayEdofEx()
 	/// focus stacks or edof images are acquired in continuously until a call of SDOAQ_StopStack() or SDOAQ_StopEdof() is done.
-	/// During this continuous acquisition SDOAQ_PlayCallback() is called
+	/// During this continuous acquisition SDOAQ_PlayCallbackEx() is called
 	/// after every complete focus stack or edof acquisition by the SDO acquisition engine.
 	/// </summary>
-	/* deprecated. Instead, use SDOAQ_PlayCallback */typedef void(__stdcall* SDOAQ_ContinuousAcquisitionCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry);
-	typedef void(__stdcall* SDOAQ_PlayCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry);
+	typedef void(__stdcall* SDOAQ_PlayCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData);
+	/* deprecated. Instead, use SDOAQ_PlayCallbackEx */typedef void(__stdcall* SDOAQ_PlayCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry);
+	/* deprecated. Instead, use SDOAQ_PlayCallbackEx */typedef void(__stdcall* SDOAQ_ContinuousAcquisitionCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -777,9 +1001,9 @@ extern "C"
 	/// </summary>
 	/// <param name="pAcquisitionParams">
 	/// This struct holds acquisition parameters.
-	/// Please refer to sAcquisitionFixedParameters.
+	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ppFocusImages">
 	/// Array with pointers to enough memory for each single focus stack image acquired.
@@ -801,14 +1025,14 @@ extern "C"
 	/// These values should be checked before acquisition/copying images to detect allocation errors and prevent
 	/// exception faults.
 	/// </param>
-	/* deprecated. Instead, use SDOAQ_SingleShotFocusStack */__declspec(dllexport) eErrorCode SDOAQ_AcquireFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
-	/* deprecated. Instead, use SDOAQ_SingleShotFocusStack */__declspec(dllexport) eErrorCode SDOAQ_AcquireFocusStack_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
-
-	__declspec(dllexport) eErrorCode SDOAQ_SingleShotFocusStack(
-		sAcquisitionFixedParameters* pAcquisitionParams,
+	__declspec(dllexport) eErrorCode SDOAQ_SingleShotFocusStackEx(
+		AcquisitionFixedParametersEx* pAcquisitionParams,
 		int* pPositions, int positionsCount,
 		unsigned char** ppFocusImages,
 		size_t* pFocusImagesBufferSizes);
+	/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */__declspec(dllexport) eErrorCode SDOAQ_SingleShotFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
+	/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */__declspec(dllexport) eErrorCode SDOAQ_AcquireFocusStack_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
+	/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */__declspec(dllexport) eErrorCode SDOAQ_AcquireFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
 
 	/// <summary>
 	/// This function starts a focus stack preview. Stack images are produced in a continuous
@@ -822,10 +1046,10 @@ extern "C"
 	/// <param name="pAcquisitionParams">
 	/// This struct holds acquisition parameters which must not be changed during continuous focus
 	/// stack acquisition because they affect the pre allocated memory in the ring buffer.
-	/// Please refer to sAcquisitionFixedParameters.
+	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
 	/// <param name="stackFinishedCb">This callback function is called after each stack acquisition.</param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ringBufferSize">
 	/// Number of ring buffer entries. Each ring buffer entry consists of a complete set of focus images.
@@ -851,41 +1075,38 @@ extern "C"
 	/// These values should be checked before acquisition/copying images to detect allocation errors and prevent
 	/// exception faults.
 	/// </param>
-	/* deprecated. Instead, use SDOAQ_PlayFocusStack */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
-	/* deprecated. Instead, use SDOAQ_PlayFocusStack */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousFocusStack_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
-
-	__declspec(dllexport) eErrorCode SDOAQ_PlayFocusStack(
-		sAcquisitionFixedParameters* pAcquisitionParams,
-		SDOAQ_PlayCallback stackFinishedCb,
+	__declspec(dllexport) eErrorCode SDOAQ_PlayFocusStackEx(
+		AcquisitionFixedParametersEx* pAcquisitionParams,
+		SDOAQ_PlayCallbackEx stackFinishedCb,
 		int* pPositions, int positionsCount,
 		int ringBufferSize,
 		unsigned char** ppFocusImages,		// array of (ringBufferSize * positionsCount) unsigned char* entries
 		size_t* pFocusImagesBufferSizes);	// size of each buffer => size of array == (ringBufferSize * positionsCount);
+	/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */__declspec(dllexport) eErrorCode SDOAQ_PlayFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayCallback stackFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
+	/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousFocusStack_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
+	/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
 
-	/* deprecated. Instead, use SDOAQ_PlaySingleFocus */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousSingleFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayCallback stackFinishedCb,
-		int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
-	
 	/// <summary>
 	/// This function starts a focus stack preview with only one focus.
 	/// MALS controller position is given by eParameterId piSingleFocus.
 	/// The position can be changed without stopping focus acquisition.
 	/// A image is produced in a continuous way until SDOAQ_StopFocusStack() is called.
 	/// </summary>
-	__declspec(dllexport) eErrorCode SDOAQ_PlaySingleFocus(
-		sAcquisitionFixedParameters* pAcquisitionParams,
-		SDOAQ_PlayCallback singleFinishedCb,
+	__declspec(dllexport) eErrorCode SDOAQ_PlaySingleFocusEx(
+		AcquisitionFixedParametersEx* pAcquisitionParams,
+		SDOAQ_PlayCallbackEx singleFinishedCb,
 		int ringBufferSize,
 		unsigned char** ppFocusImage,		// array of (ringBufferSize) unsigned char* entries
 		size_t* pFocusImageBufferSizes);	// size of each buffer => size of array == (ringBufferSize);
+	/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */__declspec(dllexport) eErrorCode SDOAQ_PlaySingleFocus(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayCallback singleFinishedCb, int ringBufferSize, unsigned char** ppFocusImage, size_t* pFocusImageBufferSizes);
+	/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousSingleFocusStack(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayCallback stackFinishedCb, int ringBufferSize, unsigned char** ppFocusImages, size_t* pFocusImagesBufferSizes);
 
 	/// <summary>
 	/// This function requests a stop of the running continuous focus stack acquisition. After this function
 	/// returns the ring buffer allocated by the client can be released. No further calls of the callback will be done.
 	/// </summary>
-	/* deprecated. Instead, use SDOAQ_StopFocusStack */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousFocusStack();
 	__declspec(dllexport) eErrorCode SDOAQ_StopFocusStack();
+	/* deprecated. Instead, use SDOAQ_StopFocusStack */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousFocusStack();
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -929,9 +1150,9 @@ extern "C"
 	/// <param name="pAcquisitionParams">
 	/// This struct holds acquisition parameters which must not be changed during continuous EDoF
 	/// acquisition because they affect the pre allocated memory in the ring buffer.
-	/// Please refer to sAcquisitionFixedParameters.
+	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="pStepMapBuffer">Pointer to the allocated memory for step map</param>
 	/// <param name="stepMapBufferSize">The size of the step map buffer</param>
@@ -943,16 +1164,13 @@ extern "C"
 	/// <param name="heightMapBufferSize">The size of the height map buffer</param>
 	/// <param name="pPointCloudBuffer">Pointer to the allocated memory for point cloud</param>
 	/// <param name="pointCloudBufferSize">The size of the point cloud buffer</param>
-
-	/* deprecated. Instead, use SDOAQ_SingleShotEdof */__declspec(dllexport) eErrorCode SDOAQ_AcquireEdof(sAcquisitionFixedParameters* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, int* pPositions, int positionsCount,
-		float* pStepMapBuffer, size_t stepMapBufferSize, unsigned char* pEdofImageBuffer, size_t edofImageBufferSize, float* pQualityMapBuffer, size_t qualityMapBufferSize, float* pHeightMapBuffer, size_t heightMapBufferSize);
-	/* deprecated. Instead, use SDOAQ_SingleShotEdof */__declspec(dllexport) eErrorCode SDOAQ_AcquireEdof_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, int* pPositions, int positionsCount,
-		float* pStepMapBuffer, size_t stepMapBufferSize, unsigned char* pEdofImageBuffer, size_t edofImageBufferSize, float* pQualityMapBuffer, size_t qualityMapBufferSize, float* pHeightMapBuffer, size_t heightMapBufferSize, float* pPointCloudBuffer, size_t pointCloudBufferSize);
-
-	__declspec(dllexport) eErrorCode SDOAQ_SingleShotEdof(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount,
+	__declspec(dllexport) eErrorCode SDOAQ_SingleShotEdofEx(AcquisitionFixedParametersEx* pAcquisitionParams, int* pPositions, int positionsCount,
 		float* pStepMapBuffer, size_t stepMapBufferSize, unsigned char* pEdofImageBuffer, size_t edofImageBufferSize,
 		float* pQualityMapBuffer, size_t qualityMapBufferSize, float* pHeightMapBuffer, size_t heightMapBufferSize,
 		float* pPointCloudBuffer, size_t pointCloudBufferSize);
+	/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */__declspec(dllexport) eErrorCode SDOAQ_SingleShotEdof(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, float* pStepMapBuffer, size_t stepMapBufferSize, unsigned char* pEdofImageBuffer, size_t edofImageBufferSize, float* pQualityMapBuffer, size_t qualityMapBufferSize, float* pHeightMapBuffer, size_t heightMapBufferSize, float* pPointCloudBuffer, size_t pointCloudBufferSize);
+	/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */__declspec(dllexport) eErrorCode SDOAQ_AcquireEdof_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, int* pPositions, int positionsCount, float* pStepMapBuffer, size_t stepMapBufferSize, unsigned char* pEdofImageBuffer, size_t edofImageBufferSize, float* pQualityMapBuffer, size_t qualityMapBufferSize, float* pHeightMapBuffer, size_t heightMapBufferSize, float* pPointCloudBuffer, size_t pointCloudBufferSize);
+	/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */__declspec(dllexport) eErrorCode SDOAQ_AcquireEdof(sAcquisitionFixedParameters* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, int* pPositions, int positionsCount, float* pStepMapBuffer, size_t stepMapBufferSize, unsigned char* pEdofImageBuffer, size_t edofImageBufferSize, float* pQualityMapBuffer, size_t qualityMapBufferSize, float* pHeightMapBuffer, size_t heightMapBufferSize);
 
 	/// <summary>
 	/// This function starts an EDoF-Preview. EDoF images are produced in a continuous way until
@@ -968,10 +1186,10 @@ extern "C"
 	/// <param name="pAcquisitionParams">
 	/// This struct holds acquisition parameters which must not be changed during continuous EDoF
 	/// acquisition because they affect the pre allocated memory in the ring buffer.
-	/// Please refer to sAcquisitionFixedParameters.
+	/// Please refer to AcquisitionFixedParametersEx.
 	/// </param>	
 	/// <param name="edofFinishedCb">This callback function is called after each EDoF-Calculation.</param>
-	/// <param name="pPositions">The list of positions used to acquire the focus stack.</param>
+	/// <param name="pPositions">The list of positions used to acquire the focus stack. It is recommended to use equal step intervals.</param>
 	/// <param name="positionsCount">Number of positions in the position list.</param>
 	/// <param name="ringBufferSize">
 	/// Number of ring buffer entries. Each ring buffer entry consists of one EDoF image, one StepMap,
@@ -1001,25 +1219,23 @@ extern "C"
 	/// exception faults.
 	/// If one of the array entries is zero, the associated image is not acquired / copied.
 	/// </param>	
-	/* deprecated. Instead, use SDOAQ_PlayEdof */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousEdof(sAcquisitionFixedParameters* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAcquisitionCallback edofFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
-	/* deprecated. Instead, use SDOAQ_PlayEdof */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousEdof_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAcquisitionCallback edofFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages_V2, size_t* pRingBufferSizes_V2);
-
-	__declspec(dllexport) eErrorCode SDOAQ_PlayEdof(
-		sAcquisitionFixedParameters* pAcquisitionParams,
-		SDOAQ_PlayCallback edofFinishedCb,
+	__declspec(dllexport) eErrorCode SDOAQ_PlayEdofEx(
+		AcquisitionFixedParametersEx* pAcquisitionParams,
+		SDOAQ_PlayCallbackEx edofFinishedCb,
 		int* pPositions, int positionsCount,
 		int ringBufferSize,
 		void** ppRingBufferImages,		// poniter to pointer array of (ringBufferSize * (stepMap* + edof* + qualityMap* + heightMap* + pointCloud*)) unsigned char* entries
 		size_t* pRingBufferSizes);		// size of each image buffer => size of array == (ringBufferSize * 5);
+	/* deprecated. Instead, use SDOAQ_PlayEdofEx */__declspec(dllexport) eErrorCode SDOAQ_PlayEdof(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayCallback edofFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
+	/* deprecated. Instead, use SDOAQ_PlayEdofEx */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousEdof_V2(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAcquisitionCallback edofFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages_V2, size_t* pRingBufferSizes_V2);
+	/* deprecated. Instead, use SDOAQ_PlayEdofEx */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousEdof(sAcquisitionFixedParameters* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAcquisitionCallback edofFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
 
 	/// <summary>
 	/// This function requests a stop of the running continuous EDoF acquisition. After this functions returns the ring buffer
 	/// allocated by the client can be released. No further calls of the callback will be done.
 	/// </param>
-	/* deprecated. Instead, use SDOAQ_StopEdof */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousEdof();
 	__declspec(dllexport) eErrorCode SDOAQ_StopEdof();
+	/* deprecated. Instead, use SDOAQ_StopEdof */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousEdof();
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1031,87 +1247,87 @@ extern "C"
 	#define NAME_AF_IMAGE "AF"
 
 	/// <summary>
-	/// After a call of SDOAQ_PlayAF()
+	/// After a call of SDOAQ_PlayAFEx()
 	/// AF data and AF images are acquired in continuously until a call of SDOAQ_StopAF() is done.
-	/// During this continuous acquisition SDOAQ_PlayAfCallback() is called
+	/// During this continuous acquisition SDOAQ_PlayAfCallbackEx2() is called
 	/// after every complete auto focus data and image by the SDO acquisition engine.
 	/// </summary>
-	/* deprecated. Instead, use SDOAQ_PlayAfCallback */typedef void(__stdcall* SDOAQ_ContinuousAfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
-	typedef void(__stdcall* SDOAQ_PlayAfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
-	typedef void(__stdcall* SDOAQ_PlayAfCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
+	/// <param name="dbBestFocusStep">Best focus step(MALS) where the specified area is shown sharpest</param>
+	/// <param name="dbBestScore">Sharpness score for the resulting best focus step</param>
+	/// <param name="dbMatchedFocusStep">The focus step closest to the best focus in the focus list used to acquire the focus stack.
+	/// This is the focus step of the resulting auto-focus image.</param>
+	typedef void(__stdcall* SDOAQ_PlayAfCallbackEx2)(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData, 
+		double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
+	/* deprecated. Instead, use SDOAQ_PlayAfCallbackEx2 */typedef void(__stdcall* SDOAQ_PlayAfCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep);
+	/* deprecated. Instead, use SDOAQ_PlayAfCallbackEx2 */typedef void(__stdcall* SDOAQ_PlayAfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
+	/* deprecated. Instead, use SDOAQ_PlayAfCallbackEx2 */typedef void(__stdcall* SDOAQ_ContinuousAfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore);
 
-	/* deprecated. Instead, use SDOAQ_SingleShotAF */__declspec(dllexport) eErrorCode SDOAQ_AcquireAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams,
-		int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore);
-
-	__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF(
-		sAcquisitionFixedParameters* pAcquisitionParams,
+	__declspec(dllexport) eErrorCode SDOAQ_SingleShotAFEx(
+		AcquisitionFixedParametersEx* pAcquisitionParams,
 		int* pPositions, int positionsCount,
 		unsigned char* pAFImageBuffer, size_t AFImageBufferSize,
-		double* pBestFocusStep, double* pBestScore);
+		double* pBestFocusStep, double* pBestScore, double* pMatchedFocusStep);
+	/* deprecated. Instead, use SDOAQ_SingleShotAFEx */__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF_Ex(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore, double* pMatchedFocusStep);
+	/* deprecated. Instead, use SDOAQ_SingleShotAFEx */__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF(sAcquisitionFixedParameters* pAcquisitionParams, int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore);
+	/* deprecated. Instead, use SDOAQ_SingleShotAFEx */__declspec(dllexport) eErrorCode SDOAQ_AcquireAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, int* pPositions, int positionsCount, unsigned char* pAFImageBuffer, size_t AFImageBufferSize, double* pBestFocusStep, double* pBestScore);
 
-	__declspec(dllexport) eErrorCode SDOAQ_SingleShotAF_Ex(
-		sAcquisitionFixedParameters* pAcquisitionParams,
-		int* pPositions, int positionsCount,
-		unsigned char* pAFImageBuffer, size_t AFImageBufferSize,
-		double* pBestFocusStep, double* pBestScore, double* pMatchedSFocusStep);
-
-	/* deprecated. Instead, use SDOAQ_PlayAF */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAfCallback afFinishedCb,
-		int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
-
-	__declspec(dllexport) eErrorCode SDOAQ_PlayAF(
-		sAcquisitionFixedParameters* pAcquisitionParams,
-		SDOAQ_PlayAfCallback afFinishedCb,
+	__declspec(dllexport) eErrorCode SDOAQ_PlayAFEx(
+		AcquisitionFixedParametersEx* pAcquisitionParams,
+		SDOAQ_PlayAfCallbackEx2 afFinishedCb,
 		int* pPositions, int positionsCount,
 		int ringBufferSize,
 		void** ppRingBufferImages,		// array of (ringBufferSize * AF) unsigned char* entries
 		size_t* pRingBufferSizes);		// size of each image buffer => size of array == (ringBufferSize * 1);
+	/* deprecated. Instead, use SDOAQ_PlayAFEx */__declspec(dllexport) eErrorCode SDOAQ_PlayAF_Ex(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayAfCallbackEx afFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
+	/* deprecated. Instead, use SDOAQ_PlayAFEx */__declspec(dllexport) eErrorCode SDOAQ_PlayAF(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayAfCallback afFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
+	/* deprecated. Instead, use SDOAQ_PlayAFEx */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousAF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousAfCallback afFinishedCb, int* pPositions, int positionsCount, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
 
-	__declspec(dllexport) eErrorCode SDOAQ_PlayAF_Ex(
-		sAcquisitionFixedParameters* pAcquisitionParams,
-		SDOAQ_PlayAfCallbackEx afFinishedCb,
-		int* pPositions, int positionsCount,
-		int ringBufferSize,
-		void** ppRingBufferImages,		// array of (ringBufferSize * AF) unsigned char* entries
-		size_t* pRingBufferSizes);		// size of each image buffer => size of array == (ringBufferSize * 1);
-
-	/* deprecated. Instead, use SDOAQ_StopAF */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousAF();
 	__declspec(dllexport) eErrorCode SDOAQ_StopAF();
+	/* deprecated. Instead, use SDOAQ_StopAF */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousAF();
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Functions and types needed to acquire a single MF image or an MF preview ...
+	// Functions and types needed to acquire a MF preview ...
+	//
+	// The multi-focus functions provided by SDOAQ.dll is one of several ways to implement multi-focus.
+	// Depending on your purpose and needs, you can freely implement your own multi-focus function
+	// by using APIs such as auto-focus and focus-stack acquisition.
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	#define NAME_MF_IMAGE "MF"
 
 	/// <summary>
-	/// After a call of SDOAQ_PlayMF()
+	/// After a call of SDOAQ_PlayMFEx()
 	/// MF data and MF images are acquired in continuously until a call of SDOAQ_StopMF() is done.
-	/// During this continuous acquisition SDOAQ_ContinuousMfCallback() is called
+	/// During this continuous acquisition SDOAQ_PlayMfCallbackEx() is called
 	/// after every complete auto multi focus information and image by the SDO acquisition engine.
 	/// </summary>
-	/* deprecated. Instead, use SDOAQ_PlayMfCallback */typedef void(__stdcall* SDOAQ_ContinuousMfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int* pRectIdArray, int* pRectStepArray);
-	typedef void(__stdcall* SDOAQ_PlayMfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int* pRectIdArray, int* pRectStepArray);
+	/// <param name="countRects">Total number of specified areas</param>
+	/// <param name="pRectIdArray">An array of unique IDs for each area</param>
+	/// <param name="pRectStepArray">An array of resulting focus steps for each area</param>
+	typedef void(__stdcall* SDOAQ_PlayMfCallbackEx)(eErrorCode errorCode, int lastFilledRingBufferEntry, void* callbackUserData,
+		int countRects, int* pRectIdArray, int* pRectStepArray);
+	/* deprecated. Instead, use SDOAQ_PlayMfCallbackEx */typedef void(__stdcall* SDOAQ_PlayMfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int* pRectIdArray, int* pRectStepArray);
+	/* deprecated. Instead, use SDOAQ_PlayMfCallbackEx */typedef void(__stdcall* SDOAQ_ContinuousMfCallback)(eErrorCode errorCode, int lastFilledRingBufferEntry, int countRects, int* pRectIdArray, int* pRectStepArray);
 
-	/* deprecated. Instead, use SDOAQ_PlayMF */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousMF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousMfCallback mfFinishedCb,
-		int* pPositions, int positionsCount, const char* sFunctionScript, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
-
-	__declspec(dllexport) eErrorCode SDOAQ_PlayMF(
-		sAcquisitionFixedParameters* pAcquisitionParams,
-		SDOAQ_PlayMfCallback mfFinishedCb,
+	__declspec(dllexport) eErrorCode SDOAQ_PlayMFEx(
+		AcquisitionFixedParametersEx* pAcquisitionParams,
+		SDOAQ_PlayMfCallbackEx mfFinishedCb,
 		int* pPositions, int positionsCount,
 		const char* sFunctionScript,
 		int ringBufferSize,
 		void** ppRingBufferImages,		// array of (ringBufferSize * MF) unsigned char* entries
 		size_t* pRingBufferSizes);		// size of each image buffer => size of array == (ringBufferSize * 1);
+	/* deprecated. Instead, use SDOAQ_PlayMFEx */__declspec(dllexport) eErrorCode SDOAQ_PlayMF(sAcquisitionFixedParameters* pAcquisitionParams, SDOAQ_PlayMfCallback mfFinishedCb, int* pPositions, int positionsCount, const char* sFunctionScript, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
+	/* deprecated. Instead, use SDOAQ_PlayMFEx */__declspec(dllexport) eErrorCode SDOAQ_StartContinuousMF(sAcquisitionFixedParameters_V2* pAcquisitionParams, sEdofCalculationFixedParameters* pCalculationParams, SDOAQ_ContinuousMfCallback mfFinishedCb, int* pPositions, int positionsCount, const char* sFunctionScript, int ringBufferSize, void** ppRingBufferImages, size_t* pRingBufferSizes);
 
-	/* deprecated. Instead, use SDOAQ_PlayMF */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousMF();
 	__declspec(dllexport) eErrorCode SDOAQ_StopMF();
+	/* deprecated. Instead, use SDOAQ_StopMF */__declspec(dllexport) eErrorCode SDOAQ_StopContinuousMF();
 
-	/* deprecated. Instead, use SDOAQ_UpdatePlayMF */__declspec(dllexport) eErrorCode SDOAQ_UpdateContinuousMF(const char* sFunctionScript);
 	__declspec(dllexport) eErrorCode SDOAQ_UpdatePlayMF(const char* sFunctionScript);
+	/* deprecated. Instead, use SDOAQ_UpdatePlayMF */__declspec(dllexport) eErrorCode SDOAQ_UpdateContinuousMF(const char* sFunctionScript);
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1120,7 +1336,8 @@ extern "C"
 	//
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	typedef SDOAQ_PlayCallback SDOAQ_SnapCallback;
+	typedef SDOAQ_PlayCallbackEx SDOAQ_SnapCallbackEx;
+	/* deprecated. Instead, use SDOAQ_SnapCallbackEx */typedef SDOAQ_PlayCallback SDOAQ_SnapCallback;
 
 	typedef struct sSnapParameters
 	{
@@ -1140,19 +1357,21 @@ extern "C"
 	/// Acquire the focus stack using the given parameters WITHOUT stopping the current acquisition operation
 	/// and save the raw images and result
 	/// </summary>
-	__declspec(dllexport) eErrorCode SDOAQ_PlaySnap(
-		SDOAQ_SnapCallback snapCb,
+	__declspec(dllexport) eErrorCode SDOAQ_PlaySnapEx(
+		SDOAQ_SnapCallbackEx snapCb, void* callbackUserData,
 		int* pPositions, int positionsCount,
 		const SnapParameters* pSnapParameters);
+	/* deprecated. Instead, use SDOAQ_PlaySnapEx */__declspec(dllexport) eErrorCode SDOAQ_PlaySnap(SDOAQ_SnapCallback snapCb, int* pPositions, int positionsCount, const SnapParameters* pSnapParameters);
 
 	/// <summary>
 	/// Acquire the focus stack using the given parameters WITH stopping the current acquisition operation 
 	/// and save the raw images and result. Stop the acquisition operation after snap. 
 	/// </summary>
-	__declspec(dllexport) eErrorCode SDOAQ_PlaySnap_and_Stop(
-		SDOAQ_SnapCallback snapCb,
+	__declspec(dllexport) eErrorCode SDOAQ_PlaySnap_and_StopEx(
+		SDOAQ_SnapCallbackEx snapCb, void* callbackUserData,
 		int* pPositions, int positionsCount,
 		const SnapParameters* pSnapParameters);
+	/* deprecated. Instead, use SDOAQ_PlaySnap_and_StopEx */__declspec(dllexport) eErrorCode SDOAQ_PlaySnap_and_Stop(SDOAQ_SnapCallback snapCb, int* pPositions, int positionsCount, const SnapParameters* pSnapParameters);
 
 #ifdef __cplusplus
 }

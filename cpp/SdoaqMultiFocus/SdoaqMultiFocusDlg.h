@@ -1,0 +1,118 @@
+#pragma once
+
+#include "SDOAQ_Lib.h"
+
+//----------------------------------------------------------------------------
+enum EUserMessage
+{
+	EUM_LOG = 0xA000, // LPARAM is a pointer of CString
+	EUM_ERROR, // LPARAM is a pointer of CString
+	EUM_INITDONE,
+	EUM_RECEIVE_MF,
+};
+
+struct tMsgParaReceiveMf
+{
+	int lastFilledRingBufferEntry;
+	struct t_rec
+	{
+		int id;
+		int step;
+	};
+	std::vector<t_rec> vRectInfo;
+};
+
+
+//============================================================================
+class CSdoaqMultiFocusDlg : public CDialogEx
+{
+public:
+	CSdoaqMultiFocusDlg(CWnd* pParent = nullptr);	// standard constructor
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+
+protected:
+	HICON m_hIcon;
+
+	// Generated message map functions
+	virtual BOOL OnInitDialog();
+	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnClose();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+
+	afx_msg LRESULT OnInitDone(WPARAM wErrorCode, LPARAM lpMessage);
+	afx_msg LRESULT OnReceiveMF(WPARAM wErrorCode, LPARAM lMsgParaReceiveMf);
+	afx_msg void OnSdoaqAddMFScript();
+	afx_msg void OnSdoaqSetOutsideFocusStep();
+	afx_msg void OnSdoaqPlayMF();
+	afx_msg void OnSdoaqUpdateScript();
+	afx_msg void OnSdoaqClearScript();
+	afx_msg void OnSdoaqStopMF();
+public:
+	struct tTestSet
+	{
+		tTestSet()
+		{
+			afp.cameraRoiTop = 0;
+			afp.cameraRoiLeft = 0;
+			afp.cameraRoiWidth = (2064 / 4) * 4;
+			afp.cameraRoiHeight = 1544;
+			afp.cameraBinning = 1;
+		}
+		~tTestSet()
+		{
+			ClearBuffer();
+		}
+		void ClearBuffer(void)
+		{
+			if (rb.ppBuf)
+			{
+				for (size_t uidx = 0; uidx < rb.numsBuf; uidx++)
+				{
+					delete[] rb.ppBuf[uidx];
+				}
+				delete[] rb.ppBuf; rb.ppBuf = NULL;
+				delete[] rb.pSizes; rb.pSizes = NULL;
+				rb.numsBuf = 0;
+			}
+		}
+
+		AcquisitionFixedParametersEx afp;
+
+		inline int PixelSize(void) const { return afp.cameraRoiWidth * afp.cameraRoiHeight; }
+		inline int ImgSize(void) const { return IsMonoCameraInstalled() ? PixelSize() : PixelSize() * COLORBYTES; }
+		inline int DataSize(void) const { return PixelSize() * sizeof(float); }
+		inline int PixelWidth(void) const { return afp.cameraRoiWidth; }
+		inline int PixelHeight(void) const { return afp.cameraRoiHeight; }
+
+		struct tRingBuf
+		{
+			bool active = false;
+			void** ppBuf = NULL; // 데이타(이미지) 버퍼 포인터
+			size_t* pSizes = NULL; // 각 데이타 버퍼의 데이타 크기(이미지 크기) 배열
+			size_t numsBuf = 0; // 링버퍼 배열 요소 개수 * 포커스 개수 ==> 링 버퍼의 실제 데이타 개수
+		} rb;
+
+		struct tFocus
+		{
+			size_t numsFocus = 10;
+			std::vector<int> vFocusSet;
+		} focus;
+
+		int m_nColorByte = COLORBYTES;
+	} SET;
+
+	std::vector<int> m_vFocusSet;
+	int m_nRingBufferSize = 3;
+	int m_nContiMF = 0;
+
+	int m_numsMR = 0;
+	CStringA m_sMultiAreas;
+	CStringA GetFunctionScript() { return (FStringA("Number of MR MULTI = %d", m_numsMR) + m_sMultiAreas); }
+
+	void ImageViewer(const char* title = NULL, int title_no = 0, const tTestSet& SET = tTestSet(), void* data = NULL);
+	void ImageViewer(const char* title, int title_no, int width, int height, int colorbytes, void* data = NULL);
+};

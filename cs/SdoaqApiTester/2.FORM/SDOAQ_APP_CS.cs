@@ -250,7 +250,7 @@ namespace SDOAQ_App_CS
 									delegate ()
 									{
 										var Parameters = new[]
-										{								
+										{
 											new{ Name = "piCameraExposureTime", Value = ((int)eParameterId.piCameraExposureTime).ToString() },
 											new{ Name = "piCameraFullFrameSizeX", Value = ((int)eParameterId.piCameraFullFrameSizeX).ToString() },
 											new{ Name = "piCameraFullFrameSizeY", Value = ((int)eParameterId.piCameraFullFrameSizeY).ToString() },
@@ -283,6 +283,17 @@ namespace SDOAQ_App_CS
 											new{ Name = "pi_edof_bilateral_sigma_color", Value = ((int)eParameterId.pi_edof_bilateral_sigma_color).ToString() },
 											new{ Name = "pi_edof_bilateral_sigma_space", Value = ((int)eParameterId.pi_edof_bilateral_sigma_space).ToString() },
 											new{ Name = "pi_edof_num_thread", Value = ((int)eParameterId.pi_edof_num_thread).ToString() },
+											new{ Name = "pi_edof_is_scale_correction_enabled", Value = ((int)eParameterId.pi_edof_is_scale_correction_enabled).ToString() },
+											new{ Name = "pi_edof_scale_correction_dst_step", Value = ((int)eParameterId.pi_edof_scale_correction_dst_step).ToString() },
+											new{ Name = "pi_af_sharpness_measure_method", Value = ((int)eParameterId.pi_af_sharpness_measure_method).ToString() },
+											new{ Name = "pi_af_resampling_method", Value = ((int)eParameterId.pi_af_resampling_method).ToString() },
+											new{ Name = "pi_af_stability_method", Value = ((int)eParameterId.pi_af_stability_method).ToString() },
+											new{ Name = "pi_af_stability_debounce_count", Value = ((int)eParameterId.pi_af_stability_debounce_count).ToString() },
+
+											new{ Name = "piVpsReportCycleSeconds", Value = ((int)eParameterId.piVpsReportCycleSeconds).ToString() },
+											new{ Name = "piVpsReportTimeSeconds", Value = ((int)eParameterId.piVpsReportTimeSeconds).ToString() },
+											new{ Name = "piSimulMalsHighestStep", Value = ((int)eParameterId.piSimulMalsHighestStep).ToString() },
+											new{ Name = "piSimulMalsLowestStep", Value = ((int)eParameterId.piSimulMalsLowestStep).ToString() },
 
 											new{ Name = "piInnerRingIntensity", Value = ((int)eParameterId.piInnerRingIntensity).ToString() },
 											new{ Name = "piMiddleRingIntensity", Value = ((int)eParameterId.piMiddleRingIntensity).ToString() },

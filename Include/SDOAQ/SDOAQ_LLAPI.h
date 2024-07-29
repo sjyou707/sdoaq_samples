@@ -1,6 +1,6 @@
-/* SDOAQ_LOWLEVEL.h
+/* SDOAQ_LLAPI.h
 
-	Comments : This file exports all types and functions needed to access the SDO acquisition engine.
+	Comments : This file exports all types and functions required to directly access the HW components that make up the SDO acquisition engine.
 	Date     : 2023/08/25
 	Author   : YoungJu Lee
 	Copyright (c) 2019 SD Optics,Inc. All rights reserved.
@@ -10,7 +10,13 @@
 	========================================================================================================================================================
 	Version     date      Author         Descriptions
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 2.3.0  2022.08.25  YoungJu Lee     - Init
+	 2.3.0  2023.08.25  YoungJu Lee     - Init (Camera register setting APIs are only valid for Basler USB and Basler GigE)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.5.0  2024.02.20	YoungJu Lee		- Supports CoaXPress type, Sentech CameraLink camera and Euresys MultiCam grabber
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.5.1  2024.03.26	YoungJu Lee		- The image buffer is released immediately when the callback function registered in the SDOAQ_SetFrameCallback is completed
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.4  2024.07.24	YoungJu Lee		- Trigger mode is subdivided into camera mode and grabber mode
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -20,13 +26,13 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif	
-	
-	// Register the low level API permission.
+#endif
+
+	// Registers the low level API permission.
 	__declspec(dllexport) void SDOAQ_RegisterLowLevelAuthorization(void);
 
 
-	// Set the camera to the content of pAcquisitionParams
+	// Sets the camera to the content of pAcquisitionParams
 	__declspec(dllexport) eErrorCode SDOAQ_SetAcquisitionFixedParameters(sAcquisitionFixedParameters* pAcquisitionParams);
 
 
@@ -35,7 +41,7 @@ extern "C"
 	//		'bytesPixel': Number of data bytes that make up a pixel of the frame.
 	//		'pixelsWidth': Number of width pixels in the frame
 	//		'pixelsHeight': Number of height pixels in the frame
-	//		'bytesLine': bytes for the With line in the frame. This may include padding bytes. ( padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
+	//		'bytesLine': bytes for the With line in the frame. This may include padding bytes. (padding bytes = 'bytesLine' - 'bytesPixel' * 'pixelsWidth').
 	typedef struct
 	{
 		int typeThis;
@@ -44,24 +50,37 @@ extern "C"
 		int pixelsHeight;
 		int bytesLine;
 	} FrameDescriptor;
-	
+
 	// 'SDOAQ_FrameCallback' Call Back Function
 	//		'errorCode': ecNoError
 	//		'buffer': Frame buffer. When the callback function is returned, the buffer is deleted, requiring a copy of the data.
 	//		'bufferSize': buffer size
 	//		'frameDescriptor': buffer frame Info 
 	typedef void(__stdcall* SDOAQ_FrameCallback)(eErrorCode errorCode, unsigned char* pBuffer, size_t BufferSize, FrameDescriptor* pFrameDescriptor);
-	// Register a callback function that receives frame data : Callback is not accepted when 'singleFrameCb' is NULL.
+	// Registers a callback function that receives frame data : Callback is not accepted when 'singleFrameCb' is NULL. Allow MULTI_WS_ALL in multiWS selection.
 	__declspec(dllexport) eErrorCode SDOAQ_SetFrameCallback(SDOAQ_FrameCallback singleFrameCb);
 
-
+	
 	enum eCameraTriggerMode
 	{
+		// The three modes below are for backward compatibility and are NOT RECOMMENDED for use.
+		// Set to camera or grabber according to the method specified in the script.
 		ctmFreerun = 1,
 		ctmSoftware = 2,
-		ctmExternal = 3
+		ctmExternal = 3,
+
+		// The six modes below may not work perfectly depending on the camera or grabber.		
+		// Set to camera.
+		ctmCameraFreerun = 0x11,
+		ctmCameraSoftware = 0x12,
+		ctmCameraExternal = 0x13,
+		
+		// Set to grabber. The camera operates under the control of the grabber.
+		ctmGrabberFreerun = 0x21,
+		ctmGrabberSoftware = 0x22,
+		ctmGrabberExternal = 0x23,
 	};
-	// Set the camera trigger mode.
+	// Sets the camera trigger mode.
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraTriggerMode(eCameraTriggerMode ctm);
 
 
@@ -70,12 +89,12 @@ extern "C"
 		cgsOffGrabbing = 0,
 		cgsOnGrabbing = 1,
 	};
-	// Set the camera grab status.
+	// Sets the camera grab status.
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraGrabbingStatus(eCameraGrabbingStatus cgs);
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraGrabbingStatus(eCameraGrabbingStatus* cgs_ptr);
 
 
-	// The API below apply only to some cameras.
+	// The APIs below only apply to some cameras.
 	enum eCameraParameterType
 	{
 		cptValue = 0,
@@ -85,6 +104,9 @@ extern "C"
 	};
 
 	__declspec(dllexport) eErrorCode SDOAQ_ExecCameraSoftwareTrigger(void);
+	__declspec(dllexport) eErrorCode SDOAQ_ExecGrabberSoftwareTrigger(void);
+
+	// for CoaXPress, Basler USB, Basler GigE
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameterString(const char* sz_register, const char* sz_value);
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraParameterString(const char* sz_register, char* buffer_ptr, int buffer_size);
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameterInteger(const char* sz_register, long long value);
@@ -93,6 +115,16 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraParameterDouble(const char* sz_register, double* value_ptr, eCameraParameterType cpt);
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameterBool(const char* sz_register, bool value);
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraParameterBool(const char* sz_register, bool* value_ptr);
+
+	// for Sentech CameraLink
+	__declspec(dllexport) eErrorCode SDOAQ_SetCameraRegisterInteger(void* id_register, long long value);
+	__declspec(dllexport) eErrorCode SDOAQ_GetCameraRegisterInteger(void* id_register, long long* value_ptr);
+
+	// for Euresys MultiCam grabber
+	__declspec(dllexport) eErrorCode SDOAQ_SetGrabberRegisterString(void* id_register, const char* sz_value);
+	__declspec(dllexport) eErrorCode SDOAQ_GetGrabberRegisterString(void* id_register, char* buffer_ptr, int buffer_size);
+	__declspec(dllexport) eErrorCode SDOAQ_SetGrabberRegisterInteger(void* id_register, long long value);
+	__declspec(dllexport) eErrorCode SDOAQ_GetGrabberRegisterInteger(void* id_register, long long* value_ptr);
 
 #ifdef __cplusplus
 }

@@ -70,6 +70,7 @@ namespace SDOWSIO
 				EPFT_XY_Z				= 0x1030C,
 				EPFT_XZ_Y				= 0x1030A,
 				EPFT_YZ_X				= 0x10306,
+				EPFT_RZ_XY				= 0x10303, // activation key
 
 				//enum projection mode
 				EPJM_ORTHOGRAPHIC		= 0x10401,
@@ -79,10 +80,26 @@ namespace SDOWSIO
 				EDIR_XY					= 0x105C0,
 				EDIR_XrY				= 0x105C4,
 
+				//test function
+				EKEY_DEVELOPER_TEST_BEGIN	= 0x10600,
+				EKEY_DEVELOPER_TEST_LAST	= 0x106FF,
+
+				//enum osd color
+				EDIR_OSD_COLOR_PICKER_TEXT	= 0x14011,
+				EDIR_OSD_COLOR_PICKER_BACK	= 0x14012,
+				EDIR_OSD_COLOR_MEASURE_TEXT	= 0x14021,
+				EDIR_OSD_COLOR_MEASURE_BACK	= 0x14022,
+				EDIR_OSD_COLOR_MEASURE_LINE	= 0x14023,
+				EDIR_OSD_COLOR_INFO_TEXT	= 0x14031,
+				EDIR_OSD_COLOR_INFO_BACK	= 0x14032,
+				EDIR_OSD_COLOR_CONSOLE_TEXT	= 0x14041,
+				EDIR_OSD_COLOR_CONSOLE_BACK	= 0x14042,
+
 				//enum user string
 				ESTR_FUNCTION			= 0x20101,
 				ESTR_PROJECTION			= 0x20102,
 				ESTR_ROTATION			= 0x20103,
+				ESTR_ZSCALE				= 0x20104,
 
 				ESTR_X_KEY_TO_REMOVE_LAST_LINE	= 0x20201,
 				ESTR_X_KEY_TO_REMOVE_ALL_LINES	= 0x20202,
@@ -229,6 +246,10 @@ namespace SDOWSIO
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSGL_StopDisplay(IntPtr hd3v);
+
+			//----------------------------------------------------------------------------
+			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+			public static extern WSIORV WSGL_Build_Welcome(IntPtr hd3v, string file_name_str, int mode, float speed);
 
 			//----------------------------------------------------------------------------
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]

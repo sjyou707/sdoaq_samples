@@ -102,6 +102,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\SDOAQ\SDOAQ_WS.h" />
+    <ClInclude Include="..\..\Include\WSIO\WSIO_UTIL.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />

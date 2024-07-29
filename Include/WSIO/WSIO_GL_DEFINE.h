@@ -9,7 +9,8 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
-#pragma once
+#ifndef _GL_DEFINE
+#define _GL_DEFINE
 
 #define GL_MG_ONSTAGE "onstage"
 #define GL_MG_GUEST "guest"
@@ -55,6 +56,7 @@ enum EKey
 	EPFT_XY_Z = 0x1030C,
 	EPFT_XZ_Y = 0x1030A,
 	EPFT_YZ_X = 0x10306,
+	EPFT_RZ_XY = 0x10303, // activation key
 
 	//enum projection mode
 	EPJM_ORTHOGRAPHIC = 0x10401,
@@ -63,6 +65,10 @@ enum EKey
 	//enum matrix direction
 	EDIR_XY = 0x105C0,
 	EDIR_XrY = 0x105C4,
+
+	//test function
+	EKEY_DEVELOPER_TEST_BEGIN = 0x10600,
+	EKEY_DEVELOPER_TEST_LAST = 0x106FF,
 
 	//enum osd color
 	EDIR_OSD_COLOR_PICKER_TEXT = 0x14011,
@@ -176,3 +182,5 @@ struct tPara_Display25D
 
 enum { NUMOF_TRIANGLE_INDICES_OF_PLANE_XY_PER_PIXEL = 6 };
 enum { NUMOF_TEXCOORD_BUF_NUMBER_PER_PIXEL = 2 };
+
+#endif
