@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SDOAQCSharpTool
+namespace SDOAQCSharp.Tool
 {
     public class LoggerEventArgs : EventArgs
     {
@@ -18,6 +18,15 @@ namespace SDOAQCSharpTool
 
     public class Logger : IDisposable
     {
+        public enum emLogLevel
+        {
+            Info,
+            API,
+            Warning,
+            Error,
+            Exception,
+        };
+
         public event EventHandler<LoggerEventArgs> DataReceived;
 
         private static MyQueue<string> _queue;

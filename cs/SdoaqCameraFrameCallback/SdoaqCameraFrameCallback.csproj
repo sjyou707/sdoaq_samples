@@ -58,20 +58,19 @@
     <Compile Include="..\..\Include\SDOAQ\SDOAQ_LLAPI.cs">
       <Link>SDOAQ\SDOAQ_WS.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\Logger.cs">
-      <Link>SDOAQCSharpTool\Logger.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\Logger.cs">
+      <Link>SDOAQCSharp\Tool\Logger.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\MyManualResetEvent.cs">
-      <Link>SDOAQCSharpTool\MyManualResetEvent.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\MyManualResetEvent.cs">
+      <Link>SDOAQCSharp\Tool\MyManualResetEvent.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\MyQueue.cs">
-      <Link>SDOAQCSharpTool\MyQueue.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\MyQueue.cs">
+      <Link>SDOAQCSharp\Tool\MyQueue.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\SdoaqImageInfo.cs">
-      <Link>SDOAQCSharpTool\SdoaqImageInfo.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\SdoaqImageInfo.cs">
+      <Link>SDOAQCSharp\Tool\SdoaqImageInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\Include\SDOAQCSharpTool\Utils.cs">
-      <Link>SDOAQCSharpTool\Utils.cs</Link>
+    <Compile Include="Utils.cs">
     </Compile>
     <Compile Include="..\..\Include\WSIO\WSIO.cs">
       <Link>WSIO\WSIO.cs</Link>

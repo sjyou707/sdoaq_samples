@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SDOAQCSharpTool
+namespace SDOAQCSharp.Tool
 {
     public static class Utils
     {
