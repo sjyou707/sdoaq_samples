@@ -50,9 +50,7 @@ namespace SDOAQCSharp
             SdoaqScriptReader.GetIntFromLineScript(path, SCRIPT_LINE_NUM_OF_WS, 1, out int numOfWiseScope);
 
             numOfWiseScope = Math.Max(1, numOfWiseScope);
-
-            Finalize();
-
+            
             s_sdoaqObjList.Clear();
             
             for (int i = 0; i< numOfWiseScope; i++)
