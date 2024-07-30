@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using SDOAQ;
 using SDOAQCSharp.Tool;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp
 {
     public partial class MySdoaq
     {
@@ -38,6 +38,9 @@ namespace SDOAQ_App_CS
         public readonly int CamIndex;
         
         public bool IsRunPlayer { get; private set; } = false;
+        private PlayerMode _playerMode = PlayerMode.None;
+        public PlayerMode CurrentPlayerMode => _playerMode;
+
         public SdoaqCamInfo CamInfo { get; private set; } = new SdoaqCamInfo();
 
         public FocusLHU FocusList { get; private set; } = new FocusLHU();
@@ -59,7 +62,7 @@ namespace SDOAQ_App_CS
             }
         }
 
-        private PlayerMode _playerMode = PlayerMode.None;
+        
         private RingBuffer _ringBuffer = new RingBuffer();
         private int _playerFoucsStepCount = 0;
 

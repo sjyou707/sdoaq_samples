@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 어셈블리에 대한 일반 정보는 다음 특성 집합을 통해 
 // 제어됩니다. 어셈블리와 관련된 정보를 수정하려면
 // 이러한 특성 값을 변경하세요.
-[assembly: AssemblyTitle("SdoaqApiTester")]
+[assembly: AssemblyTitle("SdoaqMultiWS")]
 [assembly: AssemblyDescription("SDOAQ API Test Program")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SD Optics, Inc.")]
-[assembly: AssemblyProduct("SdoaqApiTester")]
+[assembly: AssemblyProduct("SdoaqMultiWS")]
 [assembly: AssemblyCopyright("(c) SD Optics, Inc. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

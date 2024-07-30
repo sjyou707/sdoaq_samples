@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace SdoaqApiTester
+namespace SdoaqMultiWS
 {
 	static class Program
     {
@@ -13,7 +13,7 @@ namespace SdoaqApiTester
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SdoaqApiTester());
+            Application.Run(new SdoaqMultiWS());
         }
     }
 }

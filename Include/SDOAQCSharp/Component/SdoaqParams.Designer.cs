@@ -1,4 +1,4 @@
-﻿namespace SDOAQ_App_CS
+﻿namespace SDOAQCSharp.Component
 {
     partial class SdoaqParams
     {

@@ -6,23 +6,13 @@ using System.Windows.Forms;
 using SDOAQCSharp.Tool;
 using SDOWSIO;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp.Component
 {
     public partial class SdoaqImageViewr : UserControl
     {
-        private bool _visiblePointCloud = false;
-        public bool VisiblePointCloud
-        {
-            get => _visiblePointCloud;
-            set
-            {
-                if (_visiblePointCloud == value) return;
+        private readonly bool _visiblePointCloud;
+        public bool VisiblePointCloud => _visiblePointCloud;
 
-                _visiblePointCloud = value;
-                LayouyUpdate();
-            }
-        }
-        
         private MySdoaq _sdoaqObj;
 
         private List<SdoaqImageInfo> _imageList = new List<SdoaqImageInfo>();
@@ -33,9 +23,12 @@ namespace SDOAQ_App_CS
         private int _stackImgCount = 0;
         private int _afImgCount = 0;
         private int _edofImgCount = 0;
-        public SdoaqImageViewr()
+ 
+        public SdoaqImageViewr(bool visiblePointCloud)
         {
             InitializeComponent();
+
+            _visiblePointCloud = visiblePointCloud;
 
             this.Resize += UserControl_Resize;
             this.Disposed += UserControl_Disposed;
@@ -160,9 +153,15 @@ namespace SDOAQ_App_CS
         private void UpdatePointCloud(SdoaqPointCloudInfo pointCloudInfo)
         {
             var hwnd3DViewer = (IntPtr)pb_PointCloudViewer.Tag;
+
+            if (hwnd3DViewer == null)
+            {
+                return;
+            }
+
             _pointCloudInfoInfo = pointCloudInfo;
 
-            if (VisiblePointCloud == false || pointCloudInfo == null)
+            if (_visiblePointCloud == false || pointCloudInfo == null)
             {
                 WSIO.GL.WSGL_Display_BG(hwnd3DViewer);
                 return;
@@ -214,7 +213,7 @@ namespace SDOAQ_App_CS
 
         private void LayouyUpdate()
         {
-            if (VisiblePointCloud)
+            if (_visiblePointCloud)
             {
                 var rectList = this.ClientRectangle.DivideRect_Col(2);
 
@@ -257,7 +256,7 @@ namespace SDOAQ_App_CS
                 var ctrl = pb_PointCloudViewer;
                 var hwnd = (IntPtr)pb_PointCloudViewer.Tag;
                 
-                WSIO.GL.WSGL_ShowWindow(hwnd, VisiblePointCloud, ctrl.Left, ctrl.Top, ctrl.Right, ctrl.Bottom);
+                WSIO.GL.WSGL_ShowWindow(hwnd, _visiblePointCloud, ctrl.Left, ctrl.Top - 35, ctrl.Right, ctrl.Bottom - 35);
             }
         }
 
@@ -271,31 +270,36 @@ namespace SDOAQ_App_CS
             var attributes_ImageViewer = WSIO.UTIL.WSUTIVOPMODE.WSUTIVOPMODE_VISION
                                        | WSIO.UTIL.WSUTIVOPMODE.WSUTIVOPMODE_INFOOSD;
 
-            WSIO.UTIL.WSUT_IV_CreateImageViewer("Image Viewer"
+            var rvWsio = WSIO.UTIL.WSUT_IV_CreateImageViewer("Image Viewer"
                     , pb_ImageViewer.Handle
                     , out IntPtr hwndImageViewr
                     , 0
                     , attributes_ImageViewer);
 
+            MySdoaq.WriteLog(Logger.emLogLevel.API, $"WSUT_IV_CreateImageViewer(), rv = {rvWsio}");
+
             pb_ImageViewer.Tag = hwndImageViewr;
 
 
-            var rv = WSIO.GL.WSGL_Initialize(pb_PointCloudViewer.Handle, out IntPtr hwnd3DViewer);
+            if (_visiblePointCloud)
+            {
+                rvWsio = WSIO.GL.WSGL_Initialize(pb_PointCloudViewer.Handle, out IntPtr hwnd3DViewer);
 
-            var attributes_3D = WSIO.GL.EDisplayAttributes.EDA_SHOW_GUIDER_OBJECTS
-                              | WSIO.GL.EDisplayAttributes.EDA_SHOW_SCALE_OBJECTS
-                              | WSIO.GL.EDisplayAttributes.EDA_SHOW_COLORMAPBAR_OBJECTS
-                              | WSIO.GL.EDisplayAttributes.EDA_NOHIDE_PICKER;
+                MySdoaq.WriteLog(Logger.emLogLevel.API, $"WSGL_Initialize(), rv = {rvWsio}");
 
-            WSIO.GL.WSGL_SetDisplayAttributes(hwnd3DViewer, (int)attributes_3D);
+                var attributes_3D = WSIO.GL.EDisplayAttributes.EDA_SHOW_GUIDER_OBJECTS
+                                  | WSIO.GL.EDisplayAttributes.EDA_SHOW_SCALE_OBJECTS
+                                  | WSIO.GL.EDisplayAttributes.EDA_SHOW_COLORMAPBAR_OBJECTS
+                                  | WSIO.GL.EDisplayAttributes.EDA_NOHIDE_PICKER;
 
-            pb_PointCloudViewer.Tag = hwnd3DViewer;
+                WSIO.GL.WSGL_SetDisplayAttributes(hwnd3DViewer, (int)attributes_3D);
 
-            WSIO.GL.WSGL_ShowWindow(hwnd3DViewer, VisiblePointCloud, 
-                pb_PointCloudViewer.Left, pb_PointCloudViewer.Top, 
-                pb_PointCloudViewer.Right, pb_PointCloudViewer.Bottom);
+                pb_PointCloudViewer.Tag = hwnd3DViewer;
 
-            WSIO.GL.WSGL_Display_BG(hwnd3DViewer);
+                WSIO.GL.WSGL_ShowWindow(hwnd3DViewer, _visiblePointCloud, pb_PointCloudViewer.Left, pb_PointCloudViewer.Top - 35, pb_PointCloudViewer.Right, pb_PointCloudViewer.Bottom - 35);
+
+                WSIO.GL.WSGL_Display_BG(hwnd3DViewer);
+            }
         }
 
         private void UserControl_Disposed(object sender, EventArgs e)

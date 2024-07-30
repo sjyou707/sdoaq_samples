@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp.Tool
 {
     /// <summary>
     /// Focus List Low, High, Uint

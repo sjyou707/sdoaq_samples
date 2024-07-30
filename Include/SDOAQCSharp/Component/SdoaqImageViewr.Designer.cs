@@ -1,4 +1,4 @@
-﻿namespace SDOAQ_App_CS
+﻿namespace SDOAQCSharp.Component
 {
     partial class SdoaqImageViewr
     {
@@ -79,8 +79,8 @@
             // 
             // pb_ImageViewer
             // 
-            this.pb_ImageViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.pb_ImageViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pb_ImageViewer.BackColor = System.Drawing.SystemColors.ControlDark;
             this.pb_ImageViewer.Location = new System.Drawing.Point(3, 35);
@@ -115,8 +115,8 @@
             // 
             // pb_PointCloudViewer
             // 
-            this.pb_PointCloudViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.pb_PointCloudViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pb_PointCloudViewer.BackColor = System.Drawing.SystemColors.ControlDark;
             this.pb_PointCloudViewer.Location = new System.Drawing.Point(3, 35);

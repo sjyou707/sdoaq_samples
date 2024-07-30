@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp.Tool
 {
     public class RingBuffer : IDisposable
     {

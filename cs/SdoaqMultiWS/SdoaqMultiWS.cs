@@ -6,13 +6,15 @@ using System.Windows.Forms;
 
 using SDOAQCSharp.Tool;
 using System.Drawing;
+using SDOAQCSharp;
+using SDOAQCSharp.Component;
 
-namespace SDOAQ_App_CS
+namespace SdoaqMultiWS
 {
     /// <summary>
     /// Single WiseScope Control Example
     /// </summary>
-	public partial class SDOAQ_APP_CS : Form
+	public partial class SdoaqMultiWS : Form
 	{
         private enum AcquisitionMode
         {
@@ -27,17 +29,16 @@ namespace SDOAQ_App_CS
         private Dictionary<MySdoaq.EofImgViewOption, CheckBox> _chkEdofImgViewOptionList;
         private Dictionary<int, MySdoaq> _sdoaqObjList = null;
 
-        private SdoaqImageViewr _imgViewer;
+        private List<SdoaqImageViewr> _imgViewerList = new List<SdoaqImageViewr>();
+        private List<RadioButton> _rdoSelWsList = new List<RadioButton>();
+        private int _currentIdxWs = 1;
+
+        private static readonly Size SIZE_RDO_WS_SELECT = new Size(60, 30);
+        private static readonly Point LOCATION_RDO_WS_SELECT_START = new Point(7, 20);
         //----------------------------------------------------------------------------
-        public SDOAQ_APP_CS()
+        public SdoaqMultiWS()
 		{
 			InitializeComponent();
-
-            _imgViewer = new SdoaqImageViewr();
-            _imgViewer.VisiblePointCloud = true;            
-            _imgViewer.Dock = DockStyle.Fill;
-
-            pnl_Viewer.Controls.Add(_imgViewer);
 
             _chkEdofImgViewOptionList = new Dictionary<MySdoaq.EofImgViewOption, CheckBox>()
             {
@@ -49,17 +50,48 @@ namespace SDOAQ_App_CS
             };
             
             _sdoaqObjList = MySdoaq.LoadScript();
-            
-            _imgViewer.Set_SdoaqObj(GetSdoaqObj());
-            cmp_SdoaqParams.Set_SdoaqObj(GetSdoaqObj());
-            
+
+            for (int i = 0; i < _sdoaqObjList.Count; i++)
+            {
+                var imgViewer = new SdoaqImageViewr(i == 0 ? true : false);// Only one 3D viewer is supported
+
+                imgViewer.Set_SdoaqObj(_sdoaqObjList[i]);
+                
+                _imgViewerList.Add(imgViewer);
+
+                int idxWs = i + 1;
+                
+                var rdo = new RadioButton()
+                {
+                    AutoSize = false,
+                    Tag = idxWs,
+                    Name = $"rdo_WS_{idxWs}",
+                    Text = $"WS {idxWs}",     
+                    Size = SIZE_RDO_WS_SELECT,
+                };
+                rdo.CheckedChanged += rdo_SelWS_CheckedChanged;
+
+                _rdoSelWsList.Add(rdo);
+            }
+
+            _imgViewerList.ForEach(imgViewr => pnl_Viewer.Controls.Add(imgViewr));
+            _rdoSelWsList.ForEach(rdo => gr_SelectWS.Controls.Add(rdo));
+
+            int rdoLeft = LOCATION_RDO_WS_SELECT_START.X;
+            int rdoGap = 5;
+            foreach (var rdo in _rdoSelWsList)
+            {
+                rdo.Location = new Point(rdoLeft, LOCATION_RDO_WS_SELECT_START.Y);
+                rdoLeft = rdo.Right + rdoGap;
+            }
+
             MySdoaq.LogReceived += Sdoaq_LogDataReceived;
             MySdoaq.Initialized += Sdoaq_Initialized;            
         }
         
         private MySdoaq GetSdoaqObj()
         {
-            return _sdoaqObjList[0];
+            return _sdoaqObjList[Math.Max(0, _currentIdxWs - 1)];
         }
 
         private void LayoutUpdate()
@@ -78,6 +110,21 @@ namespace SDOAQ_App_CS
 
             rtxb_Log.SetBounds(rcView_Rows[0]);
             pnl_Viewer.SetBounds(rcView_Rows[1]);
+
+            var rcImgViewerList_Rows = pnl_Viewer.ClientRectangle.DivideRect_Row(_imgViewerList.Count);
+
+            for (int i = 0; i < _imgViewerList.Count; i++)
+            {
+                if (_imgViewerList[i].VisiblePointCloud)
+                {
+                    _imgViewerList[i].SetBounds(rcImgViewerList_Rows[i]);
+                }
+                else
+                {
+                    var tmpCols = rcImgViewerList_Rows[i].DivideRect_Col(2);
+                    _imgViewerList[i].SetBounds(tmpCols[0]);
+                }
+            }
         }
 
         private void WriteLog(string log, bool bNewLine = true)
@@ -124,6 +171,7 @@ namespace SDOAQ_App_CS
                     control.Enabled = false;
                 }
             }
+            btn_Snap.Enabled = true;
         }
 
         private void EnableAcqGroup_Idle()
@@ -132,6 +180,7 @@ namespace SDOAQ_App_CS
             {
                 control.Enabled = !control.Name.Contains("Stop");
             }
+            btn_Snap.Enabled = false;
         }
 
         #region My SDOAQ Object
@@ -142,16 +191,21 @@ namespace SDOAQ_App_CS
 
         private void Sdoaq_Initialized(object sender, SdoaqEventArgs e)
         {
-            if (e.ErrorCode == SDOAQ.SDOAQ_API.eErrorCode.ecNoError)
+            this.Invoke(() =>
             {
-                EnableGroup(bEnableInit: true, bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
-                EnableAcqGroup_Idle();
-                cmp_SdoaqParams.Update_Param();
-            }
-            else
-            {
-                EnableGroup(bEnableInit: true, bEnableParam: false, bEnableEdofOption: false, bEnableAcq: false);
-            }
+                if (e.ErrorCode == SDOAQ.SDOAQ_API.eErrorCode.ecNoError)
+                {
+                    MySdoaq.SelectMultWS(_currentIdxWs);
+
+                    EnableGroup(bEnableInit: true, bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
+                    EnableAcqGroup_Idle();
+                    cmp_SdoaqParams.Update_Param();
+                }
+                else
+                {
+                    EnableGroup(bEnableInit: true, bEnableParam: false, bEnableEdofOption: false, bEnableAcq: false);
+                }
+            });            
         }
         #endregion
 
@@ -171,7 +225,7 @@ namespace SDOAQ_App_CS
             }
         }
 
-        private void SDOAQ_APP_CS_Load(object sender, EventArgs e)
+        private void SdoaqMultiWS_Load(object sender, EventArgs e)
         {
             LayoutUpdate();
 
@@ -182,14 +236,16 @@ namespace SDOAQ_App_CS
 
             WriteLog($">> SDOAQ DLL Version = {MySdoaq.GetVersion()}");
             WriteLog($">> sdedof dll Version = {MySdoaq.GetVersion_SdEdofAlgorithm()}");
+
+            _rdoSelWsList[0].Checked = true;
         }
 
-        private void SDOAQ_APP_CS_FormClosing(object sender, FormClosingEventArgs e)
+        private void SdoaqMultiWS_FormClosing(object sender, FormClosingEventArgs e)
         {
             MySdoaq.Finalize();
         }
 
-        private void SDOAQ_APP_CS_Resize(object sender, EventArgs e)
+        private void SdoaqMultiWS_Resize(object sender, EventArgs e)
         {
             LayoutUpdate();
         }
@@ -276,12 +332,46 @@ namespace SDOAQ_App_CS
 
         private void btn_AcqMode_Snap_Click(object sender, EventArgs e)
         {
-            string snapPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Snap", $"{DateTime.Now:yyyy.MMM.dd.HHmmss}");
+            string snapPath = System.IO.Path.Combine(@"C:\SDOAQ\Snap", $"{DateTime.Now:yyyy.MMM.dd.HHmmss}");
 
             GetSdoaqObj().Acquisition_Sanp(snapPath);
         }
 
+        private void rdo_SelWS_CheckedChanged(object sender, EventArgs e)
+        {
+            var rdo = sender as RadioButton;
 
+            if (rdo.Checked)
+            {
+                _currentIdxWs = (int)rdo.Tag;
+                MySdoaq.SelectMultWS(_currentIdxWs);
+
+                cmp_SdoaqParams.Set_SdoaqObj(GetSdoaqObj());
+                if (MySdoaq.IsInitialize)
+                {
+                    cmp_SdoaqParams.Update();
+                }
+
+                if (GetSdoaqObj().IsRunPlayer)
+                {
+                    EnableGroup(bEnableParam: false, bEnableEdofOption: false, bEnableAcq: true);
+                    Control control = null;
+
+                    switch (GetSdoaqObj().CurrentPlayerMode)
+                    {
+                        case MySdoaq.PlayerMode.FocusStack: control = btn_StopStack; break;
+                        case MySdoaq.PlayerMode.Edof: control = btn_StopEdof; break;
+                        case MySdoaq.PlayerMode.Af: control = btn_StopAF; break;
+                    }
+                    EnableAcqGroup_Continuous(control);
+                }
+                else
+                {
+                    EnableGroup(bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
+                    EnableAcqGroup_Idle();                  
+                }
+            }
+        }
         #endregion
 
     }

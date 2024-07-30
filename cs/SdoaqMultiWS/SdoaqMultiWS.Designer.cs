@@ -1,7 +1,7 @@
 ﻿
-namespace SDOAQ_App_CS
+namespace SdoaqMultiWS
 {
-    partial class SDOAQ_APP_CS
+    partial class SdoaqMultiWS
     {
         /// <summary>
         /// 필수 디자이너 변수입니다.
@@ -30,11 +30,12 @@ namespace SDOAQ_App_CS
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SDOAQ_APP_CS));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SdoaqMultiWS));
             this.rtxb_Log = new System.Windows.Forms.RichTextBox();
             this.tmr_LogUpdate = new System.Windows.Forms.Timer(this.components);
             this.pnl_Viewer = new SDOAQCSharp.Component.SdoPanel();
             this.pnl_Control = new SDOAQCSharp.Component.SdoPanel();
+            this.gr_SelectWS = new System.Windows.Forms.GroupBox();
             this.gr_Acquisition = new System.Windows.Forms.GroupBox();
             this.btn_Snap = new System.Windows.Forms.Button();
             this.btn_AcqAF = new System.Windows.Forms.Button();
@@ -52,7 +53,7 @@ namespace SDOAQ_App_CS
             this.chk_QualityMap = new System.Windows.Forms.CheckBox();
             this.chk_Edof = new System.Windows.Forms.CheckBox();
             this.chk_StepMap = new System.Windows.Forms.CheckBox();
-            this.cmp_SdoaqParams = new SDOAQ_App_CS.SdoaqParams();
+            this.cmp_SdoaqParams = new SDOAQCSharp.Component.SdoaqParams();
             this.pnl_Init = new SDOAQCSharp.Component.SdoPanel();
             this.btn_Init = new System.Windows.Forms.Button();
             this.btn_Final = new System.Windows.Forms.Button();
@@ -91,6 +92,7 @@ namespace SDOAQ_App_CS
             // 
             this.pnl_Control.BorderColor = System.Drawing.Color.Black;
             this.pnl_Control.BorderWidth = 1;
+            this.pnl_Control.Controls.Add(this.gr_SelectWS);
             this.pnl_Control.Controls.Add(this.gr_Acquisition);
             this.pnl_Control.Controls.Add(this.gr_EdofImgViewOption);
             this.pnl_Control.Controls.Add(this.cmp_SdoaqParams);
@@ -98,8 +100,17 @@ namespace SDOAQ_App_CS
             this.pnl_Control.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnl_Control.Location = new System.Drawing.Point(0, 0);
             this.pnl_Control.Name = "pnl_Control";
-            this.pnl_Control.Size = new System.Drawing.Size(510, 965);
+            this.pnl_Control.Size = new System.Drawing.Size(510, 976);
             this.pnl_Control.TabIndex = 0;
+            // 
+            // gr_SelectWS
+            // 
+            this.gr_SelectWS.Location = new System.Drawing.Point(5, 51);
+            this.gr_SelectWS.Name = "gr_SelectWS";
+            this.gr_SelectWS.Size = new System.Drawing.Size(502, 60);
+            this.gr_SelectWS.TabIndex = 4;
+            this.gr_SelectWS.TabStop = false;
+            this.gr_SelectWS.Text = "Select WS";
             // 
             // gr_Acquisition
             // 
@@ -113,7 +124,7 @@ namespace SDOAQ_App_CS
             this.gr_Acquisition.Controls.Add(this.btn_StopStack);
             this.gr_Acquisition.Controls.Add(this.btn_ContiEdof);
             this.gr_Acquisition.Controls.Add(this.btn_ContiStack);
-            this.gr_Acquisition.Location = new System.Drawing.Point(12, 607);
+            this.gr_Acquisition.Location = new System.Drawing.Point(12, 673);
             this.gr_Acquisition.Name = "gr_Acquisition";
             this.gr_Acquisition.Size = new System.Drawing.Size(486, 202);
             this.gr_Acquisition.TabIndex = 3;
@@ -257,7 +268,7 @@ namespace SDOAQ_App_CS
             this.gr_EdofImgViewOption.Controls.Add(this.chk_QualityMap);
             this.gr_EdofImgViewOption.Controls.Add(this.chk_Edof);
             this.gr_EdofImgViewOption.Controls.Add(this.chk_StepMap);
-            this.gr_EdofImgViewOption.Location = new System.Drawing.Point(12, 414);
+            this.gr_EdofImgViewOption.Location = new System.Drawing.Point(12, 480);
             this.gr_EdofImgViewOption.Name = "gr_EdofImgViewOption";
             this.gr_EdofImgViewOption.Size = new System.Drawing.Size(486, 187);
             this.gr_EdofImgViewOption.TabIndex = 3;
@@ -330,7 +341,7 @@ namespace SDOAQ_App_CS
             // cmp_SdoaqParams
             // 
             this.cmp_SdoaqParams.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cmp_SdoaqParams.Location = new System.Drawing.Point(5, 52);
+            this.cmp_SdoaqParams.Location = new System.Drawing.Point(5, 118);
             this.cmp_SdoaqParams.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.cmp_SdoaqParams.Name = "cmp_SdoaqParams";
             this.cmp_SdoaqParams.Size = new System.Drawing.Size(500, 355);
@@ -373,11 +384,11 @@ namespace SDOAQ_App_CS
             this.btn_Final.UseVisualStyleBackColor = true;
             this.btn_Final.Click += new System.EventHandler(this.btn_Final_Click);
             // 
-            // SDOAQ_APP_CS
+            // SdoaqMultiWS
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1308, 965);
+            this.ClientSize = new System.Drawing.Size(1657, 976);
             this.Controls.Add(this.rtxb_Log);
             this.Controls.Add(this.pnl_Viewer);
             this.Controls.Add(this.pnl_Control);
@@ -385,11 +396,11 @@ namespace SDOAQ_App_CS
             this.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.Name = "SDOAQ_APP_CS";
-            this.Text = "SDOAQ APP CS";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SDOAQ_APP_CS_FormClosing);
-            this.Load += new System.EventHandler(this.SDOAQ_APP_CS_Load);
-            this.Resize += new System.EventHandler(this.SDOAQ_APP_CS_Resize);
+            this.Name = "SdoaqMultiWS";
+            this.Text = "SdoaqMultiWS";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SdoaqMultiWS_FormClosing);
+            this.Load += new System.EventHandler(this.SdoaqMultiWS_Load);
+            this.Resize += new System.EventHandler(this.SdoaqMultiWS_Resize);
             this.pnl_Control.ResumeLayout(false);
             this.gr_Acquisition.ResumeLayout(false);
             this.gr_EdofImgViewOption.ResumeLayout(false);
@@ -408,7 +419,7 @@ namespace SDOAQ_App_CS
         private System.Windows.Forms.Button btn_Init;
         private System.Windows.Forms.Button btn_Final;
         private System.Windows.Forms.Timer tmr_LogUpdate;
-        private SdoaqParams cmp_SdoaqParams;
+        private SDOAQCSharp.Component.SdoaqParams cmp_SdoaqParams;
         private System.Windows.Forms.GroupBox gr_EdofImgViewOption;
         private System.Windows.Forms.CheckBox chk_PointCloud;
         private System.Windows.Forms.CheckBox chk_HeightMap;
@@ -426,6 +437,7 @@ namespace SDOAQ_App_CS
         private System.Windows.Forms.Button btn_StopStack;
         private System.Windows.Forms.Button btn_ContiEdof;
         private System.Windows.Forms.Button btn_ContiStack;
+        private System.Windows.Forms.GroupBox gr_SelectWS;
     }
 }
 

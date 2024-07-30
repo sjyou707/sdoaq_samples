@@ -11,7 +11,7 @@ using System.IO;
 using SDOAQ;
 using SDOAQCSharp.Tool;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp.Component
 {
     public partial class SdoaqParams : UserControl
     {

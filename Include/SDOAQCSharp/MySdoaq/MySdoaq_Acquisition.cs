@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using SDOAQ;
 using SDOAQCSharp.Tool;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp
 {
     partial class MySdoaq
     {
@@ -36,15 +36,13 @@ namespace SDOAQ_App_CS
 
         public bool Acquisition_Sanp(string directoryPath)
         {
-            if (IsRunPlayer)
+            if (IsRunPlayer == false)
             {
                 return false;
             }
 
             var focusList = SnapFocusList.GetStepList();
-
-            System.IO.Directory.CreateDirectory(directoryPath);
-
+            
             var snapParams = new SDOAQ_API.SnapParameters[1]
             {
                 new SDOAQ_API.SnapParameters()
@@ -477,21 +475,5 @@ namespace SDOAQ_App_CS
         }
         #endregion
 
-        private static byte[] ConvertFloatBufferToByteBuffer(int totalPixelSize, float[] data)
-        {
-            var query = data.AsParallel();
-            var low = query.Min();
-            var high = query.Max();
-
-            float inc = ((float)256.0 / (high - low));
-
-            var buffer = new byte[totalPixelSize];
-            for (uint i = 0; i < totalPixelSize; i++)
-            {
-                buffer[i] = (byte)((data[i] - low) * inc);
-            }
-
-            return buffer;
-        }
     }
 }
