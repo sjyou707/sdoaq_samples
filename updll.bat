@@ -1,5 +1,12 @@
 @echo off
-	goto check_para
+openfiles >nul 2>&1
+if %errorlevel% neq 0 (
+echo. Administrator privileges are required. Please run this file as an administrator.
+pause
+exit /b
+)
+
+goto check_para
 
 :usage_short
 	echo.  UPDLL : Copy updated "Include/SDOAQ/*.dll, Include/WSIO/*.dll" files to "C:/Windows/System32".
