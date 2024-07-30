@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace SDOAQ_App_CS
+namespace SdoaqApiTester
 {
 	static class Program
     {
@@ -13,7 +13,7 @@ namespace SDOAQ_App_CS
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SDOAQ_APP_CS());
+            Application.Run(new SdoaqApiTester());
         }
     }
 }

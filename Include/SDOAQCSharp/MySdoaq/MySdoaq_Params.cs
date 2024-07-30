@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using SDOAQ;
 using SDOAQCSharp.Tool;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp
 {
     partial class MySdoaq
     {

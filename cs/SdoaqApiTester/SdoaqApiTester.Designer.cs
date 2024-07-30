@@ -1,7 +1,7 @@
 ﻿
-namespace SDOAQ_App_CS
+namespace SdoaqApiTester
 {
-    partial class SDOAQ_APP_CS
+    partial class SdoaqApiTester
     {
         /// <summary>
         /// 필수 디자이너 변수입니다.
@@ -30,7 +30,7 @@ namespace SDOAQ_App_CS
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SDOAQ_APP_CS));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SdoaqApiTester));
             this.rtxb_Log = new System.Windows.Forms.RichTextBox();
             this.tmr_LogUpdate = new System.Windows.Forms.Timer(this.components);
             this.pnl_Viewer = new SDOAQCSharp.Component.SdoPanel();
@@ -52,7 +52,7 @@ namespace SDOAQ_App_CS
             this.chk_QualityMap = new System.Windows.Forms.CheckBox();
             this.chk_Edof = new System.Windows.Forms.CheckBox();
             this.chk_StepMap = new System.Windows.Forms.CheckBox();
-            this.cmp_SdoaqParams = new SDOAQ_App_CS.SdoaqParams();
+            this.cmp_SdoaqParams = new SDOAQCSharp.Component.SdoaqParams();
             this.pnl_Init = new SDOAQCSharp.Component.SdoPanel();
             this.btn_Init = new System.Windows.Forms.Button();
             this.btn_Final = new System.Windows.Forms.Button();
@@ -129,7 +129,7 @@ namespace SDOAQ_App_CS
             this.btn_Snap.Name = "btn_Snap";
             this.btn_Snap.Size = new System.Drawing.Size(145, 35);
             this.btn_Snap.TabIndex = 26;
-            this.btn_Snap.Text = "Snap";
+            this.btn_Snap.Text = "Conti Acq Snap";
             this.btn_Snap.UseVisualStyleBackColor = true;
             this.btn_Snap.Click += new System.EventHandler(this.btn_AcqMode_Snap_Click);
             // 
@@ -373,7 +373,7 @@ namespace SDOAQ_App_CS
             this.btn_Final.UseVisualStyleBackColor = true;
             this.btn_Final.Click += new System.EventHandler(this.btn_Final_Click);
             // 
-            // SDOAQ_APP_CS
+            // SdoaqApiTester
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -385,11 +385,11 @@ namespace SDOAQ_App_CS
             this.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.Name = "SDOAQ_APP_CS";
-            this.Text = "SDOAQ APP CS";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SDOAQ_APP_CS_FormClosing);
-            this.Load += new System.EventHandler(this.SDOAQ_APP_CS_Load);
-            this.Resize += new System.EventHandler(this.SDOAQ_APP_CS_Resize);
+            this.Name = "SdoaqApiTester";
+            this.Text = "SdoaqApiTester";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SdoaqApiTester_FormClosing);
+            this.Load += new System.EventHandler(this.SdoaqApiTester_Load);
+            this.Resize += new System.EventHandler(this.SdoaqApiTester_Resize);
             this.pnl_Control.ResumeLayout(false);
             this.gr_Acquisition.ResumeLayout(false);
             this.gr_EdofImgViewOption.ResumeLayout(false);
@@ -408,7 +408,7 @@ namespace SDOAQ_App_CS
         private System.Windows.Forms.Button btn_Init;
         private System.Windows.Forms.Button btn_Final;
         private System.Windows.Forms.Timer tmr_LogUpdate;
-        private SdoaqParams cmp_SdoaqParams;
+        private SDOAQCSharp.Component.SdoaqParams cmp_SdoaqParams;
         private System.Windows.Forms.GroupBox gr_EdofImgViewOption;
         private System.Windows.Forms.CheckBox chk_PointCloud;
         private System.Windows.Forms.CheckBox chk_HeightMap;

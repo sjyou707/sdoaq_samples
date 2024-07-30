@@ -6,13 +6,15 @@ using System.Windows.Forms;
 
 using SDOAQCSharp.Tool;
 using System.Drawing;
+using SDOAQCSharp;
+using SDOAQCSharp.Component;
 
-namespace SDOAQ_App_CS
+namespace SdoaqApiTester
 {
     /// <summary>
     /// Single WiseScope Control Example
     /// </summary>
-	public partial class SDOAQ_APP_CS : Form
+	public partial class SdoaqApiTester : Form
 	{
         private enum AcquisitionMode
         {
@@ -29,12 +31,11 @@ namespace SDOAQ_App_CS
 
         private SdoaqImageViewr _imgViewer;
         //----------------------------------------------------------------------------
-        public SDOAQ_APP_CS()
+        public SdoaqApiTester()
 		{
 			InitializeComponent();
 
-            _imgViewer = new SdoaqImageViewr();
-            _imgViewer.VisiblePointCloud = true;            
+            _imgViewer = new SdoaqImageViewr(true);           
             _imgViewer.Dock = DockStyle.Fill;
 
             pnl_Viewer.Controls.Add(_imgViewer);
@@ -117,13 +118,14 @@ namespace SDOAQ_App_CS
             {
                 if (control == ctrlEnableStopButton)
                 {
-                    control.Enabled = true;
+                    control.Enabled = true;                   
                 }
                 else
                 {
                     control.Enabled = false;
                 }
             }
+            btn_Snap.Enabled = true;
         }
 
         private void EnableAcqGroup_Idle()
@@ -132,6 +134,7 @@ namespace SDOAQ_App_CS
             {
                 control.Enabled = !control.Name.Contains("Stop");
             }
+            btn_Snap.Enabled = false;
         }
 
         #region My SDOAQ Object
@@ -142,16 +145,19 @@ namespace SDOAQ_App_CS
 
         private void Sdoaq_Initialized(object sender, SdoaqEventArgs e)
         {
-            if (e.ErrorCode == SDOAQ.SDOAQ_API.eErrorCode.ecNoError)
+            this.Invoke(() =>
             {
-                EnableGroup(bEnableInit: true, bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
-                EnableAcqGroup_Idle();
-                cmp_SdoaqParams.Update_Param();
-            }
-            else
-            {
-                EnableGroup(bEnableInit: true, bEnableParam: false, bEnableEdofOption: false, bEnableAcq: false);
-            }
+                if (e.ErrorCode == SDOAQ.SDOAQ_API.eErrorCode.ecNoError)
+                {
+                    EnableGroup(bEnableInit: true, bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
+                    EnableAcqGroup_Idle();
+                    cmp_SdoaqParams.Update_Param();
+                }
+                else
+                {
+                    EnableGroup(bEnableInit: true, bEnableParam: false, bEnableEdofOption: false, bEnableAcq: false);
+                }
+            });
         }
         #endregion
 
@@ -171,7 +177,7 @@ namespace SDOAQ_App_CS
             }
         }
 
-        private void SDOAQ_APP_CS_Load(object sender, EventArgs e)
+        private void SdoaqApiTester_Load(object sender, EventArgs e)
         {
             LayoutUpdate();
 
@@ -184,12 +190,12 @@ namespace SDOAQ_App_CS
             WriteLog($">> sdedof dll Version = {MySdoaq.GetVersion_SdEdofAlgorithm()}");
         }
 
-        private void SDOAQ_APP_CS_FormClosing(object sender, FormClosingEventArgs e)
+        private void SdoaqApiTester_FormClosing(object sender, FormClosingEventArgs e)
         {
             MySdoaq.Finalize();
         }
 
-        private void SDOAQ_APP_CS_Resize(object sender, EventArgs e)
+        private void SdoaqApiTester_Resize(object sender, EventArgs e)
         {
             LayoutUpdate();
         }
@@ -276,7 +282,7 @@ namespace SDOAQ_App_CS
 
         private void btn_AcqMode_Snap_Click(object sender, EventArgs e)
         {
-            string snapPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Snap", $"{DateTime.Now:yyyy.MMM.dd.HHmmss}");
+            string snapPath = System.IO.Path.Combine(@"C:\SDOAQ\Snap", $"{DateTime.Now:yyyy.MMM.dd.HHmmss}");
 
             GetSdoaqObj().Acquisition_Sanp(snapPath);
         }

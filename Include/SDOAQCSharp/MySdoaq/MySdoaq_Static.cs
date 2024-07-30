@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using SDOAQ;
 using SDOAQCSharp.Tool;
 
-namespace SDOAQ_App_CS
+namespace SDOAQCSharp
 {
     partial class MySdoaq
     {
@@ -46,14 +46,10 @@ namespace SDOAQ_App_CS
         public static Dictionary<int, MySdoaq> LoadScript(string scriptFilePath = "")
         {
             string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), SCRIPT_FILE_NAME);
+            
+            SdoaqScriptReader.GetIntFromLineScript(path, SCRIPT_LINE_NUM_OF_WS, 1, out int numOfWiseScope);
 
-            int numOfWiseScope = 1;
-
-            var rv = SDOWSIO.WSIO.UTIL.WSUT_IntFromLineScript(path, SCRIPT_LINE_NUM_OF_WS, out int multiWiseScopeCount);
-            if (rv == SDOWSIO.WSIO.WSIORV.WSIORV_SUCCESS)
-            {
-                numOfWiseScope = Math.Max(1, multiWiseScopeCount);
-            }
+            numOfWiseScope = Math.Max(1, numOfWiseScope);
 
             Finalize();
 
@@ -70,7 +66,12 @@ namespace SDOAQ_App_CS
         public static bool Initialize()
         {
             Finalize();
-            
+
+            if (s_sdoaqObjList.Count > 1)
+            {
+                SDOAQ_API.SDOAQ_RegisterMultiWsApi();
+            }
+
             var rv = SDOAQ_API.SDOAQ_Initialize(CallBack_SDOAQ_Log, CallBack_SDOAQ_Error, CallBack_InitDone);
 
             return rv == SDOAQ_API.eErrorCode.ecNoError;
@@ -80,7 +81,10 @@ namespace SDOAQ_App_CS
         {
             foreach (var sdoaqObj in s_sdoaqObjList.Values)
             {
-                sdoaqObj.AcquisitionStop();
+                if (sdoaqObj.IsRunPlayer)
+                {
+                    sdoaqObj.AcquisitionStop();
+                }
             }
 
             IsInitialize = false;
@@ -99,18 +103,7 @@ namespace SDOAQ_App_CS
             return $"{algoVersion / 1000}.{algoVersion % 1000}";
         }
 
-        private static void Add_CallbackFunction()
-        {
-            CallBack_SDOAQ_Log = OnSdoaq_Log;
-            CallBack_SDOAQ_Error = OnSdoaq_Error;
-            CallBack_InitDone = OnSdoaq_InitDone;
-            CallBack_SDOAQ_PlayFocusStack = OnSdoaq_PlayFocusStack;
-            CallBack_SDOAQ_PlayEdof = OnSdoaq_PlayEdof;
-            CallBack_SDOAQ_PlayAf = OnSdoaq_PlayAf;
-            CallBack_SDOAQ_Snap = OnSdoaq_Snap;
-        }
-
-        private static void WriteLog(Logger.emLogLevel logLevel, string format, params object[] args)
+        public static void WriteLog(Logger.emLogLevel logLevel, string format, params object[] args)
         {
             if (string.IsNullOrEmpty(format))
             {
@@ -125,6 +118,26 @@ namespace SDOAQ_App_CS
             {
                 s_logger.WriteLog($"[{logLevel}] {string.Format(format, args)}");
             }
+        }
+        
+        public static bool SelectMultWS(int idxWS)
+        {
+            var rv = SDOAQ_API.SDOAQ_SelectMultiWs(idxWS);
+
+            WriteLog(Logger.emLogLevel.API, $"SelectMuyltiWS(), WS Index = {idxWS}");
+
+            return rv == SDOAQ_API.eErrorCode.ecNoError;
+        }
+
+        private static void Add_CallbackFunction()
+        {
+            CallBack_SDOAQ_Log = OnSdoaq_Log;
+            CallBack_SDOAQ_Error = OnSdoaq_Error;
+            CallBack_InitDone = OnSdoaq_InitDone;
+            CallBack_SDOAQ_PlayFocusStack = OnSdoaq_PlayFocusStack;
+            CallBack_SDOAQ_PlayEdof = OnSdoaq_PlayEdof;
+            CallBack_SDOAQ_PlayAf = OnSdoaq_PlayAf;
+            CallBack_SDOAQ_Snap = OnSdoaq_Snap;
         }
 
         private static int GetCallBackMultWs()
@@ -423,6 +436,23 @@ namespace SDOAQ_App_CS
             }
 
             WriteLog(Logger.emLogLevel.API, $"[Cam{sdoaqObj.CamIndex}]Snap Received, ErrorCode = {errorCode}");
+        }
+
+        private static byte[] ConvertFloatBufferToByteBuffer(int totalPixelSize, float[] data)
+        {
+            var query = data.AsParallel();
+            var low = query.Min();
+            var high = query.Max();
+
+            float inc = ((float)256.0 / (high - low));
+
+            var buffer = new byte[totalPixelSize];
+            for (uint i = 0; i < totalPixelSize; i++)
+            {
+                buffer[i] = (byte)((data[i] - low) * inc);
+            }
+
+            return buffer;
         }
     }
 }

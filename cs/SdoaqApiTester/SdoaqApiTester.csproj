@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{ADA1CCF4-CE37-43CD-B60F-218B22D31ED5}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>SDOAQ_App_CS</RootNamespace>
-    <AssemblyName>SDOAQ_Dll_API_Tester_CS</AssemblyName>
+    <RootNamespace>SdoaqApiTester</RootNamespace>
+    <AssemblyName>SdoaqApiTester</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -101,74 +101,75 @@
       <Link>WSIO\WSIO_UTIL.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\Tool\FocusLHU.cs">
-		<Link>SDOAQCSharp\Tool\FocusLHU.cs</Link>
+      <Link>SDOAQCSharp\Tool\FocusLHU.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\Tool\RingBuffer.cs">
-		<Link>SDOAQCSharp\Tool\RingBuffer.cs</Link>
+      <Link>SDOAQCSharp\Tool\RingBuffer.cs</Link>
     </Compile>
-	<Compile Include="..\..\Include\SDOAQCSharp\Tool\WinFormControlExtention.cs">
-		<Link>SDOAQCSharp\Tool\WinFormControlExtention.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\WinFormControlExtention.cs">
+      <Link>SDOAQCSharp\Tool\WinFormControlExtention.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\Tool\MathExtention.cs">
-		<Link>SDOAQCSharp\Tool\MathExtention.cs</Link>
+      <Link>SDOAQCSharp\Tool\MathExtention.cs</Link>
     </Compile>
-	<Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqCamInfo.cs">
-		<Link>SDOAQCSharp\MySdoaq\SdoaqCamInfo.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqCamInfo.cs">
+      <Link>SDOAQCSharp\MySdoaq\SdoaqCamInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqPointCloudInfo.cs">
-		<Link>SDOAQCSharp\MySdoaq\SdoaqPointCloudInfo.cs</Link>
+      <Link>SDOAQCSharp\MySdoaq\SdoaqPointCloudInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqEventArgs.cs">
-		<Link>SDOAQCSharp\MySdoaq\SdoaqEventArgs.cs</Link>
+      <Link>SDOAQCSharp\MySdoaq\SdoaqEventArgs.cs</Link>
     </Compile>
-	<Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq.cs">
-	<Link>SDOAQCSharp\MySdoaq\MySdoaq.cs</Link>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq.cs">
+      <Link>SDOAQCSharp\MySdoaq\MySdoaq.cs</Link>
     </Compile>
-	<Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Static.cs">
-		<Link>SDOAQCSharp\MySdoaq\MySdoaq_Static.cs</Link>
-    </Compile> 
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Static.cs">
+      <Link>SDOAQCSharp\MySdoaq\MySdoaq_Static.cs</Link>
+    </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Acquisition.cs">
-		<Link>SDOAQCSharp\MySdoaq\MySdoaq_Acquisition.cs</Link>
+      <Link>SDOAQCSharp\MySdoaq\MySdoaq_Acquisition.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Params.cs">
-		<Link>SDOAQCSharp\MySdoaq\MySdoaq_Params.cs</Link>
+      <Link>SDOAQCSharp\MySdoaq\MySdoaq_Params.cs</Link>
     </Compile>
-    
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqScriptReader.cs">
+      <Link>SDOAQCSharp\MySdoaq\SdoaqScriptReader.cs</Link>
+    </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoLabel.cs">
-		<Link>SDOAQCSharp\Component\SdoLabel.cs</Link>
-		<SubType>Component</SubType>
+      <Link>SDOAQCSharp\Component\SdoLabel.cs</Link>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoPanel.cs">
-		<Link>SDOAQCSharp\Component\SdoPanel.cs</Link>
-		<SubType>Component</SubType>
-    </Compile> 
+      <Link>SDOAQCSharp\Component\SdoPanel.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqParams.cs">
-		<Link>SDOAQCSharp\Component\SdoaqParams.cs</Link>
-		<SubType>UserControl</SubType>
+      <Link>SDOAQCSharp\Component\SdoaqParams.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqParams.Designer.cs">
-		<Link>SDOAQCSharp\Component\SdoaqParams.Designer.cs</Link>
-		<DependentUpon>SdoaqParams.cs</DependentUpon>
+      <Link>SDOAQCSharp\Component\SdoaqParams.Designer.cs</Link>
+      <DependentUpon>SdoaqParams.cs</DependentUpon>
     </Compile>
-	 <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.cs">
-		<Link>SDOAQCSharp\Component\SdoaqImageViewr.cs</Link>
-		<SubType>UserControl</SubType>
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.cs">
+      <Link>SDOAQCSharp\Component\SdoaqImageViewr.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
-	<Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.Designer.cs">
-		<Link>SDOAQCSharp\Component\SdoaqImageViewr.Designer.cs</Link>
-		<DependentUpon>SdoaqImageViewr.cs</DependentUpon>
-    </Compile>	
-    <Compile Include="SDOAQ_APP_CS.cs">
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.Designer.cs">
+      <Link>SDOAQCSharp\Component\SdoaqImageViewr.Designer.cs</Link>
+      <DependentUpon>SdoaqImageViewr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SdoaqApiTester.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SDOAQ_APP_CS.Designer.cs">
-      <DependentUpon>SDOAQ_APP_CS.cs</DependentUpon>
+    <Compile Include="SdoaqApiTester.Designer.cs">
+      <DependentUpon>SdoaqApiTester.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    
-    <EmbeddedResource Include="SDOAQ_APP_CS.resx">
-      <DependentUpon>SDOAQ_APP_CS.cs</DependentUpon>
+    <EmbeddedResource Include="SdoaqApiTester.resx">
+      <DependentUpon>SdoaqApiTester.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -180,13 +181,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-	<EmbeddedResource Include="..\..\Include\SDOAQCSharp\Component\SdoaqParams.resx">
-		<Link>SDOAQCSharp\Component\SdoaqParams.resx</Link>
-		<DependentUpon>SdoaqParams.cs</DependentUpon>
+    <EmbeddedResource Include="..\..\Include\SDOAQCSharp\Component\SdoaqParams.resx">
+      <Link>SDOAQCSharp\Component\SdoaqParams.resx</Link>
+      <DependentUpon>SdoaqParams.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\Include\SDOAQCSharp\Component\SdoaqImageViewr.resx">
-		<Link>SDOAQCSharp\Component\SdoaqImageViewr.resx</Link>
-		<DependentUpon>SdoaqImageViewr.cs</DependentUpon>
+      <Link>SDOAQCSharp\Component\SdoaqImageViewr.resx</Link>
+      <DependentUpon>SdoaqImageViewr.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
