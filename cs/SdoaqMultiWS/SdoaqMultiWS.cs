@@ -183,6 +183,18 @@ namespace SdoaqMultiWS
             btn_Snap.Enabled = false;
         }
 
+        private void UpdateSdoaqParam(int idxWs)
+        {
+            _currentIdxWs = idxWs;
+            MySdoaq.SelectMultWS(_currentIdxWs);
+
+            cmp_SdoaqParams.Set_SdoaqObj(GetSdoaqObj());
+            if (MySdoaq.IsInitialize)
+            {
+                cmp_SdoaqParams.Update_Param();
+            }
+        }
+
         #region My SDOAQ Object
         private void Sdoaq_LogDataReceived(object sender, LoggerEventArgs e)
         {
@@ -195,11 +207,10 @@ namespace SdoaqMultiWS
             {
                 if (e.ErrorCode == SDOAQ.SDOAQ_API.eErrorCode.ecNoError)
                 {
-                    MySdoaq.SelectMultWS(_currentIdxWs);
+                    UpdateSdoaqParam(_currentIdxWs);
 
                     EnableGroup(bEnableInit: true, bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
                     EnableAcqGroup_Idle();
-                    cmp_SdoaqParams.Update_Param();
                 }
                 else
                 {
@@ -270,9 +281,11 @@ namespace SdoaqMultiWS
             }
             else if (btn == btn_ContiStack)
             {
-                GetSdoaqObj().AcquisitionContinuous_FocusStack();
-                EnableGroup(bEnableParam: false, bEnableAcq: true);
-                EnableAcqGroup_Continuous(btn_StopStack);
+                if (GetSdoaqObj().AcquisitionContinuous_FocusStack())
+                {
+                    EnableGroup(bEnableParam: false, bEnableAcq: true);
+                    EnableAcqGroup_Continuous(btn_StopStack);
+                }
             }
             else if (btn == btn_StopStack)
             {
@@ -294,11 +307,13 @@ namespace SdoaqMultiWS
             }
             else if (btn == btn_ContiEdof)
             {
-                GetSdoaqObj().AcquisitionContinuous_Edof(chk_Edof.Checked,
+                if (GetSdoaqObj().AcquisitionContinuous_Edof(chk_Edof.Checked,
                     chk_StepMap.Checked, chk_QualityMap.Checked, chk_HeightMap.Checked,
-                    chk_PointCloud.Checked);
-                EnableGroup(bEnableParam: false, bEnableEdofOption:false, bEnableAcq: true);
-                EnableAcqGroup_Continuous(btn_StopEdof);
+                    chk_PointCloud.Checked))
+                {
+                    EnableGroup(bEnableParam: false, bEnableEdofOption: false, bEnableAcq: true);
+                    EnableAcqGroup_Continuous(btn_StopEdof);
+                }
             }
             else if (btn == btn_StopEdof)
             {
@@ -318,9 +333,11 @@ namespace SdoaqMultiWS
             }
             else if (btn == btn_ContiAF)
             {
-                GetSdoaqObj().AcquisitionContinuous_Af();
-                EnableGroup(bEnableParam: false, bEnableAcq: true);
-                EnableAcqGroup_Continuous(btn_StopAF);
+                if (GetSdoaqObj().AcquisitionContinuous_Af())
+                {
+                    EnableGroup(bEnableParam: false, bEnableAcq: true);
+                    EnableAcqGroup_Continuous(btn_StopAF);
+                }
             }
             else if (btn == btn_StopAF)
             {
@@ -343,14 +360,7 @@ namespace SdoaqMultiWS
 
             if (rdo.Checked)
             {
-                _currentIdxWs = (int)rdo.Tag;
-                MySdoaq.SelectMultWS(_currentIdxWs);
-
-                cmp_SdoaqParams.Set_SdoaqObj(GetSdoaqObj());
-                if (MySdoaq.IsInitialize)
-                {
-                    cmp_SdoaqParams.Update();
-                }
+                UpdateSdoaqParam((int)rdo.Tag);
 
                 if (GetSdoaqObj().IsRunPlayer)
                 {

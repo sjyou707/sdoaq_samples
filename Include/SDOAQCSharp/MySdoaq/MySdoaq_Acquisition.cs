@@ -36,8 +36,9 @@ namespace SDOAQCSharp
 
         public bool Acquisition_Sanp(string directoryPath)
         {
-            if (IsRunPlayer == false)
+            if (IsInitialize == false || IsRunPlayer == false)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_Sanp(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -65,8 +66,9 @@ namespace SDOAQCSharp
         #region Focus Stack
         public async Task<bool> Acquisition_FocusStackAsync()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_FocusStackAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -136,8 +138,9 @@ namespace SDOAQCSharp
 
         public bool AcquisitionContinuous_FocusStack()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_FocusStack(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -193,8 +196,9 @@ namespace SDOAQCSharp
         #region AF
         public async Task<bool> Acquisition_AfAsync()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_AfAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -245,8 +249,9 @@ namespace SDOAQCSharp
         
         public bool AcquisitionContinuous_Af()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Af(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -304,8 +309,9 @@ namespace SDOAQCSharp
             bool enableStepMapImg = true, bool enableQualityMap = true, 
             bool enableHeightMap = true, bool enablePointCloud = true)
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_EdofAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -401,12 +407,13 @@ namespace SDOAQCSharp
             return rv;
         }
 
-        public bool AcquisitionContinuous_Edof(bool enableStepMapImg = true,
-            bool enableEdofImg = true, bool enableQualityMap = true,
+        public bool AcquisitionContinuous_Edof(bool enableEdofImg = true,
+            bool enableStepMapImg = true, bool enableQualityMap = true,
             bool enableHeightMap = true, bool enablePointCloud = true)
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Edof(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
