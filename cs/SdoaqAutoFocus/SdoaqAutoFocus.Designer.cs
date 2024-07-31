@@ -51,13 +51,13 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tmr_LogUpdate = new System.Windows.Forms.Timer(this.components);
             this.tlp_Main = new System.Windows.Forms.TableLayoutPanel();
-            this.pnl_Controls = new System.Windows.Forms.Panel();
             this.pnl_View = new System.Windows.Forms.Panel();
             this.pnl_Viewer = new SDOAQCSharp.Component.SdoPanel();
+            this.pnl_Controls = new System.Windows.Forms.Panel();
             this.gpb_Controls.SuspendLayout();
             this.tlp_Main.SuspendLayout();
-            this.pnl_Controls.SuspendLayout();
             this.pnl_View.SuspendLayout();
+            this.pnl_Controls.SuspendLayout();
             this.SuspendLayout();
             // 
             // txt_Log
@@ -285,16 +285,6 @@
             this.tlp_Main.Size = new System.Drawing.Size(1234, 521);
             this.tlp_Main.TabIndex = 1;
             // 
-            // pnl_Controls
-            // 
-            this.pnl_Controls.Controls.Add(this.gpb_Controls);
-            this.pnl_Controls.Controls.Add(this.txt_Log);
-            this.pnl_Controls.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnl_Controls.Location = new System.Drawing.Point(3, 3);
-            this.pnl_Controls.Name = "pnl_Controls";
-            this.pnl_Controls.Size = new System.Drawing.Size(574, 515);
-            this.pnl_Controls.TabIndex = 0;
-            // 
             // pnl_View
             // 
             this.pnl_View.Controls.Add(this.pnl_Viewer);
@@ -315,6 +305,16 @@
             this.pnl_Viewer.Size = new System.Drawing.Size(648, 515);
             this.pnl_Viewer.TabIndex = 2;
             // 
+            // pnl_Controls
+            // 
+            this.pnl_Controls.Controls.Add(this.gpb_Controls);
+            this.pnl_Controls.Controls.Add(this.txt_Log);
+            this.pnl_Controls.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnl_Controls.Location = new System.Drawing.Point(3, 3);
+            this.pnl_Controls.Name = "pnl_Controls";
+            this.pnl_Controls.Size = new System.Drawing.Size(574, 515);
+            this.pnl_Controls.TabIndex = 0;
+            // 
             // SdoaqAutoFocus
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -328,8 +328,8 @@
             this.gpb_Controls.ResumeLayout(false);
             this.gpb_Controls.PerformLayout();
             this.tlp_Main.ResumeLayout(false);
-            this.pnl_Controls.ResumeLayout(false);
             this.pnl_View.ResumeLayout(false);
+            this.pnl_Controls.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

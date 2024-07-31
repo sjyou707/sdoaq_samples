@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqMultiWS", "cs\SdoaqMul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqAutoFocus", "cs\SdoaqAutoFocus\SdoaqAutoFocus.csproj", "{8CE5F349-2DCC-4D67-B603-23B601A4AC8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqEdof", "cs\SdoaqEdof\SdoaqEdof.csproj", "{F210B7EB-2C48-4022-88BB-9740CEA71CC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{8CE5F349-2DCC-4D67-B603-23B601A4AC8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CE5F349-2DCC-4D67-B603-23B601A4AC8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CE5F349-2DCC-4D67-B603-23B601A4AC8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F210B7EB-2C48-4022-88BB-9740CEA71CC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F210B7EB-2C48-4022-88BB-9740CEA71CC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F210B7EB-2C48-4022-88BB-9740CEA71CC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F210B7EB-2C48-4022-88BB-9740CEA71CC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

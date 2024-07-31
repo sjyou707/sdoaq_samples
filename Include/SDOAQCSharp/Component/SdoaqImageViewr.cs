@@ -84,7 +84,10 @@ namespace SDOAQCSharp.Component
                         this.Invoke(() =>
                         {
                             UpdatgeImageList(imageList, $"Edof {_edofImgCount}");
-                            UpdatePointCloud(pointCloudInfo);
+                            if(_visiblePointCloud)
+                            {
+                                UpdatePointCloud(pointCloudInfo);
+                            }                            
                         });
                     }
                     break;
