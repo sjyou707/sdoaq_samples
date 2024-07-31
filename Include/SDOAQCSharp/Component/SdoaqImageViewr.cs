@@ -300,6 +300,8 @@ namespace SDOAQCSharp.Component
 
                 WSIO.GL.WSGL_Display_BG(hwnd3DViewer);
             }
+
+            LayouyUpdate();
         }
 
         private void UserControl_Disposed(object sender, EventArgs e)
