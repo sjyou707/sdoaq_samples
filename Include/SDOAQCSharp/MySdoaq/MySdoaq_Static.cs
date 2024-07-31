@@ -169,12 +169,19 @@ namespace SDOAQCSharp
         {
             bool bInitDone = errorCode == SDOAQ_API.eErrorCode.ecNoError;
 
+            IsInitialize = bInitDone;
+
             if (bInitDone)
             {
                 WriteLog(Logger.emLogLevel.API, $"[INIT]Initialize Done");
 
                 foreach (var sdoaqObj in s_sdoaqObjList.Values)
                 {
+                    if (s_sdoaqObjList.Count > 0)
+                    {
+                        SelectMultWS(sdoaqObj.CamIndex + 1);
+                    }
+                        
                     bool isWriteable = false;
                     string paramValue = string.Empty;
 
@@ -220,6 +227,11 @@ namespace SDOAQCSharp
                     sdoaqObj.SetRoi_AF(DFLT_AF_ROI);
                     sdoaqObj.SetFocus(DFLT_FOCUS_LIST);
                     sdoaqObj.SetSnapFocus(DFLT_FOCUS_LIST);
+                }
+
+                if (s_sdoaqObjList.Count > 0)
+                {
+                    SelectMultWS(1);
                 }
             }
             else
@@ -305,8 +317,11 @@ namespace SDOAQCSharp
 
             byte[] resultImgEdof = new byte[sdoaqObj._ringBuffer.Sizes[idxRingBuffer]];
 
-            Marshal.Copy(sdoaqObj._ringBuffer.Buffer[idxRingBuffer], resultImgEdof, 0, resultImgEdof.Length);
-
+            if (sdoaqObj._ringBuffer.Buffer[idxRingBuffer] != IntPtr.Zero)
+            {
+                Marshal.Copy(sdoaqObj._ringBuffer.Buffer[idxRingBuffer], resultImgEdof, 0, resultImgEdof.Length);
+            }
+            
             float[][] resultImgList = new float[EDOF_RESULT_IMG_COUNT - 1][];
             unsafe
             {
