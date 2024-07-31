@@ -283,14 +283,14 @@ namespace SdoaqMultiWS
             {
                 if (GetSdoaqObj().AcquisitionContinuous_FocusStack())
                 {
-                    EnableGroup(bEnableParam: false, bEnableAcq: true);
+                    //EnableGroup(bEnableParam: false, bEnableAcq: true);
                     EnableAcqGroup_Continuous(btn_StopStack);
                 }
             }
             else if (btn == btn_StopStack)
             {
                 GetSdoaqObj().AcquisitionStop_FocusStack();
-                EnableGroup(bEnableParam: true, bEnableAcq: true);
+                //EnableGroup(bEnableParam: true, bEnableAcq: true);
                 EnableAcqGroup_Idle();
             }
         }
@@ -311,14 +311,14 @@ namespace SdoaqMultiWS
                     chk_StepMap.Checked, chk_QualityMap.Checked, chk_HeightMap.Checked,
                     chk_PointCloud.Checked))
                 {
-                    EnableGroup(bEnableParam: false, bEnableEdofOption: false, bEnableAcq: true);
+                    //EnableGroup(bEnableParam: false, bEnableEdofOption: false, bEnableAcq: true);
                     EnableAcqGroup_Continuous(btn_StopEdof);
                 }
             }
             else if (btn == btn_StopEdof)
             {
                 GetSdoaqObj().AcquisitionStop_Edof();
-                EnableGroup(bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
+                //EnableGroup(bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
                 EnableAcqGroup_Idle();
             }
         }
