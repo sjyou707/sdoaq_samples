@@ -151,6 +151,11 @@ namespace SDOAQCSharp.Component
 
         private void UpdatePointCloud()
         {
+            if (pb_PointCloudViewer.Tag == null)
+            {
+                return;
+            }
+
             var hwnd3DViewer = (IntPtr)pb_PointCloudViewer.Tag;
 
             if (hwnd3DViewer == null)
