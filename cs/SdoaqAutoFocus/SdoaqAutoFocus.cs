@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using SDOWSIO;
+using SDOAQ;
 using SDOAQCSharp.Tool;
 using SDOAQCSharp;
 using SDOAQCSharp.Component;
@@ -19,23 +20,42 @@ namespace SdoaqAutoFocus
     {
         private StringBuilder _logBuffer = new StringBuilder();
         private object _lockLog = new object();
+        private Dictionary<int, MySdoaq> _sdoaqObjList = null;
+
+        private SdoaqImageViewr _imgViewer;
 
         public SdoaqAutoFocus()
         {
             InitializeComponent();
 
-            MySdoaq.LogReceived += Sdoaq_LogDataReceived;
-            tmr_LogUpdate.Start();
+            _imgViewer = new SdoaqImageViewr(false);
+            _imgViewer.Dock = DockStyle.Fill;
+
+            pnl_Viewer.Controls.Add(_imgViewer);
+
+            _sdoaqObjList = MySdoaq.LoadScript();
+
+            _imgViewer.Set_SdoaqObj(GetSdoaqObj());
+
+            var aaa = GetSdoaqObj();
+
+            MySdoaq.LogReceived += Sdoaq_LogDataReceived;            
         }
+
         private void SdoaqAutoFocus_Load(object sender, EventArgs e)
         {
+            tmr_LogUpdate.Start();
             Frm_Load();
         }
 
         private void Frm_Load()
-        {      
-            MySdoaq.LoadScript();
+        {
             MySdoaq.Initialize();
+
+        }
+        private MySdoaq GetSdoaqObj()
+        {
+            return _sdoaqObjList[0];
         }
 
         #region [Event]
@@ -60,7 +80,17 @@ namespace SdoaqAutoFocus
             {
                 _logBuffer.Append(e.Data);
             }
-        }
+        }        
         #endregion
+
+        private void btn_SetROI_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            var task = GetSdoaqObj().Acquisition_AfAsync();
+        }
     }
 }

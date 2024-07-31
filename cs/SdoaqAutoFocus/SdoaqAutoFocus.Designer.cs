@@ -39,7 +39,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btn_SetROI = new System.Windows.Forms.Button();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
@@ -50,15 +50,13 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.pb_CamImage = new System.Windows.Forms.PictureBox();
-            this.lbl_ImageStatus = new System.Windows.Forms.Label();
             this.tmr_LogUpdate = new System.Windows.Forms.Timer(this.components);
+            this.pnl_Viewer = new SDOAQCSharp.Component.SdoPanel();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
             this.gpb_Controls.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_CamImage)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer
@@ -74,8 +72,7 @@
             // 
             // splitContainer.Panel2
             // 
-            this.splitContainer.Panel2.Controls.Add(this.pb_CamImage);
-            this.splitContainer.Panel2.Controls.Add(this.lbl_ImageStatus);
+            this.splitContainer.Panel2.Controls.Add(this.pnl_Viewer);
             this.splitContainer.Size = new System.Drawing.Size(1202, 522);
             this.splitContainer.SplitterDistance = 642;
             this.splitContainer.TabIndex = 0;
@@ -104,7 +101,7 @@
             this.gpb_Controls.Controls.Add(this.button4);
             this.gpb_Controls.Controls.Add(this.button3);
             this.gpb_Controls.Controls.Add(this.button2);
-            this.gpb_Controls.Controls.Add(this.button1);
+            this.gpb_Controls.Controls.Add(this.btn_SetROI);
             this.gpb_Controls.Controls.Add(this.textBox5);
             this.gpb_Controls.Controls.Add(this.textBox4);
             this.gpb_Controls.Controls.Add(this.textBox3);
@@ -148,6 +145,7 @@
             this.button6.TabIndex = 16;
             this.button6.Text = "SingleShot AF";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button5
             // 
@@ -185,14 +183,15 @@
             this.button2.Text = "Set";
             this.button2.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // btn_SetROI
             // 
-            this.button1.Location = new System.Drawing.Point(541, 23);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(52, 25);
-            this.button1.TabIndex = 11;
-            this.button1.Text = "Set";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btn_SetROI.Location = new System.Drawing.Point(541, 23);
+            this.btn_SetROI.Name = "btn_SetROI";
+            this.btn_SetROI.Size = new System.Drawing.Size(52, 25);
+            this.btn_SetROI.TabIndex = 11;
+            this.btn_SetROI.Text = "Set";
+            this.btn_SetROI.UseVisualStyleBackColor = true;
+            this.btn_SetROI.Click += new System.EventHandler(this.btn_SetROI_Click);
             // 
             // textBox5
             // 
@@ -279,34 +278,19 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "AF ROI (left,top,width,height)";
             // 
-            // pb_CamImage
-            // 
-            this.pb_CamImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pb_CamImage.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.pb_CamImage.Location = new System.Drawing.Point(4, 31);
-            this.pb_CamImage.Margin = new System.Windows.Forms.Padding(2);
-            this.pb_CamImage.Name = "pb_CamImage";
-            this.pb_CamImage.Size = new System.Drawing.Size(550, 489);
-            this.pb_CamImage.TabIndex = 2;
-            this.pb_CamImage.TabStop = false;
-            // 
-            // lbl_ImageStatus
-            // 
-            this.lbl_ImageStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbl_ImageStatus.Location = new System.Drawing.Point(2, 0);
-            this.lbl_ImageStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lbl_ImageStatus.Name = "lbl_ImageStatus";
-            this.lbl_ImageStatus.Size = new System.Drawing.Size(552, 29);
-            this.lbl_ImageStatus.TabIndex = 1;
-            this.lbl_ImageStatus.Text = "Text";
-            this.lbl_ImageStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // tmr_LogUpdate
             // 
             this.tmr_LogUpdate.Tick += new System.EventHandler(this.tmr_LogUpdate_Tick);
+            // 
+            // pnl_Viewer
+            // 
+            this.pnl_Viewer.BorderColor = System.Drawing.Color.Black;
+            this.pnl_Viewer.BorderWidth = 1;
+            this.pnl_Viewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnl_Viewer.Location = new System.Drawing.Point(0, 0);
+            this.pnl_Viewer.Name = "pnl_Viewer";
+            this.pnl_Viewer.Size = new System.Drawing.Size(556, 522);
+            this.pnl_Viewer.TabIndex = 2;
             // 
             // SdoaqAutoFocus
             // 
@@ -324,7 +308,6 @@
             this.splitContainer.ResumeLayout(false);
             this.gpb_Controls.ResumeLayout(false);
             this.gpb_Controls.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb_CamImage)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -332,9 +315,7 @@
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer;
-        private System.Windows.Forms.Label lbl_ImageStatus;
         private System.Windows.Forms.GroupBox gpb_Controls;
-        private System.Windows.Forms.PictureBox pb_CamImage;
         private System.Windows.Forms.RichTextBox txt_Log;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button7;
@@ -343,7 +324,7 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btn_SetROI;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.TextBox textBox3;
@@ -355,6 +336,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Timer tmr_LogUpdate;
+        private SDOAQCSharp.Component.SdoPanel pnl_Viewer;
     }
 }
 

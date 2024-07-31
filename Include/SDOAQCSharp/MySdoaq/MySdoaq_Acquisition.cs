@@ -236,7 +236,7 @@ namespace SDOAQCSharp
                     new SdoaqImageInfo($"AF", acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte, imageBuffer)
                 };
 
-                CallBackMsgLoop.Invoke((CallBackMessage.FocusStack, new object[] { imgInfoList }));
+                CallBackMsgLoop.Invoke((CallBackMessage.Af, new object[] { imgInfoList }));
                 return true;
             });
 
