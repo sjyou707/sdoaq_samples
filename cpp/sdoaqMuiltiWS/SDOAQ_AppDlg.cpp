@@ -1485,6 +1485,7 @@ struct t_oneedof_para
 {
 	eErrorCode return_code;
 	AcquisitionFixedParametersEx* pAcquisitionParams;
+	int cur_ws;
 	int* pPositions;
 	int positionsCount;
 	float* pStepMapBuffer;
@@ -1504,6 +1505,7 @@ unsigned long WINAPI WokerThread(void *aParam)
 	t_oneedof_para* p_oneedof_para = (t_oneedof_para*)aParam;
 	if (p_oneedof_para)
 	{
+		::SDOAQ_SelectMultiWs(p_oneedof_para->cur_ws + 1);
 		p_oneedof_para->return_code = ::SDOAQ_SingleShotEdofEx(
 			p_oneedof_para->pAcquisitionParams,
 			p_oneedof_para->pPositions, p_oneedof_para->positionsCount,
@@ -1582,11 +1584,12 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 	bool flag_test_counter = true;
 	static int g_test_counter = 0;
 
-	if (flag_test_counter && (++g_test_counter & 1))
+	if (flag_test_counter /*&& (++g_test_counter & 1)*/)
 	{
 		sz_api = _T("SDOAQ_SingleShotEdofEx(call from thread)");
 		t_oneedof_para oneedof_para;
 		oneedof_para.pAcquisitionParams = &AFP;
+		oneedof_para.cur_ws = m_cur_ws;
 		oneedof_para.pPositions = pPositions;
 		oneedof_para.positionsCount = (int)FOCUS.numsFocus;
 		oneedof_para.pStepMapBuffer = pStepMapImageBuffer;
