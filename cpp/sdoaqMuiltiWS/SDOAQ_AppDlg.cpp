@@ -1288,7 +1288,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 		pFocusImageBufferSizes[pos] = size;
 	}
 
-	const auto tick_begin = GetTickCount64();
+	//const auto tick_begin = GetTickCount64();
 	AFP.callbackUserData = (void*)::GetTickCount64();
 	const LPCTSTR sz_api = _T("SDOAQ_SingleShotFocusStackEx");
 	const eErrorCode rv_sdoaq = ::SDOAQ_SingleShotFocusStackEx(
@@ -1502,22 +1502,22 @@ struct t_oneedof_para
 
 unsigned long WINAPI WokerThread(void *aParam)
 {
-	t_oneedof_para* p_oneedof_para = (t_oneedof_para*)aParam;
-	if (p_oneedof_para)
-	{
-		::SDOAQ_SelectMultiWs(p_oneedof_para->cur_ws + 1);
-		p_oneedof_para->return_code = ::SDOAQ_SingleShotEdofEx(
-			p_oneedof_para->pAcquisitionParams,
-			p_oneedof_para->pPositions, p_oneedof_para->positionsCount,
-			p_oneedof_para->pStepMapBuffer, p_oneedof_para->stepMapBufferSize,
-			p_oneedof_para->pEdofImageBuffer, p_oneedof_para->edofImageBufferSize,
-			p_oneedof_para->pQualityMapBuffer, p_oneedof_para->qualityMapBufferSize,
-			p_oneedof_para->pHeightMapBuffer, p_oneedof_para->heightMapBufferSize,
-			p_oneedof_para->pPointCloudBuffer, p_oneedof_para->pointCloudBufferSize
-		);
-	}
-
-	return 0;
+	/**/t_oneedof_para* p_oneedof_para = (t_oneedof_para*)aParam;
+	/**/if (p_oneedof_para)
+	/**/{
+	/**/	::SDOAQ_SelectMultiWs(p_oneedof_para->cur_ws + 1);
+	/**/	p_oneedof_para->return_code = ::SDOAQ_SingleShotEdofEx(
+	/**/		p_oneedof_para->pAcquisitionParams,
+	/**/		p_oneedof_para->pPositions, p_oneedof_para->positionsCount,
+	/**/		p_oneedof_para->pStepMapBuffer, p_oneedof_para->stepMapBufferSize,
+	/**/		p_oneedof_para->pEdofImageBuffer, p_oneedof_para->edofImageBufferSize,
+	/**/		p_oneedof_para->pQualityMapBuffer, p_oneedof_para->qualityMapBufferSize,
+	/**/		p_oneedof_para->pHeightMapBuffer, p_oneedof_para->heightMapBufferSize,
+	/**/		p_oneedof_para->pPointCloudBuffer, p_oneedof_para->pointCloudBufferSize
+	/**/	);
+	/**/}
+	/**/
+	/**/return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1577,42 +1577,41 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 		pointCloudBufferSize = 0;
 	}
 
-	const auto tick_begin = GetTickCount64();
+	//const auto tick_begin = GetTickCount64();
 	AFP.callbackUserData = (void*)::GetTickCount64();
 	LPCTSTR sz_api;
 	eErrorCode rv_sdoaq;
-	bool flag_test_counter = true;
-	static int g_test_counter = 0;
+	bool flag_use_workerthread = true;
 
-	if (flag_test_counter /*&& (++g_test_counter & 1)*/)
+	if (flag_use_workerthread)
 	{
-		sz_api = _T("SDOAQ_SingleShotEdofEx(call from thread)");
-		t_oneedof_para oneedof_para;
-		oneedof_para.pAcquisitionParams = &AFP;
-		oneedof_para.cur_ws = m_cur_ws;
-		oneedof_para.pPositions = pPositions;
-		oneedof_para.positionsCount = (int)FOCUS.numsFocus;
-		oneedof_para.pStepMapBuffer = pStepMapImageBuffer;
-		oneedof_para.stepMapBufferSize = stepMapBufferSize;
-		oneedof_para.pEdofImageBuffer = pEdofImageBuffer;
-		oneedof_para.edofImageBufferSize = edofImageBufferSize;
-		oneedof_para.pQualityMapBuffer = pQualityMapBuffer;
-		oneedof_para.qualityMapBufferSize = qualityMapBufferSize;
-		oneedof_para.pHeightMapBuffer = pHeightMapBuffer;
-		oneedof_para.heightMapBufferSize = heightMapBufferSize;
-		oneedof_para.pPointCloudBuffer = pPointCloudBuffer;
-		oneedof_para.pointCloudBufferSize = pointCloudBufferSize;
-
-		const HANDLE h_thread = ::CreateThread(NULL, 0, WokerThread, &oneedof_para, 0, NULL);
-		if (WAIT_TIMEOUT == ::WaitForSingleObject(h_thread, 15 * 1000/*15sec*/))
-		{
-			rv_sdoaq = ecTimeoutOccurred;
-			Log(_T("WORKER THREAD TIME OUT!!!"));
-		}
-		else
-		{
-			rv_sdoaq = oneedof_para.return_code;
-		}
+		/**/sz_api = _T("SDOAQ_SingleShotEdofEx(call from thread)");
+		/**/t_oneedof_para oneedof_para;
+		/**/oneedof_para.pAcquisitionParams = &AFP;
+		/**/oneedof_para.cur_ws = m_cur_ws;
+		/**/oneedof_para.pPositions = pPositions;
+		/**/oneedof_para.positionsCount = (int)FOCUS.numsFocus;
+		/**/oneedof_para.pStepMapBuffer = pStepMapImageBuffer;
+		/**/oneedof_para.stepMapBufferSize = stepMapBufferSize;
+		/**/oneedof_para.pEdofImageBuffer = pEdofImageBuffer;
+		/**/oneedof_para.edofImageBufferSize = edofImageBufferSize;
+		/**/oneedof_para.pQualityMapBuffer = pQualityMapBuffer;
+		/**/oneedof_para.qualityMapBufferSize = qualityMapBufferSize;
+		/**/oneedof_para.pHeightMapBuffer = pHeightMapBuffer;
+		/**/oneedof_para.heightMapBufferSize = heightMapBufferSize;
+		/**/oneedof_para.pPointCloudBuffer = pPointCloudBuffer;
+		/**/oneedof_para.pointCloudBufferSize = pointCloudBufferSize;
+		/**/
+		/**/const HANDLE h_thread = ::CreateThread(NULL, 0, WokerThread, &oneedof_para, 0, NULL);
+		/**/if (WAIT_TIMEOUT == ::WaitForSingleObject(h_thread, 15 * 1000/*15sec*/))
+		/**/{
+		/**/	rv_sdoaq = ecTimeoutOccurred;
+		/**/	Log(_T("WORKER THREAD TIME OUT!!!"));
+		/**/}
+		/**/else
+		/**/{
+		/**/	rv_sdoaq = oneedof_para.return_code;
+		/**/}
 	}
 	else
 	{
