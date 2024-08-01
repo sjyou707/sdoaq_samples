@@ -44,6 +44,7 @@ BEGIN_MESSAGE_MAP(CSDOAQ_Dlg, CDialogEx)
 	ON_MESSAGE(EUM_RECEIVE_SNAP, OnReceiveSnap)
 	ON_BN_CLICKED(IDC_RADIO_WS1, OnUpdateWsSelection)
 	ON_BN_CLICKED(IDC_RADIO_WS2, OnUpdateWsSelection)
+	ON_BN_CLICKED(IDC_RADIO_WS3, OnUpdateWsSelection)
 	ON_BN_CLICKED(IDC_INITIALIZE, OnSdoaqInitialize)
 	ON_BN_CLICKED(IDC_FINALIZE, OnSdoaqFinalize)
 	ON_CBN_SELENDOK(IDC_COMBO_PARAMETER, OnSelectedCombobox)
@@ -104,10 +105,18 @@ BOOL CSDOAQ_Dlg::OnInitDialog()
 	//-------------------------------------------------------------------------------------
 	// Register multiple wisescopes uses before initialization
 	//-------------------------------------------------------------------------------------
-	GetDlgItem(IDC_RADIO_WS1)->ShowWindow(MULWS == MULTI_2WS_SDOAQ ? SW_SHOW : SW_HIDE);
-	GetDlgItem(IDC_RADIO_WS2)->ShowWindow(MULWS == MULTI_2WS_SDOAQ ? SW_SHOW : SW_HIDE);
+	GetDlgItem(IDC_RADIO_WS1)->ShowWindow(MULWS >= MULTI_2WS_SDOAQ ? SW_SHOW : SW_HIDE);
+	GetDlgItem(IDC_RADIO_WS2)->ShowWindow(MULWS >= MULTI_2WS_SDOAQ ? SW_SHOW : SW_HIDE);
+	GetDlgItem(IDC_RADIO_WS3)->ShowWindow(MULWS >= MULTI_3WS_SDOAQ ? SW_SHOW : SW_HIDE);
 	switch (MULWS)
 	{
+	case MULTI_3WS_SDOAQ:
+		((CButton*)GetDlgItem(IDC_RADIO_WS1))->SetCheck(BST_CHECKED);
+		((CButton*)GetDlgItem(IDC_RADIO_WS2))->SetCheck(BST_UNCHECKED);
+		((CButton*)GetDlgItem(IDC_RADIO_WS3))->SetCheck(BST_UNCHECKED);
+		::SDOAQ_RegisterMultiWsApi();
+		OnUpdateWsSelection();
+		break;
 	case MULTI_2WS_SDOAQ:
 		((CButton*)GetDlgItem(IDC_RADIO_WS1))->SetCheck(BST_CHECKED);
 		((CButton*)GetDlgItem(IDC_RADIO_WS2))->SetCheck(BST_UNCHECKED);
@@ -333,13 +342,20 @@ void CSDOAQ_Dlg::ShowViewer(void)
 	auto p_wnd = GetDlgItem(IDC_IMAGE);
 	if (p_wnd)
 	{
-		CRect rc_ws[2];
+		CRect rc_ws[NUMS_WS];
 		p_wnd->GetWindowRect(rc_ws[0]);
 		ScreenToClient(rc_ws[0]);
 		if (MULWS == MULTI_2WS_SDOAQ)
 		{
 			rc_ws[1] = rc_ws[0];
 			rc_ws[0].right = rc_ws[1].left = (rc_ws[0].left + rc_ws[0].right) / 2;
+		}
+		else if (MULWS == MULTI_3WS_SDOAQ)
+		{
+			rc_ws[2] = rc_ws[1] = rc_ws[0];
+			auto width = (rc_ws[0].right - rc_ws[0].left) / 3;
+			rc_ws[0].right = rc_ws[1].left = rc_ws[0].left + width;
+			rc_ws[1].right = rc_ws[2].left = rc_ws[1].left + width;
 		}
 
 		for (auto& ws : vWSSET)
@@ -614,7 +630,7 @@ void CSDOAQ_Dlg::BuildEnvironment(void)
 	(void)::WSUT_IntFromLineScript((CStringA)m_sScriptFile, "Number of WSM", &MULWS);
 
 	vWSSET.clear();
-	for (int wsi = 0; wsi < (MULWS == MULTI_2WS_SDOAQ ? 2 : 1); wsi++)
+	for (int wsi = 0; wsi < (MULWS == MULTI_3WS_SDOAQ ? 3 : MULWS == MULTI_2WS_SDOAQ ? 2 : 1); wsi++)
 	{
 		vWSSET.push_back(wsi);
 	}
@@ -728,7 +744,8 @@ void CSDOAQ_Dlg::OnUpdateWsSelection()
 {
 	const bool ws1 = (((CButton*)GetDlgItem(IDC_RADIO_WS1))->GetCheck() == BST_CHECKED);
 	const bool ws2 = (((CButton*)GetDlgItem(IDC_RADIO_WS2))->GetCheck() == BST_CHECKED);
-	const auto new_ws = (ws2 ? 1 : 0);
+	const bool ws3 = (((CButton*)GetDlgItem(IDC_RADIO_WS3))->GetCheck() == BST_CHECKED);
+	const auto new_ws = (ws3 ? 2 : ws2 ? 1 : 0);
 
 	if (m_cur_ws != new_ws)
 	{
@@ -1022,7 +1039,7 @@ void CSDOAQ_Dlg::OnSdoaqSetParameter()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqSetROI()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	CString sParameters;
@@ -1111,7 +1128,7 @@ void CSDOAQ_Dlg::OnSdoaqSetAFROI()
 		return;
 	}
 
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	VSET[m_cur_ws].ui.AFROI = sParameters;
 }
 
@@ -1121,7 +1138,7 @@ void CSDOAQ_Dlg::OnSdoaqSetRingBufSize()
 	CString sSize;
 	GetDlgItemText(IDC_EDIT_RING_BUF_SIZE, sSize);
 
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	SET.ui.RING_BUF_SIZE = sSize;
@@ -1134,7 +1151,7 @@ void CSDOAQ_Dlg::OnSdoaqSetFocusSet()
 	CString sFocusSet;
 	GetDlgItemText(IDC_EDIT_FOCUS_SET, sFocusSet);
 
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	SET.ui.vFocusSet.clear();
@@ -1178,7 +1195,7 @@ void CSDOAQ_Dlg::OnSdoaqSetSnapFocusSet()
 	CString sSnapFocusSet;
 	GetDlgItemText(IDC_EDIT_SNAPFOCUS_SET, sSnapFocusSet);
 
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	SET.ui.vSnapFocusSet.clear();
@@ -1213,7 +1230,7 @@ void CSDOAQ_Dlg::OnSdoaqSetSnapFocusSet()
 		SET.ui.vSnapFocusSet.push_back(DFLT_FOCUS_STEP);
 	}
 
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	VSET[m_cur_ws].ui.SNAPFOCUS_SET = sSnapFocusSet;
 }
 
@@ -1246,7 +1263,7 @@ void CSDOAQ_Dlg::OnSdoaqSetEdofResize()
 		return;
 	}
 
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	VSET[m_cur_ws].ui.EDOF_RESIZE_RATIO = sEdofResize;
 }
 
@@ -1255,7 +1272,7 @@ void CSDOAQ_Dlg::OnSdoaqSetEdofResize()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	if (m_cur_ws == ONLY_WS0_3D)
@@ -1341,7 +1358,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqPlayStack()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	if (m_cur_ws == ONLY_WS0_3D)
@@ -1405,7 +1422,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayStack()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqStopStack()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	SET.rb.active = false;
@@ -1423,14 +1440,14 @@ void CSDOAQ_Dlg::OnSdoaqStopStack()
 //----------------------------------------------------------------------------
 LRESULT CSDOAQ_Dlg::OnReceiveZstack(WPARAM wparam, LPARAM lLastFilledRingBufferEntry)
 {
-	bool flag_last_done[TWO_WS] = { false,false };
+	bool flag_last_done[NUMS_WS] = { false,false };
 	auto const vmsg = RetrieveMessages(m_hWnd, EUM_RECEIVE_ZSTACK, wparam, lLastFilledRingBufferEntry);
 	for (auto it = vmsg.rbegin(); it != vmsg.rend(); it++)
 	{
 		const auto vid = HIWORD(it->wParam);
 		const auto ecode = LOWORD(it->wParam);
 		const int rbufidx = (int)it->lParam;
-		if (vid < TWO_WS && ecNoError == ecode)
+		if (vid < NUMS_WS && ecNoError == ecode)
 		{
 			auto& SET = VSET[vid];
 			if (SET.rb.active && false == flag_last_done[vid])
@@ -1523,7 +1540,7 @@ unsigned long WINAPI WokerThread(void *aParam)
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	if (SET.rb.active)
@@ -1632,7 +1649,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 		const auto tick_end = GetTickCount64();
 		//Log(FString(_T(">> %s() takes : %llu ms / %d imgs"), sz_api, tick_end - tick_begin, FOCUS.numsFocus));
 
-		if (m_cur_ws < TWO_WS)
+		if (m_cur_ws < NUMS_WS)
 		{
 			++SET.ui.nContiEdof;
 			auto& vw = m_vVW[m_cur_ws];
@@ -1669,7 +1686,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqPlayEdof()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	if (SET.rb.active)
@@ -1769,7 +1786,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayEdof()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqStopEdof()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	SET.rb.active = false;
@@ -1787,14 +1804,14 @@ void CSDOAQ_Dlg::OnSdoaqStopEdof()
 //----------------------------------------------------------------------------
 LRESULT CSDOAQ_Dlg::OnReceiveEdof(WPARAM wparam, LPARAM lLastFilledRingBufferEntry)
 {
-	bool flag_last_done[TWO_WS] = { false,false };
+	bool flag_last_done[NUMS_WS] = { false,false };
 	auto const vmsg = RetrieveMessages(m_hWnd, EUM_RECEIVE_EDOF, wparam, lLastFilledRingBufferEntry);
 	for (auto it = vmsg.rbegin(); it != vmsg.rend(); it++)
 	{
 		const auto vid = HIWORD(it->wParam);
 		const auto ecode = LOWORD(it->wParam);
 		const int rbufidx = (int)it->lParam;
-		if (vid < TWO_WS && ecNoError == ecode)
+		if (vid < NUMS_WS && ecNoError == ecode)
 		{
 			auto& SET = VSET[vid];
 			if (SET.rb.active && false == flag_last_done[vid])
@@ -1831,7 +1848,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveEdof(WPARAM wparam, LPARAM lLastFilledRingBufferEnt
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	if (m_cur_ws == ONLY_WS0_3D)
@@ -1876,7 +1893,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 	);
 	if (ecNoError == rv_sdoaq)
 	{
-		if (m_cur_ws < TWO_WS)
+		if (m_cur_ws < NUMS_WS)
 		{
 			++SET.ui.nContiAF;
 			auto& vw = m_vVW[m_cur_ws];
@@ -1903,7 +1920,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqPlayAF()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	if (m_cur_ws == ONLY_WS0_3D)
@@ -1970,7 +1987,7 @@ void CSDOAQ_Dlg::OnSdoaqPlayAF()
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqStopAF()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	SET.rb.active = false;
@@ -1988,14 +2005,14 @@ void CSDOAQ_Dlg::OnSdoaqStopAF()
 //----------------------------------------------------------------------------
 LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wparam, LPARAM lMsgParaReceiveAf)
 {
-	bool flag_last_done[TWO_WS] = { false,false };
+	bool flag_last_done[NUMS_WS] = { false,false };
 	auto const vmsg = RetrieveMessages(m_hWnd, EUM_RECEIVE_AF, wparam, lMsgParaReceiveAf);
 	for (auto it = vmsg.rbegin(); it != vmsg.rend(); it++)
 	{
 		const auto vid = HIWORD(it->wParam);
 		const auto ecode = LOWORD(it->wParam);
 		auto prx = (tMsgParaReceiveAf*)it->lParam;
-		if (vid < TWO_WS && ecNoError == ecode && prx)
+		if (vid < NUMS_WS && ecNoError == ecode && prx)
 		{
 			auto& SET = VSET[vid];
 			if (SET.rb.active && false == flag_last_done[vid])
@@ -2035,7 +2052,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wparam, LPARAM lMsgParaReceiveAf)
 //----------------------------------------------------------------------------
 void CSDOAQ_Dlg::OnSdoaqSnap()
 {
-	ASSERT(m_cur_ws < TWO_WS);
+	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
 	if (SET.rb.active)
@@ -2077,14 +2094,14 @@ void CSDOAQ_Dlg::OnSdoaqSnap()
 //------------------------------------------------------------------------------------------------
 LRESULT CSDOAQ_Dlg::OnReceiveSnap(WPARAM wparam, LPARAM lLastFilledRingBufferEntry)
 {
-	bool flag_last_done[TWO_WS] = { false,false };
+	bool flag_last_done[NUMS_WS] = { false,false };
 	auto const vmsg = RetrieveMessages(m_hWnd, EUM_RECEIVE_SNAP, wparam, lLastFilledRingBufferEntry);
 	for (auto it = vmsg.rbegin(); it != vmsg.rend(); it++)
 	{
 		const auto vid = HIWORD(it->wParam);
 		const auto ecode = LOWORD(it->wParam);
 		const int rbufidx = (int)it->lParam;
-		if (vid < TWO_WS && ecNoError == ecode)
+		if (vid < NUMS_WS && ecNoError == ecode)
 		{
 			auto& SET = VSET[vid];
 			if (SET.rb.active && false == flag_last_done[vid])

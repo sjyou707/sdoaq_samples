@@ -8,7 +8,7 @@
 #include "SDOAQ_CalibrationFile.h"
 
 //----------------------------------------------------------------------------
-#define TWO_WS 2
+#define NUMS_WS 3
 
 enum EUserMessage
 {
@@ -110,7 +110,8 @@ public:
 	{
 		SINGLE_WS_SDOAQ = 0,	// SDOAQ operates as a single WiseScope engine that controls one wisescope module. Script data must not contain WSI_1.
 		MULTI_1WS_SDOAQ = 1,	// SDOAQ operates as a multi WiseScope engine that controls one wisescope module. Script data requires WSI_1.
-		MULTI_2WS_SDOAQ = 2		// SDOAQ operates as a multi WiseScope engine that controls two wisescope module. Script data requires WSI_1 and WSI_2.
+		MULTI_2WS_SDOAQ = 2,	// SDOAQ operates as a multi WiseScope engine that controls two wisescope module. Script data requires WSI_1 and WSI_2.
+		MULTI_3WS_SDOAQ = 3,	// SDOAQ operates as a multi WiseScope engine that controls three wisescope module. Script data requires WSI_1, WSI_2 and WSI_3.
 	};
 	int MULWS = SINGLE_WS_SDOAQ;
 	unsigned m_cur_ws = MAXINT;
@@ -210,7 +211,7 @@ public:
 			std::vector<int> vSnapFocusSet;
 		} ui;
 	};
-	tTestSet VSET[TWO_WS];
+	tTestSet VSET[NUMS_WS];
 
 public:
 	int nMaxWidth, nMaxHeight;
@@ -252,7 +253,7 @@ private:
 	{
 		std::vector<HWND> vhwnd_iv;
 		HWND hwnd_3d = NULL;
-	} m_vVW[TWO_WS];
+	} m_vVW[NUMS_WS];
 	void print_wsio_last_error(void);
 	void print_wsgl_last_error(HWND hwnd_3d);
 

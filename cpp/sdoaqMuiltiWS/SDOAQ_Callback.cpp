@@ -86,9 +86,9 @@ void __stdcall g_MoveokCallback(eErrorCode errorCode, void* callbackUserData)
 	if (theApp.m_pMainWnd)
 	{
 		const unsigned cb_ws = ::SDOAQ_GetCallbackMultiWs() - 1;
-		if (cb_ws < TWO_WS)
+		if (cb_ws < NUMS_WS)
 		{
-			static void* g_prev[TWO_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("MOVEOK"), errorCode, callbackUserData);
+			static void* g_prev[NUMS_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("MOVEOK"), errorCode, callbackUserData);
 		}
 	}
 }
@@ -99,11 +99,11 @@ void __stdcall g_PlayFocusStackCallbackEx(eErrorCode errorCode, int lastFilledRi
 	if (theApp.m_pMainWnd)
 	{
 		const unsigned cb_ws = ::SDOAQ_GetCallbackMultiWs() - 1;
-		if (cb_ws < TWO_WS)
+		if (cb_ws < NUMS_WS)
 		{
 			theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_ZSTACK, MAKEWPARAM(errorCode, cb_ws), (LPARAM)lastFilledRingBufferEntry);
 
-			static void* g_prev[TWO_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("FOCUS"), errorCode, callbackUserData);
+			static void* g_prev[NUMS_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("FOCUS"), errorCode, callbackUserData);
 		}
 	}
 }
@@ -119,11 +119,11 @@ void __stdcall g_PlayEdofCallbackEx(eErrorCode errorCode, int lastFilledRingBuff
 	if (theApp.m_pMainWnd)
 	{
 		const unsigned cb_ws = ::SDOAQ_GetCallbackMultiWs() - 1;
-		if (cb_ws < TWO_WS)
+		if (cb_ws < NUMS_WS)
 		{
 			theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_EDOF, MAKEWPARAM(errorCode, cb_ws), (LPARAM)lastFilledRingBufferEntry);
 
-			static void* g_prev[TWO_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("EDOF"), errorCode, callbackUserData);
+			static void* g_prev[NUMS_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("EDOF"), errorCode, callbackUserData);
 		}
 	}
 }
@@ -145,11 +145,11 @@ void __stdcall g_PlayAFCallbackEx2(eErrorCode errorCode, int lastFilledRingBuffe
 		pcPara->dbMatchedStep = dbMatchedStep;
 
 		const unsigned cb_ws = ::SDOAQ_GetCallbackMultiWs() - 1;
-		if (cb_ws < TWO_WS)
+		if (cb_ws < NUMS_WS)
 		{
 			theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_AF, MAKEWPARAM(errorCode, cb_ws), (LPARAM)pcPara);
 
-			static void* g_prev[TWO_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("AF"), errorCode, callbackUserData);
+			static void* g_prev[NUMS_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("AF"), errorCode, callbackUserData);
 		}
 	}
 }
@@ -172,7 +172,7 @@ void __stdcall g_SnapCallbackEx(eErrorCode errorCode, int lastFilledRingBufferEn
 		const unsigned cb_ws = ::SDOAQ_GetCallbackMultiWs() - 1;
 		theApp.m_pMainWnd->PostMessageW(EUM_RECEIVE_SNAP, MAKEWPARAM(errorCode, cb_ws), (LPARAM)lastFilledRingBufferEntry);
 
-		static void* g_prev[TWO_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("SNAP"), errorCode, callbackUserData);
+		static void* g_prev[NUMS_WS] = { 0,0 }; callback_test_log(g_prev[cb_ws], _T("SNAP"), errorCode, callbackUserData);
 	}
 }
 
