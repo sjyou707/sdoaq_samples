@@ -220,14 +220,16 @@ namespace SdoaqApiTester
             }
             else if (btn == btn_ContiStack)
             {
-                GetSdoaqObj().AcquisitionContinuous_FocusStack();
-                EnableGroup(bEnableParam: false, bEnableAcq: true);
-                EnableAcqGroup_Continuous(btn_StopStack);
+                if (GetSdoaqObj().AcquisitionContinuous_FocusStack())
+                {
+                    //EnableGroup(bEnableParam: false, bEnableAcq: true);
+                    EnableAcqGroup_Continuous(btn_StopStack);
+                }
             }
             else if (btn == btn_StopStack)
             {
                 GetSdoaqObj().AcquisitionStop_FocusStack();
-                EnableGroup(bEnableParam: true, bEnableAcq: true);
+                //EnableGroup(bEnableParam: true, bEnableAcq: true);
                 EnableAcqGroup_Idle();
             }
         }
@@ -244,16 +246,19 @@ namespace SdoaqApiTester
             }
             else if (btn == btn_ContiEdof)
             {
-                GetSdoaqObj().AcquisitionContinuous_Edof(chk_Edof.Checked,
+                if (GetSdoaqObj().AcquisitionContinuous_Edof(chk_Edof.Checked,
                     chk_StepMap.Checked, chk_QualityMap.Checked, chk_HeightMap.Checked,
-                    chk_PointCloud.Checked);
-                EnableGroup(bEnableParam: false, bEnableEdofOption:false, bEnableAcq: true);
-                EnableAcqGroup_Continuous(btn_StopEdof);
+                    chk_PointCloud.Checked))
+                {
+                    //EnableGroup(bEnableParam: false, bEnableEdofOption: false, bEnableAcq: true);
+                    EnableAcqGroup_Continuous(btn_StopEdof);
+                }
+                
             }
             else if (btn == btn_StopEdof)
             {
                 GetSdoaqObj().AcquisitionStop_Edof();
-                EnableGroup(bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
+                //EnableGroup(bEnableParam: true, bEnableEdofOption: true, bEnableAcq: true);
                 EnableAcqGroup_Idle();
             }
         }
@@ -268,14 +273,16 @@ namespace SdoaqApiTester
             }
             else if (btn == btn_ContiAF)
             {
-                GetSdoaqObj().AcquisitionContinuous_Af();
-                EnableGroup(bEnableParam: false, bEnableAcq: true);
-                EnableAcqGroup_Continuous(btn_StopAF);
+                if(GetSdoaqObj().AcquisitionContinuous_Af())
+                {
+                    //EnableGroup(bEnableParam: false, bEnableAcq: true);
+                    EnableAcqGroup_Continuous(btn_StopAF);
+                }
             }
             else if (btn == btn_StopAF)
             {
                 GetSdoaqObj().AcquisitionStop_Af();
-                EnableGroup(bEnableParam: true, bEnableAcq: true);
+                //EnableGroup(bEnableParam: true, bEnableAcq: true);
                 EnableAcqGroup_Idle();
             }
         }
@@ -286,8 +293,6 @@ namespace SdoaqApiTester
 
             GetSdoaqObj().Acquisition_Sanp(snapPath);
         }
-
-
         #endregion
 
     }

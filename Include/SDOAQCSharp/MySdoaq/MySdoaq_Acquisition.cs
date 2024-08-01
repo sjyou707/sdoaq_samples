@@ -36,8 +36,9 @@ namespace SDOAQCSharp
 
         public bool Acquisition_Sanp(string directoryPath)
         {
-            if (IsRunPlayer == false)
+            if (IsInitialize == false || IsRunPlayer == false)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_Sanp(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -57,6 +58,8 @@ namespace SDOAQCSharp
                 }
             };
 
+            SelectMultWS(CamIndex);
+
             var rv = SDOAQ_API.SDOAQ_PlaySnap(CallBack_SDOAQ_Snap, focusList, focusList.Length, snapParams);
 
             return rv != SDOAQ_API.eErrorCode.ecNoError;
@@ -65,8 +68,9 @@ namespace SDOAQCSharp
         #region Focus Stack
         public async Task<bool> Acquisition_FocusStackAsync()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_FocusStackAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -104,6 +108,7 @@ namespace SDOAQCSharp
 
                 long tickStart = Environment.TickCount;
 
+                SelectMultWS(CamIndex);
                 var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotFocusStack(
                     acqParamList,
                     focusList, focusList.Length,
@@ -136,8 +141,9 @@ namespace SDOAQCSharp
 
         public bool AcquisitionContinuous_FocusStack()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_FocusStack(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -163,6 +169,7 @@ namespace SDOAQCSharp
             _ringBuffer.Set_Buffer(resultImageSizes.ToArray());
             _playerFoucsStepCount = focusList.Length;
 
+            SelectMultWS(CamIndex);
             var rv = SDOAQ_API.SDOAQ_PlayFocusStack(acqParamList, CallBack_SDOAQ_PlayFocusStack,
                 focusList, focusList.Length,
                 ringBufferSize,
@@ -193,8 +200,9 @@ namespace SDOAQCSharp
         #region AF
         public async Task<bool> Acquisition_AfAsync()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_AfAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -216,6 +224,7 @@ namespace SDOAQCSharp
 
                 long tickStart = Environment.TickCount;
 
+                SelectMultWS(CamIndex);
                 var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotAF(
                     acqParamList,
                     focusList, focusList.Length,
@@ -245,8 +254,9 @@ namespace SDOAQCSharp
         
         public bool AcquisitionContinuous_Af()
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Af(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -272,6 +282,7 @@ namespace SDOAQCSharp
             _ringBuffer.Set_Buffer(resultImageSizes.ToArray());
             _playerFoucsStepCount = focusList.Length;
 
+            SelectMultWS(CamIndex);
             var rv = SDOAQ_API.SDOAQ_PlayAF(acqParamList, CallBack_SDOAQ_PlayAf, 
                 focusList, focusList.Length,
                 ringBufferSize, 
@@ -304,8 +315,9 @@ namespace SDOAQCSharp
             bool enableStepMapImg = true, bool enableQualityMap = true, 
             bool enableHeightMap = true, bool enablePointCloud = true)
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_EdofAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -337,6 +349,8 @@ namespace SDOAQCSharp
                 var sizePointCloudBuffer = (uint)(enablePointCloud ? dataSize * 3 : 0);
 
                 long tickStart = Environment.TickCount;
+
+                SelectMultWS(CamIndex);
 
                 var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotEdof(
                     acqParamList,
@@ -401,12 +415,13 @@ namespace SDOAQCSharp
             return rv;
         }
 
-        public bool AcquisitionContinuous_Edof(bool enableStepMapImg = true,
-            bool enableEdofImg = true, bool enableQualityMap = true,
+        public bool AcquisitionContinuous_Edof(bool enableEdofImg = true,
+            bool enableStepMapImg = true, bool enableQualityMap = true,
             bool enableHeightMap = true, bool enablePointCloud = true)
         {
-            if (IsRunPlayer)
+            if (IsInitialize == false || IsRunPlayer)
             {
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Edof(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
                 return false;
             }
 
@@ -447,6 +462,8 @@ namespace SDOAQCSharp
 
             _ringBuffer.Set_Buffer(resultImageSizes.ToArray());
             _playerFoucsStepCount = focusList.Length;
+
+            SelectMultWS(CamIndex);
 
             var rv = SDOAQ_API.SDOAQ_PlayEdof(acqParamList, CallBack_SDOAQ_PlayEdof,
                 focusList, focusList.Length,

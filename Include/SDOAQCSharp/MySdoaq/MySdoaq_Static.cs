@@ -50,9 +50,7 @@ namespace SDOAQCSharp
             SdoaqScriptReader.GetIntFromLineScript(path, SCRIPT_LINE_NUM_OF_WS, 1, out int numOfWiseScope);
 
             numOfWiseScope = Math.Max(1, numOfWiseScope);
-
-            Finalize();
-
+            
             s_sdoaqObjList.Clear();
             
             for (int i = 0; i< numOfWiseScope; i++)
@@ -120,13 +118,23 @@ namespace SDOAQCSharp
             }
         }
         
-        public static bool SelectMultWS(int idxWS)
+        public static bool SelectMultWS(int idxCam)
         {
+            if (s_sdoaqObjList.Count == 0)
+            {
+                return true;
+            }
+
+            int idxWS = idxCam + 1;
             var rv = SDOAQ_API.SDOAQ_SelectMultiWs(idxWS);
 
-            WriteLog(Logger.emLogLevel.API, $"SelectMuyltiWS(), WS Index = {idxWS}");
+            if (rv != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                WriteLog(Logger.emLogLevel.API, $"SelectMuyltiWS(), WS Index = {idxWS}, rv = {rv}");
+                return false;
+            }
 
-            return rv == SDOAQ_API.eErrorCode.ecNoError;
+            return true;
         }
 
         private static void Add_CallbackFunction()
@@ -171,12 +179,16 @@ namespace SDOAQCSharp
         {
             bool bInitDone = errorCode == SDOAQ_API.eErrorCode.ecNoError;
 
+            IsInitialize = bInitDone;
+
             if (bInitDone)
             {
                 WriteLog(Logger.emLogLevel.API, $"[INIT]Initialize Done");
 
                 foreach (var sdoaqObj in s_sdoaqObjList.Values)
                 {
+                    SelectMultWS(sdoaqObj.CamIndex);
+                        
                     bool isWriteable = false;
                     string paramValue = string.Empty;
 
@@ -223,6 +235,8 @@ namespace SDOAQCSharp
                     sdoaqObj.SetFocus(DFLT_FOCUS_LIST);
                     sdoaqObj.SetSnapFocus(DFLT_FOCUS_LIST);
                 }
+
+                SelectMultWS(0);
             }
             else
             {
@@ -307,8 +321,11 @@ namespace SDOAQCSharp
 
             byte[] resultImgEdof = new byte[sdoaqObj._ringBuffer.Sizes[idxRingBuffer]];
 
-            Marshal.Copy(sdoaqObj._ringBuffer.Buffer[idxRingBuffer], resultImgEdof, 0, resultImgEdof.Length);
-
+            if (sdoaqObj._ringBuffer.Buffer[idxRingBuffer] != IntPtr.Zero)
+            {
+                Marshal.Copy(sdoaqObj._ringBuffer.Buffer[idxRingBuffer], resultImgEdof, 0, resultImgEdof.Length);
+            }
+            
             float[][] resultImgList = new float[EDOF_RESULT_IMG_COUNT - 1][];
             unsafe
             {

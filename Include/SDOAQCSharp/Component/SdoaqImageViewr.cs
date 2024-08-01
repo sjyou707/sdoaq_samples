@@ -56,9 +56,9 @@ namespace SDOAQCSharp.Component
                         _afImgCount = 0;
                         _edofImgCount = 0;
 
-                        var imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
+                         _imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
 
-                        this.Invoke(() => UpdatgeImageList(imageList, $"Focus Stack {_stackImgCount}"));
+                        this.Invoke(() => UpdatgeImageList($"Focus Stack {_stackImgCount}"));
                     }
                     break;
                 case MySdoaq.CallBackMessage.Af:
@@ -67,9 +67,9 @@ namespace SDOAQCSharp.Component
                         _afImgCount++;
                         _edofImgCount = 0;
 
-                        var imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
+                        _imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
 
-                        this.Invoke(() => UpdatgeImageList(imageList, $"AF {_afImgCount}"));
+                        this.Invoke(() => UpdatgeImageList($"AF {_afImgCount}"));
                     }
                     break;
                 case MySdoaq.CallBackMessage.Edof:
@@ -78,8 +78,8 @@ namespace SDOAQCSharp.Component
                         _afImgCount = 0;
                         _edofImgCount++;
 
-                        var imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
-                        var pointCloudInfo = (SdoaqPointCloudInfo)callBackMsg.objs[1];
+                        _imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
+                        _pointCloudInfoInfo = (SdoaqPointCloudInfo)callBackMsg.objs[1];
 
                         this.Invoke(() =>
                         {
@@ -110,15 +110,15 @@ namespace SDOAQCSharp.Component
             }
             return true;
         }
-        private void UpdatgeImageList(List<SdoaqImageInfo> imageList, string labelText)
+        private void UpdatgeImageList(string labelText)
         {
             var listBox = listbox_ImageList;
             
-            if (CompareImageList(imageList, listBox) == false)
+            if (CompareImageList(_imageList, listBox) == false)
             {
                 listBox.Items.Clear();
 
-                foreach (var imgInfo in imageList)
+                foreach (var imgInfo in _imageList)
                 {
                     listBox.Items.Add(imgInfo.Name);
                 }
@@ -136,7 +136,6 @@ namespace SDOAQCSharp.Component
                 }
             }
             
-            _imageList = imageList;
 
             if (_lastSelectImageIndex >= 0)
             {
@@ -153,8 +152,13 @@ namespace SDOAQCSharp.Component
             lbl_ImageViewer.Text = labelText;
         }
 
-        private void UpdatePointCloud(SdoaqPointCloudInfo pointCloudInfo)
+        private void UpdatePointCloud()
         {
+            if (pb_PointCloudViewer.Tag == null)
+            {
+                return;
+            }
+
             var hwnd3DViewer = (IntPtr)pb_PointCloudViewer.Tag;
 
             if (hwnd3DViewer == null)
@@ -162,9 +166,7 @@ namespace SDOAQCSharp.Component
                 return;
             }
 
-            _pointCloudInfoInfo = pointCloudInfo;
-
-            if (_visiblePointCloud == false || pointCloudInfo == null)
+            if (_visiblePointCloud == false || _pointCloudInfoInfo == null)
             {
                 WSIO.GL.WSGL_Display_BG(hwnd3DViewer);
                 return;
