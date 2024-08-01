@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SdoaqAutoFocus));
             this.txt_Log = new System.Windows.Forms.RichTextBox();
             this.gpb_Controls = new System.Windows.Forms.GroupBox();
             this.btn_StopAF = new System.Windows.Forms.Button();
@@ -322,8 +323,9 @@
             this.ClientSize = new System.Drawing.Size(1234, 521);
             this.Controls.Add(this.tlp_Main);
             this.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "SdoaqAutoFocus";
-            this.Text = "Form1";
+            this.Text = "SDOAQ Auto-focus Sample";
             this.Load += new System.EventHandler(this.SdoaqAutoFocus_Load);
             this.gpb_Controls.ResumeLayout(false);
             this.gpb_Controls.PerformLayout();

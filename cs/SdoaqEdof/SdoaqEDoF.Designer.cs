@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SdoaqEDoF));
             this.tlp_Main = new System.Windows.Forms.TableLayoutPanel();
             this.pnl_Controls = new System.Windows.Forms.Panel();
             this.txt_Log = new System.Windows.Forms.RichTextBox();
@@ -36,31 +37,32 @@
             this.btn_PlayEDoF = new System.Windows.Forms.Button();
             this.btn_SingleShotEDoF = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.button8 = new System.Windows.Forms.Button();
+            this.cmb_EdofResizeRatio = new System.Windows.Forms.ComboBox();
+            this.btn_SetScaleStep = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
-            this.btn_SetStep = new System.Windows.Forms.TextBox();
+            this.txt_ScaleStep = new System.Windows.Forms.TextBox();
             this.btn_SetThreshold = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
-            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.txt_Threshold = new System.Windows.Forms.TextBox();
             this.btn_SetIteraion = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.txt_Iteraion = new System.Windows.Forms.TextBox();
             this.btn_SetKernelSize = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.txt_KernelSize = new System.Windows.Forms.TextBox();
             this.btn_SetResizeRatio = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btn_SetMALSFocus = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txt_MALSFocus = new System.Windows.Forms.TextBox();
             this.btn_SetROI = new System.Windows.Forms.Button();
             this.txt_ROI = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.pnl_Viewer = new SDOAQCSharp.Component.SdoPanel();
+            this.btn_OpenCalibration = new System.Windows.Forms.Button();
             this.tmr_LogUpdate = new System.Windows.Forms.Timer(this.components);
+            this.openFile = new System.Windows.Forms.OpenFileDialog();
+            this.pnl_Viewer = new SDOAQCSharp.Component.SdoPanel();
             this.tlp_Main.SuspendLayout();
             this.pnl_Controls.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -141,21 +143,21 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.button8);
+            this.groupBox2.Controls.Add(this.cmb_EdofResizeRatio);
+            this.groupBox2.Controls.Add(this.btn_SetScaleStep);
             this.groupBox2.Controls.Add(this.label7);
-            this.groupBox2.Controls.Add(this.btn_SetStep);
+            this.groupBox2.Controls.Add(this.txt_ScaleStep);
             this.groupBox2.Controls.Add(this.btn_SetThreshold);
             this.groupBox2.Controls.Add(this.label6);
-            this.groupBox2.Controls.Add(this.textBox5);
+            this.groupBox2.Controls.Add(this.txt_Threshold);
             this.groupBox2.Controls.Add(this.btn_SetIteraion);
             this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Controls.Add(this.textBox4);
+            this.groupBox2.Controls.Add(this.txt_Iteraion);
             this.groupBox2.Controls.Add(this.btn_SetKernelSize);
             this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Controls.Add(this.textBox3);
+            this.groupBox2.Controls.Add(this.txt_KernelSize);
             this.groupBox2.Controls.Add(this.btn_SetResizeRatio);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this.textBox2);
             this.groupBox2.Location = new System.Drawing.Point(11, 144);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(575, 201);
@@ -163,14 +165,28 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Live-compatible EDoF Parameters";
             // 
-            // button8
+            // cmb_EdofResizeRatio
             // 
-            this.button8.Location = new System.Drawing.Point(516, 166);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(50, 25);
-            this.button8.TabIndex = 25;
-            this.button8.Text = "Set";
-            this.button8.UseVisualStyleBackColor = true;
+            this.cmb_EdofResizeRatio.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmb_EdofResizeRatio.FormattingEnabled = true;
+            this.cmb_EdofResizeRatio.Items.AddRange(new object[] {
+            "1",
+            "0.5",
+            "0.25"});
+            this.cmb_EdofResizeRatio.Location = new System.Drawing.Point(350, 31);
+            this.cmb_EdofResizeRatio.Name = "cmb_EdofResizeRatio";
+            this.cmb_EdofResizeRatio.Size = new System.Drawing.Size(160, 23);
+            this.cmb_EdofResizeRatio.TabIndex = 26;
+            // 
+            // btn_SetScaleStep
+            // 
+            this.btn_SetScaleStep.Location = new System.Drawing.Point(516, 166);
+            this.btn_SetScaleStep.Name = "btn_SetScaleStep";
+            this.btn_SetScaleStep.Size = new System.Drawing.Size(50, 25);
+            this.btn_SetScaleStep.TabIndex = 25;
+            this.btn_SetScaleStep.Text = "Set";
+            this.btn_SetScaleStep.UseVisualStyleBackColor = true;
+            this.btn_SetScaleStep.Click += new System.EventHandler(this.btn_SetScaleStep_Click);
             // 
             // label7
             // 
@@ -181,13 +197,13 @@
             this.label7.TabIndex = 23;
             this.label7.Text = "scale correction refer step (range MALS steps)";
             // 
-            // btn_SetStep
+            // txt_ScaleStep
             // 
-            this.btn_SetStep.Location = new System.Drawing.Point(350, 167);
-            this.btn_SetStep.Name = "btn_SetStep";
-            this.btn_SetStep.Size = new System.Drawing.Size(160, 23);
-            this.btn_SetStep.TabIndex = 24;
-            this.btn_SetStep.Text = "160";
+            this.txt_ScaleStep.Location = new System.Drawing.Point(350, 167);
+            this.txt_ScaleStep.Name = "txt_ScaleStep";
+            this.txt_ScaleStep.Size = new System.Drawing.Size(160, 23);
+            this.txt_ScaleStep.TabIndex = 24;
+            this.txt_ScaleStep.Text = "160";
             // 
             // btn_SetThreshold
             // 
@@ -197,6 +213,7 @@
             this.btn_SetThreshold.TabIndex = 22;
             this.btn_SetThreshold.Text = "Set";
             this.btn_SetThreshold.UseVisualStyleBackColor = true;
+            this.btn_SetThreshold.Click += new System.EventHandler(this.btn_SetThreshold_Click);
             // 
             // label6
             // 
@@ -207,13 +224,13 @@
             this.label6.TabIndex = 20;
             this.label6.Text = "threshold (range 0.0~9.9)";
             // 
-            // textBox5
+            // txt_Threshold
             // 
-            this.textBox5.Location = new System.Drawing.Point(350, 133);
-            this.textBox5.Name = "textBox5";
-            this.textBox5.Size = new System.Drawing.Size(160, 23);
-            this.textBox5.TabIndex = 21;
-            this.textBox5.Text = "1.0";
+            this.txt_Threshold.Location = new System.Drawing.Point(350, 133);
+            this.txt_Threshold.Name = "txt_Threshold";
+            this.txt_Threshold.Size = new System.Drawing.Size(160, 23);
+            this.txt_Threshold.TabIndex = 21;
+            this.txt_Threshold.Text = "1.0";
             // 
             // btn_SetIteraion
             // 
@@ -223,6 +240,7 @@
             this.btn_SetIteraion.TabIndex = 19;
             this.btn_SetIteraion.Text = "Set";
             this.btn_SetIteraion.UseVisualStyleBackColor = true;
+            this.btn_SetIteraion.Click += new System.EventHandler(this.btn_SetIteraion_Click);
             // 
             // label5
             // 
@@ -233,14 +251,14 @@
             this.label5.TabIndex = 17;
             this.label5.Text = "pixel-wise iteration (range 0~16)";
             // 
-            // textBox4
+            // txt_Iteraion
             // 
-            this.textBox4.Location = new System.Drawing.Point(350, 99);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(160, 23);
-            this.textBox4.TabIndex = 18;
-            this.textBox4.Tag = "8";
-            this.textBox4.Text = "1020,543,128,128";
+            this.txt_Iteraion.Location = new System.Drawing.Point(350, 99);
+            this.txt_Iteraion.Name = "txt_Iteraion";
+            this.txt_Iteraion.Size = new System.Drawing.Size(160, 23);
+            this.txt_Iteraion.TabIndex = 18;
+            this.txt_Iteraion.Tag = "8";
+            this.txt_Iteraion.Text = "8";
             // 
             // btn_SetKernelSize
             // 
@@ -250,6 +268,7 @@
             this.btn_SetKernelSize.TabIndex = 16;
             this.btn_SetKernelSize.Text = "Set";
             this.btn_SetKernelSize.UseVisualStyleBackColor = true;
+            this.btn_SetKernelSize.Click += new System.EventHandler(this.btn_SetKernelSize_Click);
             // 
             // label4
             // 
@@ -260,13 +279,13 @@
             this.label4.TabIndex = 14;
             this.label4.Text = "pixel-wise kernel size (range 3~5)";
             // 
-            // textBox3
+            // txt_KernelSize
             // 
-            this.textBox3.Location = new System.Drawing.Point(350, 65);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(160, 23);
-            this.textBox3.TabIndex = 15;
-            this.textBox3.Text = "5";
+            this.txt_KernelSize.Location = new System.Drawing.Point(350, 65);
+            this.txt_KernelSize.Name = "txt_KernelSize";
+            this.txt_KernelSize.Size = new System.Drawing.Size(160, 23);
+            this.txt_KernelSize.TabIndex = 15;
+            this.txt_KernelSize.Text = "5";
             // 
             // btn_SetResizeRatio
             // 
@@ -276,6 +295,7 @@
             this.btn_SetResizeRatio.TabIndex = 13;
             this.btn_SetResizeRatio.Text = "Set";
             this.btn_SetResizeRatio.UseVisualStyleBackColor = true;
+            this.btn_SetResizeRatio.Click += new System.EventHandler(this.btn_SetResizeRatio_Click);
             // 
             // label3
             // 
@@ -286,23 +306,15 @@
             this.label3.TabIndex = 11;
             this.label3.Text = "EDoF resize ratio (0.25, 0.5, 1.0)";
             // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(350, 31);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(160, 23);
-            this.textBox2.TabIndex = 12;
-            this.textBox2.Text = "0.5";
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.btn_SetMALSFocus);
-            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.txt_MALSFocus);
             this.groupBox1.Controls.Add(this.btn_SetROI);
             this.groupBox1.Controls.Add(this.txt_ROI);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.btn_OpenCalibration);
             this.groupBox1.Location = new System.Drawing.Point(11, 6);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(575, 129);
@@ -320,13 +332,13 @@
             this.btn_SetMALSFocus.UseVisualStyleBackColor = true;
             this.btn_SetMALSFocus.Click += new System.EventHandler(this.btn_SetMALSFocus_Click);
             // 
-            // textBox1
+            // txt_MALSFocus
             // 
-            this.textBox1.Location = new System.Drawing.Point(350, 95);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(160, 23);
-            this.textBox1.TabIndex = 9;
-            this.textBox1.Text = "0-319-32";
+            this.txt_MALSFocus.Location = new System.Drawing.Point(350, 95);
+            this.txt_MALSFocus.Name = "txt_MALSFocus";
+            this.txt_MALSFocus.Size = new System.Drawing.Size(160, 23);
+            this.txt_MALSFocus.TabIndex = 9;
+            this.txt_MALSFocus.Text = "0-319-32";
             // 
             // btn_SetROI
             // 
@@ -364,14 +376,23 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "ROI(left,top,width,height)";
             // 
-            // button1
+            // btn_OpenCalibration
             // 
-            this.button1.Location = new System.Drawing.Point(15, 24);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(280, 28);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Select caibration file for objective";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btn_OpenCalibration.Location = new System.Drawing.Point(15, 24);
+            this.btn_OpenCalibration.Name = "btn_OpenCalibration";
+            this.btn_OpenCalibration.Size = new System.Drawing.Size(280, 28);
+            this.btn_OpenCalibration.TabIndex = 0;
+            this.btn_OpenCalibration.Text = "Select calibration file for objective";
+            this.btn_OpenCalibration.UseVisualStyleBackColor = true;
+            this.btn_OpenCalibration.Click += new System.EventHandler(this.btn_OpenCalibration_Click);
+            // 
+            // tmr_LogUpdate
+            // 
+            this.tmr_LogUpdate.Tick += new System.EventHandler(this.tmr_LogUpdate_Tick);
+            // 
+            // openFile
+            // 
+            this.openFile.FileName = "openFileDialog1";
             // 
             // pnl_Viewer
             // 
@@ -384,10 +405,6 @@
             this.pnl_Viewer.Size = new System.Drawing.Size(624, 591);
             this.pnl_Viewer.TabIndex = 3;
             // 
-            // tmr_LogUpdate
-            // 
-            this.tmr_LogUpdate.Tick += new System.EventHandler(this.tmr_LogUpdate_Tick);
-            // 
             // SdoaqEDoF
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -395,9 +412,10 @@
             this.ClientSize = new System.Drawing.Size(1234, 591);
             this.Controls.Add(this.tlp_Main);
             this.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "SdoaqEDoF";
-            this.Text = "Form1";
+            this.Text = "SDOAQ EDoF Sample";
             this.Load += new System.EventHandler(this.SdoaqEDoF_Load);
             this.tlp_Main.ResumeLayout(false);
             this.pnl_Controls.ResumeLayout(false);
@@ -415,34 +433,35 @@
         private System.Windows.Forms.Panel pnl_Controls;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btn_OpenCalibration;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btn_SetResizeRatio;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button btn_SetMALSFocus;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txt_MALSFocus;
         private System.Windows.Forms.Button btn_SetROI;
         private System.Windows.Forms.TextBox txt_ROI;
-        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button btn_SetScaleStep;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox btn_SetStep;
+        private System.Windows.Forms.TextBox txt_ScaleStep;
         private System.Windows.Forms.Button btn_SetThreshold;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.TextBox txt_Threshold;
         private System.Windows.Forms.Button btn_SetIteraion;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.TextBox txt_Iteraion;
         private System.Windows.Forms.Button btn_SetKernelSize;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox txt_KernelSize;
         private System.Windows.Forms.Button btn_StopEDoF;
         private System.Windows.Forms.Button btn_PlayEDoF;
         private System.Windows.Forms.Button btn_SingleShotEDoF;
         private System.Windows.Forms.RichTextBox txt_Log;
         private SDOAQCSharp.Component.SdoPanel pnl_Viewer;
         private System.Windows.Forms.Timer tmr_LogUpdate;
+        private System.Windows.Forms.ComboBox cmb_EdofResizeRatio;
+        private System.Windows.Forms.OpenFileDialog openFile;
     }
 }
 

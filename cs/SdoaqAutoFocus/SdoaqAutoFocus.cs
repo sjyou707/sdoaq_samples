@@ -45,22 +45,22 @@ namespace SdoaqAutoFocus
 
         private void btn_SetROI_Click(object sender, EventArgs e)
         {
-            GetSdoaqObj().SetRoi_AF(txt_ROI.Text);
+            GetSdoaqObj()?.SetRoi_AF(txt_ROI.Text);
         }
 
         private void btn_SingleShotAF_Click(object sender, EventArgs e)
         {
-            var task = GetSdoaqObj().Acquisition_AfAsync();
+            var task = GetSdoaqObj()?.Acquisition_AfAsync();
         }
 
         private void btn_PlayAF_Click(object sender, EventArgs e)
         {
-            GetSdoaqObj().AcquisitionContinuous_Af();
+            GetSdoaqObj()?.AcquisitionContinuous_Af();
         }
 
         private void btn_StopAF_Click(object sender, EventArgs e)
         {
-            GetSdoaqObj().AcquisitionStop_Af();
+            GetSdoaqObj()?.AcquisitionStop_Af();
         }
 
         private void btn_SharpnessMethod_Click(object sender, EventArgs e)

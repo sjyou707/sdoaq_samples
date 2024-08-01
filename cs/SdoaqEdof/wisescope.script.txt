@@ -50,7 +50,7 @@
  #                               : MAC-address(string): (Vis-GigE)
  #                               : Grabber-id(00~99): Board-Index(MultiCam-*, CoaxLink-*) / USB-ID(HVSV5U) / NA(Milx-*)
 #----------------------------------------------------------------------------------------------
- #Camera Model (V2) = { Pylon-USB , -1 }
+ Camera Model (V2) = { Pylon-USB , -1 }
 
  # Camera Trigger Method
  #                               : External / External-Camera / External-Grabber
@@ -65,12 +65,12 @@
  # The capture time depends on image size, exposure time, trigger delay, etc.
  #Camera Rx Buffer Number   = 4   # DV = 12(Multicam), 4(Milx)
 
- #Camera Reverse X = false
- #Camera Reverse Y = false
+ Camera Reverse X = false
+ Camera Reverse Y = false
  #Camera Gain = 0
- #Pylon USB Line Number = Line2   # DV = Line2, none / Line2 / Line3 / both
+ Pylon USB Line Number = Line2   # DV = Line2, none / Line2 / Line3 / both
 #----------------------------------------------------------------------------------------------
- Camera Model (V2) = { Simul-2040-1086-color , -1 }
+ #Camera Model (V2) = { Simul-2040-1086-color , -1 }
  Camera Trigger Method = Software 
  Full Focus Simul Image = C:\\Simul.Zstack
 #----------------------------------------------------------------------------------------------
