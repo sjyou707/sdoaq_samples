@@ -181,7 +181,9 @@ namespace SdoaqEdof
 
         private void btn_SetScaleStep_Click(object sender, EventArgs e)
         {
-            GetSdoaqObj()?.GetIntParamRange(SDOAQ_API.eParameterId.pi_edof_scale_correction_dst_step, out int min, out int max);
+            int min = -1;
+            int max = -1;
+            GetSdoaqObj()?.GetIntParamRange(SDOAQ_API.eParameterId.pi_edof_scale_correction_dst_step, out min, out max);
 
             bool isSet = false;
             if (Int32.TryParse(txt_ScaleStep.Text, out int value))
