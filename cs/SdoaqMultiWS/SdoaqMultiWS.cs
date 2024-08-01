@@ -186,8 +186,7 @@ namespace SdoaqMultiWS
         private void UpdateSdoaqParam(int idxWs)
         {
             _currentIdxWs = idxWs;
-            MySdoaq.SelectMultWS(_currentIdxWs);
-
+           
             cmp_SdoaqParams.Set_SdoaqObj(GetSdoaqObj());
             if (MySdoaq.IsInitialize)
             {

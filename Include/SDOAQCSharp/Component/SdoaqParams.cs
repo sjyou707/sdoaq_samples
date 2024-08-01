@@ -179,7 +179,5 @@ namespace SDOAQCSharp.Component
                 _sdoaqObj?.SetCalibrationFile(dlg.FileName);
             }
         }
-
-        
     }
 }
