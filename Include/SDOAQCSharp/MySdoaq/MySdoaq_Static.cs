@@ -118,13 +118,23 @@ namespace SDOAQCSharp
             }
         }
         
-        public static bool SelectMultWS(int idxWS)
+        public static bool SelectMultWS(int idxCam)
         {
+            if (s_sdoaqObjList.Count == 0)
+            {
+                return true;
+            }
+
+            int idxWS = idxCam + 1;
             var rv = SDOAQ_API.SDOAQ_SelectMultiWs(idxWS);
 
-            WriteLog(Logger.emLogLevel.API, $"SelectMuyltiWS(), WS Index = {idxWS}");
+            if (rv != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                WriteLog(Logger.emLogLevel.API, $"SelectMuyltiWS(), WS Index = {idxWS}, rv = {rv}");
+                return false;
+            }
 
-            return rv == SDOAQ_API.eErrorCode.ecNoError;
+            return true;
         }
 
         private static void Add_CallbackFunction()
@@ -177,10 +187,7 @@ namespace SDOAQCSharp
 
                 foreach (var sdoaqObj in s_sdoaqObjList.Values)
                 {
-                    if (s_sdoaqObjList.Count > 0)
-                    {
-                        SelectMultWS(sdoaqObj.CamIndex + 1);
-                    }
+                    SelectMultWS(sdoaqObj.CamIndex);
                         
                     bool isWriteable = false;
                     string paramValue = string.Empty;
@@ -229,10 +236,7 @@ namespace SDOAQCSharp
                     sdoaqObj.SetSnapFocus(DFLT_FOCUS_LIST);
                 }
 
-                if (s_sdoaqObjList.Count > 0)
-                {
-                    SelectMultWS(1);
-                }
+                SelectMultWS(0);
             }
             else
             {
