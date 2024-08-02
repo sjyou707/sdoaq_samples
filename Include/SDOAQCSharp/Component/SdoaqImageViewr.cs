@@ -87,7 +87,7 @@ namespace SDOAQCSharp.Component
                             if(_visiblePointCloud)
                             {
                                 UpdatePointCloud();
-                            }                            
+                            }
                         });
                     }
                     break;
