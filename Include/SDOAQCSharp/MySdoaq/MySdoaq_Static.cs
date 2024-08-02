@@ -403,7 +403,7 @@ namespace SDOAQCSharp
 
             if (errorCode != SDOAQ_API.eErrorCode.ecNoError)
             {
-                WriteLog(Logger.emLogLevel.API, $"OnSdoaq_PlayFocusStack(), Error = {errorCode}");
+                WriteLog(Logger.emLogLevel.API, $"OnSdoaq_PlayAf(), Error = {errorCode}");
                 return;
             }
 
