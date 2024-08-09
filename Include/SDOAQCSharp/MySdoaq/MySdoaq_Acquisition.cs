@@ -19,15 +19,15 @@ namespace SDOAQCSharp
                 return true;
             }
 
-            switch (_playerMode)
+            switch (PlayerMode)
             {
-                case PlayerMode.Edof:
+                case emPlayerMode.Edof:
                     AcquisitionStop_Edof();
                     break;
-                case PlayerMode.Af:
+                case emPlayerMode.Af:
                     AcquisitionStop_Af();
                     break;
-                case PlayerMode.FocusStack:
+                case emPlayerMode.FocusStack:
                     AcquisitionStop_FocusStack();
                     break;
             }
@@ -38,7 +38,7 @@ namespace SDOAQCSharp
         {
             if (IsInitialize == false || IsRunPlayer == false)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_Sanp(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_Sanp(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
 
@@ -70,7 +70,7 @@ namespace SDOAQCSharp
         {
             if (IsInitialize == false || IsRunPlayer)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_FocusStackAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_FocusStackAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
 
@@ -81,70 +81,87 @@ namespace SDOAQCSharp
 
             var focusList = FocusList.GetStepList();
 
-            var rv = await Task.Run(() =>
-            {
-                byte[][] imageBuffer = null;
-                imageBuffer = new byte[focusList.Length][];
-
-                var focusImagePointerList = new IntPtr[focusList.Length];
-                var focusImageBufferSizeList = new ulong[focusList.Length];
-
-                ref var acqParam = ref acqParamList[0];
-
-                int sizeOfImage = acqParam.cameraRoiHeight * acqParam.cameraRoiWidth * CamInfo.ColorByte;
-
-                for (int focus = 0; focus < focusList.Length; focus++)
-                {
-                    imageBuffer[focus] = new byte[sizeOfImage];
-                    focusImageBufferSizeList[focus] = (ulong)sizeOfImage;
-                    unsafe
-                    {
-                        fixed (byte* pointerToFirst = imageBuffer[focus])
-                        {
-                            focusImagePointerList[focus] = new IntPtr(pointerToFirst);
-                        }
-                    }
-                }
-
-                long tickStart = Environment.TickCount;
-
-                SelectMultWS(CamIndex);
-                var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotFocusStack(
-                    acqParamList,
-                    focusList, focusList.Length,
-                    focusImagePointerList, focusImageBufferSizeList);
-
-                long elapsedTime = Environment.TickCount - tickStart;
-
-                WriteLog(Logger.emLogLevel.Info, $"[Info] StackImage(), rv = {rvSdoaq}, Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
-
-
-                if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
-                {
-                    return false;
-                }
-
-                var imgInfoList = new List<SdoaqImageInfo>();
-                for (int i = 0; i < imageBuffer.Length; i++)
-                {
-                    string name = $"F-{focusList[i]}";
-
-                    imgInfoList.Add(new SdoaqImageInfo(name, acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte, imageBuffer[i]));
-                }
-
-                CallBackMsgLoop.Invoke((CallBackMessage.FocusStack, new object[] { imgInfoList }));
-                return true;
-            });
+            var rv = await Task.Run(() => Acq_FocusStack(acqParamList, focusList, true));
             
             return rv;
+        }
+
+        private bool Acq_FocusStack(SDOAQ_API.AcquisitionFixedParameters[] acqParamList, int[] focusList, bool bShowLog)
+        {
+            byte[][] imageBuffer = null;
+            imageBuffer = new byte[focusList.Length][];
+
+            var focusImagePointerList = new IntPtr[focusList.Length];
+            var focusImageBufferSizeList = new ulong[focusList.Length];
+
+            ref var acqParam = ref acqParamList[0];
+
+            int sizeOfImage = acqParam.cameraRoiHeight * acqParam.cameraRoiWidth * CamInfo.ColorByte;
+
+            for (int focus = 0; focus < focusList.Length; focus++)
+            {
+                imageBuffer[focus] = new byte[sizeOfImage];
+                focusImageBufferSizeList[focus] = (ulong)sizeOfImage;
+                unsafe
+                {
+                    fixed (byte* pointerToFirst = imageBuffer[focus])
+                    {
+                        focusImagePointerList[focus] = new IntPtr(pointerToFirst);
+                    }
+                }
+            }
+
+            long tickStart = Environment.TickCount;
+
+            SelectMultWS(CamIndex);
+            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotFocusStack(
+                acqParamList,
+                focusList, focusList.Length,
+                focusImagePointerList, focusImageBufferSizeList);
+
+            long elapsedTime = Environment.TickCount - tickStart;
+
+            if (bShowLog)
+            {
+                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotFocusStack(), rv = {rvSdoaq}, Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
+            }
+            else if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotFocusStack(), rv = {rvSdoaq}");
+            }
+
+
+            if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                return false;
+            }
+
+            var imgInfoList = new List<SdoaqImageInfo>();
+            for (int i = 0; i < imageBuffer.Length; i++)
+            {
+                string name = $"F-{focusList[i]}";
+
+                imgInfoList.Add(new SdoaqImageInfo(name, acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte, imageBuffer[i]));
+            }
+
+            CallBackMsgLoop.Invoke((emCallBackMessage.FocusStack, new object[] { imgInfoList }));
+            return true;
         }
 
         public bool AcquisitionContinuous_FocusStack()
         {
             if (IsInitialize == false || IsRunPlayer)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_FocusStack(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_FocusStack(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
+            }
+
+            if (PlayerMethod == emPlayerMethod.Thread)
+            {
+                PlayerMode = emPlayerMode.FocusStack;
+                IsRunPlayer = true;
+                _evtContinuosAcq_FocusStack.Set(true);
+                return true;
             }
 
             var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
@@ -178,7 +195,7 @@ namespace SDOAQCSharp
 
             if (rv == SDOAQ_API.eErrorCode.ecNoError)
             {
-                _playerMode = PlayerMode.FocusStack;
+                PlayerMode = emPlayerMode.FocusStack;
                 IsRunPlayer = true;
                 return true;
             }
@@ -188,11 +205,18 @@ namespace SDOAQCSharp
 
         public void AcquisitionStop_FocusStack()
         {
-            if (IsRunPlayer && _playerMode == PlayerMode.FocusStack)
+            if (IsRunPlayer && PlayerMode == emPlayerMode.FocusStack)
             {
-                SDOAQ_API.SDOAQ_StopFocusStack();
+                if (PlayerMethod == emPlayerMethod.CallBackFunc)
+                {
+                    SDOAQ_API.SDOAQ_StopFocusStack();
+                }
+                else
+                {
+                    _evtContinuosAcq_FocusStack.Reset();
+                }               
                 IsRunPlayer = false;
-                _playerMode = PlayerMode.None;
+                PlayerMode = emPlayerMode.None;
             }
         }
         #endregion
@@ -202,7 +226,7 @@ namespace SDOAQCSharp
         {
             if (IsInitialize == false || IsRunPlayer)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_AfAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_AfAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
 
@@ -213,51 +237,69 @@ namespace SDOAQCSharp
 
             var focusList = FocusList.GetStepList();
 
-            var rv = await Task.Run(() =>
-            {
-                var acqParam = acqParamList[0];
-
-                var imageBufferSize = (uint)CamInfo.ImgSize;
-                var imageBuffer = new byte[imageBufferSize];
-                var bestFocusStep = new double[1] { 0 };
-                var score = new double[1] { 0 };
-
-                long tickStart = Environment.TickCount;
-
-                SelectMultWS(CamIndex);
-                var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotAF(
-                    acqParamList,
-                    focusList, focusList.Length,
-                    imageBuffer, imageBufferSize,
-                    bestFocusStep, score);
-
-                long elapsedTime = Environment.TickCount - tickStart;
-
-                WriteLog(Logger.emLogLevel.Info, $"[Info] StackImage(), rv = {rvSdoaq}, Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
-
-                if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
-                {
-                    return false;
-                }
-
-                var imgInfoList = new List<SdoaqImageInfo>
-                {
-                    new SdoaqImageInfo($"AF", acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte, imageBuffer)
-                };
-
-                CallBackMsgLoop.Invoke((CallBackMessage.Af, new object[] { imgInfoList }));
-                return true;
-            });
+            var rv = await Task.Run(() => Acq_Af(acqParamList, focusList, true));
 
             return rv;
         }
         
+        private bool Acq_Af(SDOAQ_API.AcquisitionFixedParameters[] acqParamList, int[] focusList, bool bShowLog)
+        {
+            var acqParam = acqParamList[0];
+
+            var imageBufferSize = (uint)CamInfo.ImgSize;
+            var imageBuffer = new byte[imageBufferSize];
+            var bestFocusStep = new double[1] { 0 };
+            var score = new double[1] { 0 };
+
+            long tickStart = Environment.TickCount;
+
+            SelectMultWS(CamIndex);
+            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotAF(
+                acqParamList,
+                focusList, focusList.Length,
+                imageBuffer, imageBufferSize,
+                bestFocusStep, score);
+
+            long elapsedTime = Environment.TickCount - tickStart;
+
+            if (bShowLog)
+            {
+                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotAF(), rv = {rvSdoaq}, Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
+            }
+            else if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotAF(), rv = {rvSdoaq}");
+            }
+                
+
+            if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                return false;
+            }
+
+            var imgInfoList = new List<SdoaqImageInfo>
+                {
+                    new SdoaqImageInfo($"AF", acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte, imageBuffer)
+                };
+
+            CallBackMsgLoop.Invoke((emCallBackMessage.Af, new object[] { imgInfoList }));
+            return true;
+        }
+
         public bool AcquisitionContinuous_Af()
         {
             if (IsInitialize == false || IsRunPlayer)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Af(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Af(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
+            }
+
+            if (PlayerMethod == emPlayerMethod.Thread)
+            {
+                PlayerMode = emPlayerMode.Af;
+                IsRunPlayer = true;
+                _evtContinuosAcq_Af.Set(true);
+                return true;
             }
 
             var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
@@ -291,7 +333,7 @@ namespace SDOAQCSharp
 
             if (rv == SDOAQ_API.eErrorCode.ecNoError)
             {
-                _playerMode = PlayerMode.Af;
+                PlayerMode = emPlayerMode.Af;
                 IsRunPlayer = true;
                 return true;
             }
@@ -301,23 +343,28 @@ namespace SDOAQCSharp
 
         public void AcquisitionStop_Af()
         {
-            if (IsRunPlayer && _playerMode == PlayerMode.Af)
+            if (IsRunPlayer && PlayerMode == emPlayerMode.Af)
             {
-                SDOAQ_API.SDOAQ_StopAF();
+                if (PlayerMethod == emPlayerMethod.CallBackFunc)
+                {
+                    SDOAQ_API.SDOAQ_StopAF();
+                }
+                else
+                {
+                    _evtContinuosAcq_Af.Reset();
+                }
                 IsRunPlayer = false;
-                _playerMode = PlayerMode.None;
+                PlayerMode = emPlayerMode.None;
             }
         }
         #endregion
 
         #region EDof
-        public async Task<bool> Acquisition_EdofAsync(bool enableEdofImg = true,
-            bool enableStepMapImg = true, bool enableQualityMap = true, 
-            bool enableHeightMap = true, bool enablePointCloud = true)
+        public async Task<bool> Acquisition_EdofAsync(EdofImageList edofImageList)
         {
             if (IsInitialize == false || IsRunPlayer)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_EdofAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_EdofAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
 
@@ -328,101 +375,119 @@ namespace SDOAQCSharp
 
             var focusList = FocusList.GetStepList();
 
-            var rv = await Task.Run(() =>
-            {
-                var acqParam = acqParamList[0];
-
-                var pixelSize = CamInfo.PixelSize;
-                var imgSize = CamInfo.ImgSize;
-                var dataSize = CamInfo.DataSize;
-
-                var bufferEdofImage = new byte[imgSize];         // all-in-focus image
-                var bufferStepMapImage = new float[pixelSize];   // 각 pixel 별 focus step number (0~319)                
-                var bufferQualityMap = new float[pixelSize];     // 높이맵의 각 픽셀높이에 대한 점수(얼마나 신뢰할만한지)
-                var bufferHeightMap = new float[pixelSize];      // 각 pixel 별 높이 정보
-                var bufferPointCloud = new float[pixelSize * 3]; // 각 pixel의 (x,y,z) 좌표데이타
-
-                var sizeEdofImageBuffer = (uint)(enableEdofImg ? imgSize : 0);
-                var sizeStepMapBuffer =  (uint)(enableStepMapImg ? dataSize : 0);                
-                var sizeQualityMapBuffer = (uint)(enableQualityMap ? dataSize : 0);
-                var sizeHeightMapBuffer = (uint)(enableHeightMap ? dataSize : 0);
-                var sizePointCloudBuffer = (uint)(enablePointCloud ? dataSize * 3 : 0);
-
-                long tickStart = Environment.TickCount;
-
-                SelectMultWS(CamIndex);
-
-                var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotEdof(
-                    acqParamList,
-                    focusList, focusList.Length,
-                    bufferStepMapImage, sizeStepMapBuffer,
-                    bufferEdofImage, sizeEdofImageBuffer,
-                    bufferQualityMap, sizeQualityMapBuffer,
-                    bufferHeightMap, sizeHeightMapBuffer,
-                    bufferPointCloud, sizePointCloudBuffer);
-
-                long elapsedTime = Environment.TickCount - tickStart;
-                WriteLog(Logger.emLogLevel.Info, $"[Info] EdofImage(), rv = {rvSdoaq} Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
-
-                if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
-                {
-                    return false;
-                }
-
-                var imgInfoList = new List<SdoaqImageInfo>();
-                SdoaqPointCloudInfo pointCloudInfo = null;
-
-                if (sizeEdofImageBuffer > 0)
-                {
-                    imgInfoList.Add(new SdoaqImageInfo("Edof",
-                        acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte,
-                        bufferEdofImage));
-                }
-
-                if (sizeStepMapBuffer > 0)
-                {
-                    imgInfoList.Add(new SdoaqImageInfo("StepMap", 
-                        acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, 1, 
-                        ConvertFloatBufferToByteBuffer(pixelSize, bufferStepMapImage)));
-                }
-
-                if (sizeQualityMapBuffer > 0)
-                {
-                    imgInfoList.Add(new SdoaqImageInfo("QualityMap",
-                        acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, 1,
-                        ConvertFloatBufferToByteBuffer(pixelSize, bufferQualityMap)));
-                }
-
-                if (sizeHeightMapBuffer > 0)
-                {
-                    imgInfoList.Add(new SdoaqImageInfo("HeightMap",
-                        acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, 1,
-                        ConvertFloatBufferToByteBuffer(pixelSize, bufferHeightMap)));
-                }
-
-                if (sizePointCloudBuffer > 0 && sizeEdofImageBuffer > 0)
-                {
-                    pointCloudInfo = new SdoaqPointCloudInfo("PointCloud",
-                        acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, focusList.Length,
-                        bufferPointCloud, sizePointCloudBuffer, 
-                        bufferEdofImage, sizeEdofImageBuffer);
-                }
-
-                CallBackMsgLoop.Invoke((CallBackMessage.Edof, new object[] { imgInfoList, pointCloudInfo }));
-                return true;
-            });
+            var rv = await Task.Run(() => Acq_Edof(acqParamList, focusList, edofImageList, true));
 
             return rv;
         }
 
-        public bool AcquisitionContinuous_Edof(bool enableEdofImg = true,
-            bool enableStepMapImg = true, bool enableQualityMap = true,
-            bool enableHeightMap = true, bool enablePointCloud = true)
+        private bool Acq_Edof(SDOAQ_API.AcquisitionFixedParameters[] acqParamList, int[] focusList, EdofImageList edofImageList, bool bShowLog)
+        {
+            var acqParam = acqParamList[0];
+
+            var pixelSize = CamInfo.PixelSize;
+            var imgSize = CamInfo.ImgSize;
+            var dataSize = CamInfo.DataSize;
+
+            var bufferEdofImage = new byte[imgSize];         // all-in-focus image
+            var bufferStepMapImage = new float[pixelSize];   // 각 pixel 별 focus step number (0~319)                
+            var bufferQualityMap = new float[pixelSize];     // 높이맵의 각 픽셀높이에 대한 점수(얼마나 신뢰할만한지)
+            var bufferHeightMap = new float[pixelSize];      // 각 pixel 별 높이 정보
+            var bufferPointCloud = new float[pixelSize * 3]; // 각 pixel의 (x,y,z) 좌표데이타
+
+            var sizeEdofImageBuffer = (uint)(edofImageList.EnableEdofImg ? imgSize : 0);
+            var sizeStepMapBuffer = (uint)(edofImageList.EnableStepMapImg ? dataSize : 0);
+            var sizeQualityMapBuffer = (uint)(edofImageList.EnableQualityMap ? dataSize : 0);
+            var sizeHeightMapBuffer = (uint)(edofImageList.EnableHeightMap ? dataSize : 0);
+            var sizePointCloudBuffer = (uint)(edofImageList.EnablePointCloud ? dataSize * 3 : 0);
+
+            long tickStart = Environment.TickCount;
+
+            SelectMultWS(CamIndex);
+
+            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotEdof(
+                acqParamList,
+                focusList, focusList.Length,
+                bufferStepMapImage, sizeStepMapBuffer,
+                bufferEdofImage, sizeEdofImageBuffer,
+                bufferQualityMap, sizeQualityMapBuffer,
+                bufferHeightMap, sizeHeightMapBuffer,
+                bufferPointCloud, sizePointCloudBuffer);
+
+            long elapsedTime = Environment.TickCount - tickStart;
+
+            if (bShowLog)
+            {
+                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotEdof(), rv = {rvSdoaq} Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
+            }
+            else if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotEdof(), rv = {rvSdoaq}");
+            }
+                
+
+            if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                return false;
+            }
+
+            var imgInfoList = new List<SdoaqImageInfo>();
+            SdoaqPointCloudInfo pointCloudInfo = null;
+
+            if (sizeEdofImageBuffer > 0)
+            {
+                imgInfoList.Add(new SdoaqImageInfo("Edof",
+                    acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte,
+                    bufferEdofImage));
+            }
+
+            if (sizeStepMapBuffer > 0)
+            {
+                imgInfoList.Add(new SdoaqImageInfo("StepMap",
+                    acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, 1,
+                    ConvertFloatBufferToByteBuffer(pixelSize, bufferStepMapImage)));
+            }
+
+            if (sizeQualityMapBuffer > 0)
+            {
+                imgInfoList.Add(new SdoaqImageInfo("QualityMap",
+                    acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, 1,
+                    ConvertFloatBufferToByteBuffer(pixelSize, bufferQualityMap)));
+            }
+
+            if (sizeHeightMapBuffer > 0)
+            {
+                imgInfoList.Add(new SdoaqImageInfo("HeightMap",
+                    acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, 1,
+                    ConvertFloatBufferToByteBuffer(pixelSize, bufferHeightMap)));
+            }
+
+            if (sizePointCloudBuffer > 0 && sizeEdofImageBuffer > 0)
+            {
+                pointCloudInfo = new SdoaqPointCloudInfo("PointCloud",
+                    acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, focusList.Length,
+                    bufferPointCloud, sizePointCloudBuffer,
+                    bufferEdofImage, sizeEdofImageBuffer);
+            }
+
+            CallBackMsgLoop.Invoke((emCallBackMessage.Edof, new object[] { imgInfoList, pointCloudInfo }));
+            return true;
+        }
+
+        public bool AcquisitionContinuous_Edof(EdofImageList edofImageList)
         {
             if (IsInitialize == false || IsRunPlayer)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Edof(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {CurrentPlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Edof(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
+            }
+
+            if (PlayerMethod == emPlayerMethod.Thread)
+            {
+                _edofImageList = edofImageList;
+                PlayerMode = emPlayerMode.Edof;
+                IsRunPlayer = true;
+                _evtContinuosAcq_Edof.Set(true);
+                return true;
             }
 
             var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
@@ -440,11 +505,11 @@ namespace SDOAQCSharp
 
             var ringBufferSize = PlyerRingBufferSize;
 
-            int sizeEdofImageBuffer = enableEdofImg ? imgSize : 0;
-            int sizeStepMapBuffer = enableStepMapImg ? dataSize : 0;            
-            int sizeQualityMapBuffer = enableQualityMap ? dataSize : 0;
-            int sizeHeightMapBuffer = enableHeightMap ? dataSize : 0;
-            int sizePointCloudBuffer = enablePointCloud ? dataSize * 3 : 0;
+            int sizeEdofImageBuffer = edofImageList.EnableEdofImg ? imgSize : 0;
+            int sizeStepMapBuffer = edofImageList.EnableStepMapImg ? dataSize : 0;            
+            int sizeQualityMapBuffer = edofImageList.EnableQualityMap ? dataSize : 0;
+            int sizeHeightMapBuffer = edofImageList.EnableHeightMap ? dataSize : 0;
+            int sizePointCloudBuffer = edofImageList.EnablePointCloud ? dataSize * 3 : 0;
 
             var resultImageSizes = new List<ulong>(); 
             
@@ -473,21 +538,28 @@ namespace SDOAQCSharp
 
             if (rv == SDOAQ_API.eErrorCode.ecNoError)
             {
-                _playerMode = PlayerMode.Edof;
+                PlayerMode = emPlayerMode.Edof;
                 IsRunPlayer = true;               
                 return true;
             }
             WriteLog(Logger.emLogLevel.API, $"SDOAQ_PlayEdof(), Error = {rv}");
             return rv == SDOAQ_API.eErrorCode.ecNoError;
         }
-
+        
         public void AcquisitionStop_Edof()
         {
-            if (IsRunPlayer && _playerMode == PlayerMode.Edof)
+            if (IsRunPlayer && PlayerMode == emPlayerMode.Edof)
             {
-                SDOAQ_API.SDOAQ_StopEdof();
+                if (PlayerMethod == emPlayerMethod.CallBackFunc)
+                {
+                    SDOAQ_API.SDOAQ_StopEdof();
+                }
+                else
+                {
+                    _evtContinuosAcq_Edof.Reset();
+                }
                 IsRunPlayer = false;
-                _playerMode = PlayerMode.None;
+                PlayerMode = emPlayerMode.None;
             }
         }
         #endregion
