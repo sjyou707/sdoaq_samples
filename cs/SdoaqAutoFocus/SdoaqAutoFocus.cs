@@ -40,7 +40,7 @@ namespace SdoaqAutoFocus
 
         private void Frm_Load()
         {
-            MySdoaq.Initialize();
+            MySdoaq.SDOAQ_Initialize();
         }               
 
         private void btn_SetROI_Click(object sender, EventArgs e)

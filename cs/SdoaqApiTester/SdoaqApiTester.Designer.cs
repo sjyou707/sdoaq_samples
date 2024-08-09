@@ -387,7 +387,7 @@ namespace SdoaqApiTester
             this.KeyPreview = true;
             this.Name = "SdoaqApiTester";
             this.Text = "SdoaqApiTester";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SdoaqApiTester_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SdoaqApiTester_FormClosed);
             this.Load += new System.EventHandler(this.SdoaqApiTester_Load);
             this.Resize += new System.EventHandler(this.SdoaqApiTester_Resize);
             this.pnl_Control.ResumeLayout(false);

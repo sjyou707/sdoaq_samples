@@ -13,9 +13,9 @@
  # When operating multi-WS, specify the number of WSM and write the prefix "WSI_#" to each script item.
  # When operating single-WS, do not specify it.
 
- Number of WSM = 2
+ Number of WSM = 3
 
- Image Manager Size GB = 8 # DV=1.0 , Unit:GB
+ Image Manager Size GB = 2 # DV=1.0 , Unit:GB
   
  # Patch
  # Patch = { item1 , item2 , ... }
@@ -33,6 +33,7 @@
 #----------------------------------------------------------------------------------------------
  WSI_1 MALS Device = { Auto , Simul , 1.8 , 1.0 }   # DV = { NONE , Simul , 0 , 0 }
  WSI_2 MALS Device = { Auto , Simul , 1.8 , 1.0 }
+ WSI_3 MALS Device = { Auto , Simul , 1.8 , 1.0 }
 #----------------------------------------------------------------------------------------------
 
 
@@ -75,9 +76,13 @@
  WSI_1 Camera Trigger Method = Software
  WSI_1 Full Focus Simul Image = C:\Simul.Zstack
 
- WSI_2 Camera Model (V2) = { Simul-2464-2056-color , -1 }
+ WSI_2 Camera Model (V2) = { Simul-2040-1086-color , -1 }
  WSI_2 Camera Trigger Method = Software
- WSI_2 Full Focus Simul Image = C:\\Simul.Zstack 
+ WSI_2 Full Focus Simul Image = C:\Simul.Zstack
+
+ WSI_3 Camera Model (V2) = { Simul-2040-1086-color , -1 }
+ WSI_3 Camera Trigger Method = Software
+ WSI_3 Full Focus Simul Image = C:\Simul.Zstack
 #----------------------------------------------------------------------------------------------
 
 
@@ -116,11 +121,14 @@
 
  #WSI_1 Lighting Device (V3) 1 = { Null , External , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
 #----------------------------------------------------------------------------------------------
- WSI_1 Lighting Device (V3) 1 = { GROUP , SDZEISS , UI , 8 }
- WSI_1 Lighting Device (V3) 1-1 = { SDZEISS-NOSTROBE , Sub^m , Simul , 0 , 0 , -2 , -1 , 1000000 }
+ WSI_1 Lighting Device (V3) 1 = { LCBPWM , L , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
+ WSI_1 Lighting Device (V3) 1 attributes = { strobe = on }
 
  WSI_2 Lighting Device (V3) 1 = { LCBPWM , L , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
  WSI_2 Lighting Device (V3) 1 attributes = { strobe = on }
+
+ WSI_3 Lighting Device (V3) 1 = { LCBPWM , L , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
+ WSI_3 Lighting Device (V3) 1 attributes = { strobe = on }
 #----------------------------------------------------------------------------------------------
 
 

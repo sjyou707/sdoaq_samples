@@ -46,47 +46,40 @@ namespace SDOAQCSharp.Component
             _sdoaqObj.CallBackMsgLoop += SdoaqObj_CallBackMsgLoop;
         }
         
-        private void SdoaqObj_CallBackMsgLoop((MySdoaq.CallBackMessage msg, object[] objs) callBackMsg)
+        private void SdoaqObj_CallBackMsgLoop((MySdoaq.emCallBackMessage msg, object[] objs) callBackMsg)
         {
             switch (callBackMsg.msg)
             {
-                case MySdoaq.CallBackMessage.FocusStack:
+                case MySdoaq.emCallBackMessage.FocusStack:
                     {
                         _stackImgCount++;
                         _afImgCount = 0;
                         _edofImgCount = 0;
-
-                         _imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
-
-                        this.Invoke(() => UpdatgeImageList($"Focus Stack {_stackImgCount}"));
+                        
+                        this.Invoke(() => UpdatgeImageList((List<SdoaqImageInfo>)callBackMsg.objs[0], $"Focus Stack {_stackImgCount}"));
                     }
                     break;
-                case MySdoaq.CallBackMessage.Af:
+                case MySdoaq.emCallBackMessage.Af:
                     {
                         _stackImgCount = 0;
                         _afImgCount++;
                         _edofImgCount = 0;
-
-                        _imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
-
-                        this.Invoke(() => UpdatgeImageList($"AF {_afImgCount}"));
+                        
+                        this.Invoke(() => UpdatgeImageList((List<SdoaqImageInfo>)callBackMsg.objs[0], $"AF {_afImgCount}"));
                     }
                     break;
-                case MySdoaq.CallBackMessage.Edof:
+                case MySdoaq.emCallBackMessage.Edof:
                     {
                         _stackImgCount = 0;
                         _afImgCount = 0;
                         _edofImgCount++;
-
-                        _imageList = (List<SdoaqImageInfo>)callBackMsg.objs[0];
-                        _pointCloudInfoInfo = (SdoaqPointCloudInfo)callBackMsg.objs[1];
-
+                        
                         this.Invoke(() =>
                         {
-                            UpdatgeImageList($"Edof {_edofImgCount}");
+                            UpdatgeImageList((List<SdoaqImageInfo>)callBackMsg.objs[0], $"Edof {_edofImgCount}");
                             if(_visiblePointCloud)
                             {
-                                UpdatePointCloud();
+                                UpdatePointCloud((SdoaqPointCloudInfo)callBackMsg.objs[1]);
                             }
                         });
                     }
@@ -110,10 +103,21 @@ namespace SDOAQCSharp.Component
             }
             return true;
         }
-        private void UpdatgeImageList(string labelText)
+        private void UpdatgeImageList(List<SdoaqImageInfo> imgList, string labelText)
         {
             var listBox = listbox_ImageList;
-            
+
+            listBox.SuspendLayout();
+
+            foreach (var img in _imageList)
+            {
+                img.Dispose();
+            }
+
+            _imageList.Clear();
+
+            _imageList = imgList;
+
             if (CompareImageList(_imageList, listBox) == false)
             {
                 listBox.Items.Clear();
@@ -150,9 +154,11 @@ namespace SDOAQCSharp.Component
             }
             
             lbl_ImageViewer.Text = labelText;
+
+            listBox.ResumeLayout();
         }
 
-        private void UpdatePointCloud()
+        private void UpdatePointCloud(SdoaqPointCloudInfo poinCloudimg)
         {
             if (pb_PointCloudViewer.Tag == null)
             {
@@ -165,6 +171,9 @@ namespace SDOAQCSharp.Component
             {
                 return;
             }
+
+            _pointCloudInfoInfo?.Dispose();
+            _pointCloudInfoInfo = poinCloudimg;
 
             if (_visiblePointCloud == false || _pointCloudInfoInfo == null)
             {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SDOAQCSharp
 {
-    public class SdoaqImageInfo : ICloneable
+    public class SdoaqImageInfo : ICloneable, IDisposable
     {
         public readonly string Name;
         public readonly int Width;
@@ -27,5 +27,30 @@ namespace SDOAQCSharp
         {
             return this.MemberwiseClone();
         }
+
+        #region IDisposable Support
+        private bool _disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    if (Data != null)
+                    {
+                        Array.Clear(Data, 0, Data.Length);
+                    }                    
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }
