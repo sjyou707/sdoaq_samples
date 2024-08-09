@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SDOAQCSharp
 {
-    public class SdoaqPointCloudInfo
+    public class SdoaqPointCloudInfo : IDisposable
     {
         public readonly string Name;
         public readonly uint VertexDataSize;
@@ -30,5 +30,35 @@ namespace SDOAQCSharp
             ImgDataSize = imgDataSize;
             ImgDataBuffer = imgDataBuffer;
         }
+
+        #region IDisposable Support
+        private bool _disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    if (ImgDataBuffer != null)
+                    {
+                        Array.Clear(ImgDataBuffer, 0, ImgDataBuffer.Length);
+                    }
+
+                    if (VertexDataBuffer != null)
+                    {
+                        Array.Clear(VertexDataBuffer, 0, VertexDataBuffer.Length);
+                    }
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }
