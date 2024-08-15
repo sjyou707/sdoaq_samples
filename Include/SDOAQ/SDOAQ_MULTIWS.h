@@ -29,6 +29,7 @@ extern "C"
 	enum { MULTI_WS_ALL = 0, MULTI_WS_FIRST = 1 };
 	// Among multiple wisescopes, select the wisescope to use by ID. This function is not supported unless you register multiple wisescopes uses.
 	// 'multi_ws_id'(Multi WS ID) is started from 1(MULTI_WS_FIRST). 0 means all.
+	// Thread safety. Since SDOAQ has a wisescope ID for each thread, there is no problem even if it is accessed by multiple threads simultaneously.
 	__declspec(dllexport) eErrorCode SDOAQ_SelectMultiWs(int multi_ws_id);
 
 	// Returns the wisescope ID from which the result was acquired.

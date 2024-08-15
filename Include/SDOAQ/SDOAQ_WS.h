@@ -144,6 +144,12 @@
 										- Support automatic detection for LCBPWM and SDZEISS light without specifying the light model name
 										- Fix an issue that callback functions for some cameras would be skipped when playing or snapping from multiple cameras simultaneously
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.5  2024.08.13  YoungJu Lee		- Enable simultaneous use of two or more grabber cards from the same manufacturer for all interface cameras
+										  (USB, CoaXPress, Camera Link, GigE)
+										- Support automatic detection for Pylon-USB and Matrox CLink camera without specifying the camera model name
+										- When performing the reflection correction algorithm with group lighting, there was a phenomenon in which the execution time increased
+										  abnormally when the number of sub-light was one. Modify to apply a another algorithm only when there is only one sub-light.
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once

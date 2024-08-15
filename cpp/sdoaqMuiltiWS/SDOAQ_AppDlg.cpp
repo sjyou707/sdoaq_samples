@@ -376,7 +376,7 @@ void CSDOAQ_Dlg::ShowViewer(void)
 			{
 				::WSUT_IV_ShowWindow(vw.vhwnd_iv[uid], (WSIOINT)true, vrc[uid].left, vrc[uid].top, vrc[uid].right, vrc[uid].bottom);
 			}
-			if (ws == ONLY_WS0_3D)
+			if (vw.hwnd_3d)
 			{
 				(void)::WSGL_ShowWindow(vw.hwnd_3d, (WSIOINT)true, rc3d.left, rc3d.top, rc3d.right, rc3d.bottom);
 			}
@@ -439,7 +439,7 @@ void CSDOAQ_Dlg::OnClose()
 		{
 			(void)::WSUT_IV_DestroyImageViewer(each);
 		}
-		if (ws == ONLY_WS0_3D)
+		if (vw.hwnd_3d)
 		{
 			(void)::WSGL_Finalize(vw.hwnd_3d);
 		}
@@ -486,7 +486,7 @@ BOOL CSDOAQ_Dlg::PreTranslateMessage(MSG* pMsg)
 	// TODO: Add your specialized code here and/or call the base class
 	if (pMsg->message == WM_KEYDOWN)
 	{
-		auto& hwnd_3d = m_vVW[ONLY_WS0_3D].hwnd_3d;
+		const auto hwnd_3d = m_vVW[m_cur_ws].hwnd_3d;
 		if (pMsg->wParam == VK_RETURN)
 		{
 			return TRUE;
@@ -778,7 +778,7 @@ void CSDOAQ_Dlg::OnSdoaqInitialize()
 	}
 
 	// You can also register a separate callback function for each wisescope.
-	if (MULWS == MULTI_2WS_SDOAQ)
+	if (MULWS >= MULTI_2WS_SDOAQ)
 	{
 		rv_sdoaq = ::SDOAQ_SelectMultiWs(MULTI_WS_ALL);
 		if (ecNoError != rv_sdoaq)
@@ -1275,9 +1275,10 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotStack()
 	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
-	if (m_cur_ws == ONLY_WS0_3D)
+	const auto hwnd_3d = m_vVW[m_cur_ws].hwnd_3d;
+	if (hwnd_3d)
 	{
-		(void)::WSGL_Display_BG(m_vVW[m_cur_ws].hwnd_3d);
+		(void)::WSGL_Display_BG(hwnd_3d);
 	}
 
 	if (SET.rb.active)
@@ -1361,9 +1362,10 @@ void CSDOAQ_Dlg::OnSdoaqPlayStack()
 	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
-	if (m_cur_ws == ONLY_WS0_3D)
+	const auto hwnd_3d = m_vVW[m_cur_ws].hwnd_3d;
+	if (hwnd_3d)
 	{
-		(void)::WSGL_Display_BG(m_vVW[m_cur_ws].hwnd_3d);
+		(void)::WSGL_Display_BG(hwnd_3d);
 	}
 
 	if (SET.rb.active)
@@ -1410,6 +1412,11 @@ void CSDOAQ_Dlg::OnSdoaqPlayStack()
 	if (ecNoError == rv_sdoaq)
 	{
 		SET.rb.active = true;
+
+		if (MULWS > MULTI_1WS_SDOAQ)
+		{
+			Log(FString(_T(">> To prevent UI TASK overload due to continuous acquisition of high-speed or high-resolution images from multiple cameras, the update frequency of image viewer is limited to 1/5.")));
+		}
 	}
 	else
 	{
@@ -1463,28 +1470,34 @@ LRESULT CSDOAQ_Dlg::OnReceiveZstack(WPARAM wparam, LPARAM lLastFilledRingBufferE
 
 				++SET.ui.nContiStack;
 				auto& vw = m_vVW[vid];
-				for (size_t uid = 0; uid < vw.vhwnd_iv.size(); uid++)
+
+				// To prevent UI TASK overload due to continuous acquisition of high-speed or high-resolution images from multiple cameras,
+				// the update frequency of image viewer is limited to 1/5.
+				if (MULWS > MULTI_1WS_SDOAQ && SET.ui.nContiStack % 5 == 0)
 				{
-					if (uid < nFocusNums)
+					for (size_t uid = 0; uid < vw.vhwnd_iv.size(); uid++)
 					{
-						auto pos = uid;
-						if (uid == vw.vhwnd_iv.size() - 1)
+						if (uid < nFocusNums)
 						{
-							// last window -> last position
-							pos = nFocusNums - 1;
+							auto pos = uid;
+							if (uid == vw.vhwnd_iv.size() - 1)
+							{
+								// last window -> last position
+								pos = nFocusNums - 1;
+							}
+							WSIOCHAR title[256];
+							sprintf_s(title, sizeof title, "Zstack(%d)", SET.focus.vFocusSet[pos]);
+							ImageViewer(vw.vhwnd_iv[uid], title, SET.ui.nContiStack, SET, SET.rb.ppBuf[base_order + uid]);
 						}
-						WSIOCHAR title[256];
-						sprintf_s(title, sizeof title, "Zstack(%d)", SET.focus.vFocusSet[pos]);
-						ImageViewer(vw.vhwnd_iv[uid], title, SET.ui.nContiStack, SET, SET.rb.ppBuf[base_order + uid]);
+						else
+						{
+							ImageViewer(vw.vhwnd_iv[uid]);
+						}
 					}
-					else
+					if (vw.hwnd_3d)
 					{
-						ImageViewer(vw.vhwnd_iv[uid]);
+						(void)::WSGL_Display_BG(vw.hwnd_3d);
 					}
-				}
-				if (vid == ONLY_WS0_3D)
-				{
-					(void)::WSGL_Display_BG(vw.hwnd_3d);
 				}
 			}
 		}
@@ -1664,7 +1677,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 			FloatViewer(pStepMapImageBuffer && stepMapBufferSize, vw.vhwnd_iv[1], "StepMAP", SET.ui.nContiEdof, SET, pStepMapImageBuffer);
 			//FloatViewer(pQualityMapBuffer && qualityMapBufferSize, vw.vhwnd_iv[2], "QualityMAP", SET.ui.nContiEdof, SET, pQualityMapBuffer);
 			FloatViewer(pHeightMapBuffer && heightMapBufferSize, vw.vhwnd_iv[2], "HeightMAP", SET.ui.nContiEdof, SET, pHeightMapBuffer);
-			if (m_cur_ws == ONLY_WS0_3D)
+			if (vw.hwnd_3d)
 			{
 				Viewer3D(pPointCloudBuffer && pointCloudBufferSize, vw.hwnd_3d, SET, pPointCloudBuffer, pEdofImageBuffer);
 			}
@@ -1830,7 +1843,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveEdof(WPARAM wparam, LPARAM lLastFilledRingBufferEnt
 				FloatViewer(true, vw.vhwnd_iv[1], "StepMAP", SET.ui.nContiEdof, SET, SET.rb.ppBuf[base_order + RBE2O_SMAP]);
 				//FloatViewer(true, vw.vhwnd_iv[2], "QualityMAP", SET.ui.nContiEdof, SET, SET.rb.ppBuf[base_order + RBE2O_QMAP]);
 				FloatViewer(true, vw.vhwnd_iv[2], "HeightMAP", SET.ui.nContiEdof, SET, SET.rb.ppBuf[base_order + RBE2O_HMAP]);
-				if (vid == ONLY_WS0_3D)
+				if (vw.hwnd_3d)
 				{
 					Viewer3D(true, vw.hwnd_3d, SET, SET.rb.ppBuf[base_order + RBE2O_PCLOUD], SET.rb.ppBuf[base_order + RBE2O_EDOF]);
 				}
@@ -1851,9 +1864,10 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotAF()
 	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
-	if (m_cur_ws == ONLY_WS0_3D)
+	const auto hwnd_3d = m_vVW[m_cur_ws].hwnd_3d;
+	if (hwnd_3d)
 	{
-		(void)::WSGL_Display_BG(m_vVW[m_cur_ws].hwnd_3d);
+		(void)::WSGL_Display_BG(hwnd_3d);
 	}
 
 	if (SET.rb.active)
@@ -1923,9 +1937,10 @@ void CSDOAQ_Dlg::OnSdoaqPlayAF()
 	ASSERT(m_cur_ws < NUMS_WS);
 	auto& SET = VSET[m_cur_ws];
 
-	if (m_cur_ws == ONLY_WS0_3D)
+	const auto hwnd_3d = m_vVW[m_cur_ws].hwnd_3d;
+	if (hwnd_3d)
 	{
-		(void)::WSGL_Display_BG(m_vVW[m_cur_ws].hwnd_3d);
+		(void)::WSGL_Display_BG(hwnd_3d);
 	}
 
 	if (SET.rb.active)
@@ -2030,7 +2045,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveAF(WPARAM wparam, LPARAM lMsgParaReceiveAf)
 				auto& vw = m_vVW[vid];
 				ImageViewer(vw.vhwnd_iv[0], "AF", SET.ui.nContiAF, SET, (BYTE*)SET.rb.ppBuf[base_order + 0]);
 				Log(FString(_T(">> Best focus step : %.4lf,\tScore : %.4lf"), ParaAF.dbBestFocusStep, ParaAF.dbScore));
-				if (vid == ONLY_WS0_3D)
+				if (vw.hwnd_3d)
 				{
 					(void)::WSGL_Display_BG(vw.hwnd_3d);
 				}

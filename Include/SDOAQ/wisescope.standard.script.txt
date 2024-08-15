@@ -64,6 +64,8 @@
  # The capture time depends on image size, exposure time, trigger delay, etc.
  #Camera Rx Buffer Number   = 4   # DV = 12(Multicam), 4(Milx)
 
+ Camera Feature TestImageSelector = Testimage6
+
  Camera Reverse X = false
  Camera Reverse Y = false
  Camera Gain = 0

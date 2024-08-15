@@ -69,6 +69,7 @@
  #WSI_1 Camera Reverse Y = false
  #WSI_1 Camera Gain = 0
  #WSI_1 Pylon USB Line Number = Line2   # DV = Line2, none / Line2 / Line3 / both
+ #WSI_1 Camera Feature TestImageSelector = Testimage6
 #----------------------------------------------------------------------------------------------
 
  WSI_1 Camera Model (V2) = { Simul-2040-1086-color , -1 }
