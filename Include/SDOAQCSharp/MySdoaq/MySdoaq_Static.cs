@@ -43,7 +43,7 @@ namespace SDOAQCSharp
         private static Dictionary<int, MySdoaq> s_sdoaqObjList = new Dictionary<int, MySdoaq>();
         private static Logger s_logger = new Logger();
         
-        public static Dictionary<int, MySdoaq> LoadScript(string scriptFilePath = "")
+        public static Dictionary<int, MySdoaq> LoadScript(emPlayerMethod playerMethod = emPlayerMethod.CallBackFunc, string scriptFilePath = "")
         {
             string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), SCRIPT_FILE_NAME);
             
@@ -55,15 +55,15 @@ namespace SDOAQCSharp
             
             for (int i = 0; i< numOfWiseScope; i++)
             {
-                s_sdoaqObjList.Add(i, new MySdoaq());
+                s_sdoaqObjList.Add(i, new MySdoaq(playerMethod));
             }
 
             return s_sdoaqObjList;
         }
 
-        public static bool Initialize()
+        public static bool SDOAQ_Initialize()
         {
-            Finalize();
+            SDOAQ_Finalize();
 
             if (s_sdoaqObjList.Count > 1)
             {
@@ -75,7 +75,7 @@ namespace SDOAQCSharp
             return rv == SDOAQ_API.eErrorCode.ecNoError;
         }
 
-        public static bool Finalize()
+        public static bool SDOAQ_Finalize()
         {
             foreach (var sdoaqObj in s_sdoaqObjList.Values)
             {
@@ -296,7 +296,7 @@ namespace SDOAQCSharp
                 imgInfoList.Add(new SdoaqImageInfo($"F-{foucsList[i]}", camInfo.PixelWidth, camInfo.PixelHeight, camInfo.ColorByte, resultImgList[i]));
             }
 
-            sdoaqObj.CallBackMsgLoop.Invoke((CallBackMessage.FocusStack, new object[] { imgInfoList }));
+            sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.FocusStack, new object[] { imgInfoList }));
         }
 
         private static void OnSdoaq_PlayEdof(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)
@@ -388,7 +388,7 @@ namespace SDOAQCSharp
                     resultImgEdof, (uint)resultImgEdof.Length);
             }
 
-            sdoaqObj.CallBackMsgLoop.Invoke((CallBackMessage.Edof, new object[] { imgInfoList, pointCloudInfo }));
+            sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.Edof, new object[] { imgInfoList, pointCloudInfo }));
 
         }
 
@@ -440,7 +440,7 @@ namespace SDOAQCSharp
                 imgInfoList.Add(new SdoaqImageInfo($"AF", camInfo.PixelWidth, camInfo.PixelHeight, camInfo.ColorByte, resultImgList[i]));
             }
 
-            sdoaqObj.CallBackMsgLoop.Invoke((CallBackMessage.Af, new object[] { imgInfoList }));
+            sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.Af, new object[] { imgInfoList }));
         }
 
         private static void OnSdoaq_Snap(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)

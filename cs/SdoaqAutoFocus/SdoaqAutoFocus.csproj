@@ -121,6 +121,9 @@
     <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Acquisition.cs">
       <Link>SDOAQCSharp\MySdoaq\MySdoaq_Acquisition.cs</Link>
     </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Acquisition_Continuous.cs">
+      <Link>SDOAQCSharp\MySdoaq\MySdoaq_Acquisition_Continuous.cs</Link>
+    </Compile>
     <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MySdoaq_Params.cs">
       <Link>SDOAQCSharp\MySdoaq\MySdoaq_Params.cs</Link>
     </Compile>

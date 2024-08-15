@@ -46,7 +46,7 @@ namespace SdoaqEdof
 
         private void Frm_Load()
         {
-            MySdoaq.Initialize();
+            MySdoaq.SDOAQ_Initialize();
         }
 
         private MySdoaq GetSdoaqObj()
@@ -88,12 +88,29 @@ namespace SdoaqEdof
 
         private void btn_SingleShotEDoF_Click(object sender, EventArgs e)
         {
-            var task = GetSdoaqObj()?.Acquisition_EdofAsync();
+            var edofImageOption = new MySdoaq.EdofImageList()
+            {
+                EnableEdofImg = true,
+                EnableStepMapImg = true,
+                EnableQualityMap = true,
+                EnableHeightMap = true,
+                EnablePointCloud = true,
+            };
+            var task = GetSdoaqObj()?.Acquisition_EdofAsync(edofImageOption);
         }
 
         private void btn_PlayEDoF_Click(object sender, EventArgs e)
         {
-            GetSdoaqObj()?.AcquisitionContinuous_Edof();
+            var edofImageOption = new MySdoaq.EdofImageList()
+            {
+                EnableEdofImg = true,
+                EnableStepMapImg = true,
+                EnableQualityMap = true,
+                EnableHeightMap = true,
+                EnablePointCloud = true,
+            };
+
+            GetSdoaqObj()?.AcquisitionContinuous_Edof(edofImageOption);
         }
 
         private void btn_StopEDoF_Click(object sender, EventArgs e)

@@ -398,7 +398,7 @@ namespace SdoaqMultiWS
             this.KeyPreview = true;
             this.Name = "SdoaqMultiWS";
             this.Text = "SdoaqMultiWS";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SdoaqMultiWS_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SdoaqMultiWS_FormClosed);
             this.Load += new System.EventHandler(this.SdoaqMultiWS_Load);
             this.Resize += new System.EventHandler(this.SdoaqMultiWS_Resize);
             this.pnl_Control.ResumeLayout(false);
