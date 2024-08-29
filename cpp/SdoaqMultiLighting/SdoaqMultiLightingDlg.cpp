@@ -353,7 +353,7 @@ void CSdoaqMultiLightingDlg::OnCbnSelActiveLighting()
 	auto p_combo = (CComboBox*)GetDlgItem(IDC_COMBO_ACTIVE_LIGHTING);
 	p_combo->GetLBText(p_combo->GetCurSel(), sActivatedLight);
 
-	::SDOAQ_SetStringParameterValue(piSelectSettingLighting, (CStringA)sActivatedLight.GetBuffer());
+	::SDOAQ_SetStringParameterValue(piActiveLightingList, (CStringA)sActivatedLight.GetBuffer());
 }
 
 
