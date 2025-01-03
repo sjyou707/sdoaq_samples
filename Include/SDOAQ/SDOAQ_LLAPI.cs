@@ -35,6 +35,7 @@ namespace SDOAQ
 
 
 		// Sets the camera to the content of acquisitionParams
+		// Camera binning is only supported on some Pylon and Vieworks cameras. To apply binning for other cameras, set the ROI and binning value directly via the registry.
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetAcquisitionFixedParameters(AcquisitionFixedParameters[] acquisitionParams);
 

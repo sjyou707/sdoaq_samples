@@ -69,7 +69,6 @@ protected:
 	afx_msg void OnSdoaqSetRingBufSize();
 	afx_msg void OnSdoaqSetFocusSet();
 	afx_msg void OnSdoaqSetSnapFocusSet();
-	afx_msg void OnSdoaqSetEdofResize();
 	afx_msg void OnSdoaqSingleShotStack();
 	afx_msg void OnSdoaqPlayStack();
 	afx_msg void OnSdoaqStopStack();

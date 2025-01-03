@@ -27,7 +27,7 @@ namespace SDOAQCSharp
             var tmp_min = new int[1] { 0 };
             var tmp_max = new int[1] { 0 };
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
 
             var rv = SDOAQ_API.SDOAQ_GetIntParameterRange(param, tmp_min, tmp_max);
 
@@ -48,7 +48,7 @@ namespace SDOAQCSharp
             var tmp_min = new double[1] { 0 };
             var tmp_max = new double[1] { 0 };
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
 
             var rv = SDOAQ_API.SDOAQ_GetDblParameterRange(param, tmp_min, tmp_max);
 
@@ -213,7 +213,7 @@ namespace SDOAQCSharp
         {
             if (System.IO.File.Exists(fileName))
             {
-                SelectMultWS(CamIndex);
+                SelectMultiWS(CamIndex);
                 SDOAQ_API.SDOAQ_SetCalibrationFile(fileName);
 
                 WriteLog(Logger.emLogLevel.Info, ">> calibration data of file [{0}] is set.", fileName);
@@ -224,7 +224,7 @@ namespace SDOAQCSharp
 
         public bool SetParam(SDOAQ_API.eParameterId paramID, string paramValue)
         {
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
             var availables = new int[1] { 0 };
             var rv = SDOAQ_API.SDOAQ_IsParameterAvailable(paramID, availables);
 
@@ -318,7 +318,7 @@ namespace SDOAQCSharp
             out bool isWritable,
             out string paramValue)
         {
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
 
             isWritable = false;
             paramValue = string.Empty;

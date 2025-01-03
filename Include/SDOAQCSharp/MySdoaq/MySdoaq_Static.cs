@@ -45,9 +45,13 @@ namespace SDOAQCSharp
         
         public static Dictionary<int, MySdoaq> LoadScript(emPlayerMethod playerMethod = emPlayerMethod.CallBackFunc, string scriptFilePath = "")
         {
-            string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), SCRIPT_FILE_NAME);
-            
-            SdoaqScriptReader.GetIntFromLineScript(path, SCRIPT_LINE_NUM_OF_WS, 1, out int numOfWiseScope);
+			string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), SCRIPT_FILE_NAME);
+
+			//string currentPath = System.IO.Directory.GetCurrentDirectory();
+			//string upperPath = System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(currentPath));
+			//string path = System.IO.Path.Combine(upperPath, SCRIPT_FILE_NAME);
+
+			SdoaqScriptReader.GetIntFromLineScript(path, SCRIPT_LINE_NUM_OF_WS, 1, out int numOfWiseScope);
 
             numOfWiseScope = Math.Max(1, numOfWiseScope);
             
@@ -70,7 +74,11 @@ namespace SDOAQCSharp
                 SDOAQ_API.SDOAQ_RegisterMultiWsApi();
             }
 
-            var rv = SDOAQ_API.SDOAQ_Initialize(CallBack_SDOAQ_Log, CallBack_SDOAQ_Error, CallBack_InitDone);
+			// set the path to the cam files folder
+			//string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "CamFiles");
+			//SDOAQ_API.SDOAQ_SetCamfilePath(path);
+
+			var rv = SDOAQ_API.SDOAQ_Initialize(CallBack_SDOAQ_Log, CallBack_SDOAQ_Error, CallBack_InitDone);
 
             return rv == SDOAQ_API.eErrorCode.ecNoError;
         }
@@ -118,9 +126,9 @@ namespace SDOAQCSharp
             }
         }
         
-        public static bool SelectMultWS(int idxCam)
+        public static bool SelectMultiWS(int idxCam)
         {
-            if (s_sdoaqObjList.Count == 0)
+            if (s_sdoaqObjList.Count <= 1)
             {
                 return true;
             }
@@ -130,7 +138,7 @@ namespace SDOAQCSharp
 
             if (rv != SDOAQ_API.eErrorCode.ecNoError)
             {
-                WriteLog(Logger.emLogLevel.API, $"SelectMuyltiWS(), WS Index = {idxWS}, rv = {rv}");
+                WriteLog(Logger.emLogLevel.API, $"SelectMultiWS(), WS Index = {idxWS}, rv = {rv}");
                 return false;
             }
 
@@ -187,7 +195,7 @@ namespace SDOAQCSharp
 
                 foreach (var sdoaqObj in s_sdoaqObjList.Values)
                 {
-                    SelectMultWS(sdoaqObj.CamIndex);
+                    SelectMultiWS(sdoaqObj.CamIndex);
                         
                     bool isWriteable = false;
                     string paramValue = string.Empty;
@@ -236,7 +244,7 @@ namespace SDOAQCSharp
                     sdoaqObj.SetSnapFocus(DFLT_FOCUS_LIST);
                 }
 
-                SelectMultWS(0);
+                SelectMultiWS(0);
             }
             else
             {

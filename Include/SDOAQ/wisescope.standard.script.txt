@@ -32,6 +32,10 @@
  # mals_metric_pixel(fixed-point number) : Distance of 1 pixel, unit is um.
 #----------------------------------------------------------------------------------------------
  MALS Device = { Auto , Auto , 2.0 , 1.0 }   # DV = { NONE , Simul , 0 , 0 }
+
+ #WSI_1 MALS Device = { Auto , COM1 , 1.8 , 1.0 }
+ #WSI_2 MALS Device = { Auto , COM2 , 1.8 , 1.0 }
+ #WSI_3 MALS Device = { Auto , COM3 , 1.8 , 1.0 }
 #----------------------------------------------------------------------------------------------
 
 
@@ -64,7 +68,7 @@
  # The capture time depends on image size, exposure time, trigger delay, etc.
  #Camera Rx Buffer Number   = 4   # DV = 12(Multicam), 4(Milx)
 
- Camera Feature TestImageSelector = Testimage6
+ #Camera Feature TestImageSelector = Testimage6
 
  Camera Reverse X = false
  Camera Reverse Y = false
@@ -102,9 +106,15 @@
 
  #Lighting Device (V3) 1 = { GROUP , SDZEISS , UI , 8 }
  #Lighting Device (V3) 1-1 = { SDZEISS-NOSTROBE , Sub^m , Auto  , 0 , 0 , -2 , -1 , 1000000 }
- 
- #Lighting Device (V3) 1 = { LCBPWM , L , Auto ,  0 ,  0 , -2 , -1 , 1000000 }
+ #Lighting Device (V3) 2 = { SDZEISS-NOSTROBE , L , Auto  , 0 , 0 , -2 , -1 , 1000000 }
+
+ #Lighting Device (V3) 1 = { LCBPWM , L1 , Auto ,  0 ,  0 , -2 , -1 , 1000000 }
  #Lighting Device (V3) 1 attributes = { strobe = on }
+ #Lighting Device (V3) 2 attributes = { strobe = on }
+ #Lighting Device (V3) 3 = { TPSU , L12 , Auto ,  0 ,  1 , -2 , -1 , 1000000 }
+ #Lighting Device (V3) 3 attributes = { strobe = on }
+ #Lighting Device (V3) 4 = { GROUP , L13G , UI , 8 }
+ #Lighting Device (V3) 4-1 = { SDZEISS-NOSTROBE , Sub^m , Auto  , 0 , 0 , -2 , -1 , 1000000 }  
 
  #Lighting Device (V3) 1 = { Null , External , Simul ,  0 ,  0 , -2 , -1 , 1000000 }
 #----------------------------------------------------------------------------------------------

@@ -176,7 +176,7 @@
             this.lbl_SnapFocusSet.Name = "lbl_SnapFocusSet";
             this.lbl_SnapFocusSet.Size = new System.Drawing.Size(327, 23);
             this.lbl_SnapFocusSet.TabIndex = 14;
-            this.lbl_SnapFocusSet.Text = "Snap Focus set (Low-Hight-Unit)";
+            this.lbl_SnapFocusSet.Text = "Snap Focus set (Low-High-Unit)";
             this.lbl_SnapFocusSet.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // txt_SnapFocusSet
@@ -185,7 +185,7 @@
             this.txt_SnapFocusSet.Name = "txt_SnapFocusSet";
             this.txt_SnapFocusSet.Size = new System.Drawing.Size(80, 23);
             this.txt_SnapFocusSet.TabIndex = 13;
-            this.txt_SnapFocusSet.Text = "0-319-16";
+            this.txt_SnapFocusSet.Text = "0-319-18";
             // 
             // btn_SetSnapFocus
             // 
@@ -215,7 +215,7 @@
             this.lbl_FocusSet.Name = "lbl_FocusSet";
             this.lbl_FocusSet.Size = new System.Drawing.Size(327, 23);
             this.lbl_FocusSet.TabIndex = 11;
-            this.lbl_FocusSet.Text = "Live Focus set (Low-Hight-Unit)";
+            this.lbl_FocusSet.Text = "Live Focus set (Low-High-Unit)";
             this.lbl_FocusSet.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // btn_EdofRatio
@@ -237,7 +237,7 @@
             this.txt_FocusSet.Name = "txt_FocusSet";
             this.txt_FocusSet.Size = new System.Drawing.Size(80, 23);
             this.txt_FocusSet.TabIndex = 10;
-            this.txt_FocusSet.Text = "0-319-32";
+            this.txt_FocusSet.Text = "0-319-35";
             // 
             // btn_SetFocus
             // 

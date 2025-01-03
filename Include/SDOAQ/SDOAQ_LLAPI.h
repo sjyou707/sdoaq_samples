@@ -33,6 +33,7 @@ extern "C"
 
 
 	// Sets the camera to the content of pAcquisitionParams
+	// Camera binning is only supported on some Pylon and Vieworks cameras. To apply binning for other cameras, set the ROI and binning value directly via the registry.
 	__declspec(dllexport) eErrorCode SDOAQ_SetAcquisitionFixedParameters(sAcquisitionFixedParameters* pAcquisitionParams);
 
 

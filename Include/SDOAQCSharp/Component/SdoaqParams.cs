@@ -55,7 +55,7 @@ namespace SDOAQCSharp.Component
                 txt_AFROI.Text = string.Join(",", roi_AF);
                 txt_FocusSet.Text = _sdoaqObj.FocusList.ToString();
                 txt_SnapFocusSet.Text = _sdoaqObj.SnapFocusList.ToString();
-                txt_RingBufferSize.Text = _sdoaqObj.PlyerRingBufferSize.ToString();
+                txt_RingBufferSize.Text = _sdoaqObj.PlayerRingBufferSize.ToString();
 
                 if (_sdoaqObj.GetParam(SDOAQ_API.eParameterId.pi_edof_calc_resize_ratio, out bool isWritalbe, out string paramValue))
                 {
@@ -145,7 +145,7 @@ namespace SDOAQCSharp.Component
 
             if (_sdoaqObj != null)
             {
-                _sdoaqObj.PlyerRingBufferSize = ringBufferSize;
+                _sdoaqObj.PlayerRingBufferSize = ringBufferSize;
             }
         }
 

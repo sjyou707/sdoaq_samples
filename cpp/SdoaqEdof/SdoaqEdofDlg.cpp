@@ -104,7 +104,7 @@ BOOL CSdoaqEdofDlg::OnInitDialog()
 	}
 
 	SetDlgItemText(IDC_EDIT_ROI, _T("0,0,2040,1086"));
-	SetDlgItemText(IDC_EDIT_FOCUS_SET, _T("0-319-32"));
+	SetDlgItemText(IDC_EDIT_FOCUS_SET, _T("0-319-35"));
 	SetDlgItemText(IDC_EDIT_EDOF_RESIZE_RATIO, _T("0.5"));
 	SetDlgItemText(IDC_EDIT_EDOF_KERNEL_SIZE, _T("5"));
 	SetDlgItemText(IDC_EDIT_EDOF_ITERATION, _T("8"));

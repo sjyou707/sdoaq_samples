@@ -61,7 +61,7 @@ namespace SDOAQCSharp
         public FocusLHU FocusList { get; private set; } = new FocusLHU();
         public FocusLHU SnapFocusList { get; private set; } = new FocusLHU();
 
-        public int PlyerRingBufferSize { get; set; } = DFLT_RING_BUFFER_SIZE;
+        public int PlayerRingBufferSize { get; set; } = DFLT_RING_BUFFER_SIZE;
 
         private MyQueue<(emCallBackMessage msg, object[] objs)> _callBackMsgQueue = new MyQueue<(emCallBackMessage msg, object[] objs)>();
 
@@ -94,7 +94,7 @@ namespace SDOAQCSharp
 
         public const int DFLT_RING_BUFFER_SIZE = 3;
         
-        public const string DFLT_FOCUS_LIST = "0-319-32";
+        public const string DFLT_FOCUS_LIST = "0-319-35";
         public const string DFLT_AF_ROI = "0,0,100,100";
 
         public MySdoaq(emPlayerMethod playerMethod)

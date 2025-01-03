@@ -58,7 +58,7 @@ namespace SDOAQCSharp
                 }
             };
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
 
             var rv = SDOAQ_API.SDOAQ_PlaySnap(CallBack_SDOAQ_Snap, focusList, focusList.Length, snapParams);
 
@@ -113,7 +113,7 @@ namespace SDOAQCSharp
 
             long tickStart = Environment.TickCount;
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
             var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotFocusStack(
                 acqParamList,
                 focusList, focusList.Length,
@@ -173,7 +173,7 @@ namespace SDOAQCSharp
 
             var acqParam = acqParamList[0];
 
-            var ringBufferSize = PlyerRingBufferSize;
+            var ringBufferSize = PlayerRingBufferSize;
             var imageBufferSize = (uint)CamInfo.ImgSize;
             var resultImageSizes = new List<ulong>();
 
@@ -186,7 +186,7 @@ namespace SDOAQCSharp
             _ringBuffer.Set_Buffer(resultImageSizes.ToArray());
             _playerFoucsStepCount = focusList.Length;
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
             var rv = SDOAQ_API.SDOAQ_PlayFocusStack(acqParamList, CallBack_SDOAQ_PlayFocusStack,
                 focusList, focusList.Length,
                 ringBufferSize,
@@ -253,7 +253,7 @@ namespace SDOAQCSharp
 
             long tickStart = Environment.TickCount;
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
             var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotAF(
                 acqParamList,
                 focusList, focusList.Length,
@@ -311,7 +311,7 @@ namespace SDOAQCSharp
 
             var acqParam = acqParamList[0];
 
-            var ringBufferSize = PlyerRingBufferSize;
+            var ringBufferSize = PlayerRingBufferSize;
             var imageBufferSize = (uint)CamInfo.ImgSize;
             var resultImageSizes = new List<ulong>();
 
@@ -324,7 +324,7 @@ namespace SDOAQCSharp
             _ringBuffer.Set_Buffer(resultImageSizes.ToArray());
             _playerFoucsStepCount = focusList.Length;
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
             var rv = SDOAQ_API.SDOAQ_PlayAF(acqParamList, CallBack_SDOAQ_PlayAf, 
                 focusList, focusList.Length,
                 ringBufferSize, 
@@ -402,7 +402,7 @@ namespace SDOAQCSharp
 
             long tickStart = Environment.TickCount;
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
 
             var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotEdof(
                 acqParamList,
@@ -503,7 +503,7 @@ namespace SDOAQCSharp
             var imgSize = CamInfo.ImgSize;
             var dataSize = CamInfo.DataSize;
 
-            var ringBufferSize = PlyerRingBufferSize;
+            var ringBufferSize = PlayerRingBufferSize;
 
             int sizeEdofImageBuffer = edofImageList.EnableEdofImg ? imgSize : 0;
             int sizeStepMapBuffer = edofImageList.EnableStepMapImg ? dataSize : 0;            
@@ -528,11 +528,16 @@ namespace SDOAQCSharp
             _ringBuffer.Set_Buffer(resultImageSizes.ToArray());
             _playerFoucsStepCount = focusList.Length;
 
-            SelectMultWS(CamIndex);
+            SelectMultiWS(CamIndex);
 
-            var rv = SDOAQ_API.SDOAQ_PlayEdof(acqParamList, CallBack_SDOAQ_PlayEdof,
-                focusList, focusList.Length,
-                ringBufferSize,
+
+			// FOR EXAMPLE
+			//int[] fixed_focusLise = { 100, 200, 300 };
+
+			var rv = SDOAQ_API.SDOAQ_PlayEdof(acqParamList, CallBack_SDOAQ_PlayEdof,
+				focusList, focusList.Length,
+				//fixed_focusLise, fixed_focusLise.Length,
+				ringBufferSize,
                 _ringBuffer.Buffer,
                 _ringBuffer.Sizes);
 

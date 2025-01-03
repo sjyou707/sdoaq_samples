@@ -54,7 +54,6 @@ BEGIN_MESSAGE_MAP(CSDOAQ_Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_SET_RING_BUF_SIZE, OnSdoaqSetRingBufSize)
 	ON_BN_CLICKED(IDC_SET_FOCUS_SET, OnSdoaqSetFocusSet)
 	ON_BN_CLICKED(IDC_SET_SNAPFOCUS_SET, OnSdoaqSetSnapFocusSet)
-	ON_BN_CLICKED(IDC_SET_EDOF_RESIZE_RATIO, OnSdoaqSetEdofResize)
 	ON_BN_CLICKED(IDC_ACQ_STACK, OnSdoaqSingleShotStack)
 	ON_BN_CLICKED(IDC_CONTI_STACK, OnSdoaqPlayStack)
 	ON_BN_CLICKED(IDC_STOP_STACK, OnSdoaqStopStack)
@@ -202,7 +201,6 @@ void CSDOAQ_Dlg::tTestSet::t_ui::update_editwnd(CWnd& wnd)
 	wnd.GetDlgItem(IDC_EDIT_RING_BUF_SIZE)->SetWindowText(RING_BUF_SIZE);
 	wnd.GetDlgItem(IDC_EDIT_FOCUS_SET)->SetWindowText(FOCUS_SET);
 	wnd.GetDlgItem(IDC_EDIT_SNAPFOCUS_SET)->SetWindowText(SNAPFOCUS_SET);
-	wnd.GetDlgItem(IDC_EDIT_EDOF_RESIZE_RATIO)->SetWindowText(EDOF_RESIZE_RATIO);
 }
 
 //----------------------------------------------------------------------------
@@ -700,8 +698,8 @@ LRESULT CSDOAQ_Dlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 				VSET[m_cur_ws].ui.ROI = _T("0,0,2040,1086");
 				VSET[m_cur_ws].ui.AFROI = _T("956,479,128,128");
 				VSET[m_cur_ws].ui.RING_BUF_SIZE = _T("3");
-				VSET[m_cur_ws].ui.FOCUS_SET = _T("0-319-32");
-				VSET[m_cur_ws].ui.SNAPFOCUS_SET = _T("0-319-16");
+				VSET[m_cur_ws].ui.FOCUS_SET = _T("0-319-35");
+				VSET[m_cur_ws].ui.SNAPFOCUS_SET = _T("0-319-18");
 				VSET[m_cur_ws].ui.EDOF_RESIZE_RATIO = _T("0.5");
 			}
 
@@ -715,15 +713,6 @@ LRESULT CSDOAQ_Dlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 
 		// reset m_cur_ws to the actual UI settings
 		OnUpdateWsSelection();
-
-		double dbValue;
-		rv_sdoaq = ::SDOAQ_GetDblParameterValue(pi_edof_calc_resize_ratio, &dbValue);
-		if (ecNoError == rv_sdoaq)
-		{
-			CString sValue;
-			sValue.Format(_T("%.3lf"), dbValue);
-			SetDlgItemText(IDC_EDIT_EDOF_RESIZE_RATIO, sValue);
-		}
 	}
 	else
 	{
@@ -769,6 +758,9 @@ void CSDOAQ_Dlg::OnSdoaqInitialize()
 	{
 		each.rb.active = false;
 	}
+
+	// set the path to the cam files folder
+	::SDOAQ_SetCamfilePath(FStringA("%s\\..\\..\\Include\\SDOAQ\\CamFiles", (CStringA)GetCurrentDir()));
 
 	eErrorCode rv_sdoaq = ::SDOAQ_Initialize(g_LogCallback, g_ErrorCallback, g_InitDoneCallback);
 	if (ecNoError != rv_sdoaq)
@@ -1232,39 +1224,6 @@ void CSDOAQ_Dlg::OnSdoaqSetSnapFocusSet()
 
 	ASSERT(m_cur_ws < NUMS_WS);
 	VSET[m_cur_ws].ui.SNAPFOCUS_SET = sSnapFocusSet;
-}
-
-//----------------------------------------------------------------------------
-void CSDOAQ_Dlg::OnSdoaqSetEdofResize()
-{
-	CString sEdofResize;
-	GetDlgItemText(IDC_EDIT_EDOF_RESIZE_RATIO, sEdofResize);
-
-	auto resize_ratio = _ttof(sEdofResize);
-
-	double dbMin, dbMax;
-	auto rv_sdoaq = SDOAQ_GetDblParameterRange(pi_edof_calc_resize_ratio, &dbMin, &dbMax);
-	if (ecNoError == rv_sdoaq)
-	{
-		if (resize_ratio >= dbMin && resize_ratio <= dbMax)
-		{
-			//SET.efp.resize_ratio = resize_ratio;
-			::SDOAQ_SetDblParameterValue(pi_edof_calc_resize_ratio, resize_ratio);
-		}
-		else
-		{
-			ApiError(FString(_T("Set EDoF resize ratio : value is out of range[%.2lf ~ %.2lf]"), dbMin, dbMax), ecUnknownError);
-			return;
-		}
-	}
-	else
-	{
-		ApiError(_T("SDOAQ_GetDblParameterRange [pi_edof_calc_resize_ratio]"), rv_sdoaq);
-		return;
-	}
-
-	ASSERT(m_cur_ws < NUMS_WS);
-	VSET[m_cur_ws].ui.EDOF_RESIZE_RATIO = sEdofResize;
 }
 
 //============================================================================

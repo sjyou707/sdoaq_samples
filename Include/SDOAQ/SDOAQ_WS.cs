@@ -156,6 +156,12 @@ using System.Text;
 										- When performing the reflection correction algorithm with group lighting, there was a phenomenon in which the execution time increased
 										  abnormally when the number of sub-light was one. Modify to apply a another algorithm only when there is only one sub-light.
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.6  2024.11.20  YoungJu Lee		- Extend auto-detection camera models (all cameras supported by SDOAQ, except Clink-CIS)
+										- Remove TestImage setting error log for some cameras
+										- Support saving BMP file with bottom-up processing
+										- Improve high-resolution camera acquisition speed
+										- Fix an issue that FFC is not applied when using an MALS trigger
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 
@@ -840,6 +846,7 @@ namespace SDOAQ
 		};
 
 		public const int SDOAQ_AM56_DLL_EDOF_ZMAP = 56;
+		public const int SDOAQ_AM65E_DLL_EDOF_WITH_AF = 65;
 		public const int SDOAQ_AM60_DLL_EDOF_DEMO_CMP = 60;
 		public const int SDOAQ_AM61_DLL_EDOF_HELICONFOCUS = 61;
 
