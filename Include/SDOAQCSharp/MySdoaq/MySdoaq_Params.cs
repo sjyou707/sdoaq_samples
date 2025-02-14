@@ -203,7 +203,8 @@ namespace SDOAQCSharp
             if (ConvertStrPara_FocusList(focus, out int low, out int high, out int unit))
             {
                 SnapFocusList.SetFocusList(low, high, unit);
-            }
+				return true;
+			}
             return false;
         }
         
