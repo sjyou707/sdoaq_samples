@@ -8,6 +8,7 @@ using SDOAQCSharp.Tool;
 using System.Drawing;
 using SDOAQCSharp;
 using SDOAQCSharp.Component;
+using System.Threading.Tasks;
 
 namespace SdoaqMultiWS
 {
@@ -254,13 +255,19 @@ namespace SdoaqMultiWS
 
         private void SdoaqMultiWS_FormClosed(object sender, FormClosedEventArgs e)
         {
-            MySdoaq.SDOAQ_Finalize();
-            foreach (var sdoaqObj in _sdoaqObjList.Values)
+			// Run SDOAQ_Finalize method asynchronously
+			Task.Run(() =>
+			{
+				MySdoaq.SDOAQ_Finalize();
+			});
+
+			// Loop through all objects in _sdoaqObjList and call Dispose method
+			foreach (var sdoaqObj in _sdoaqObjList.Values)
             {
                 sdoaqObj.Dispose();
             }
-
         }
+
         private void SdoaqMultiWS_Resize(object sender, EventArgs e)
         {
             LayoutUpdate();
