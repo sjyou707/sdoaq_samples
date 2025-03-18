@@ -10,10 +10,12 @@ namespace SDOAQCSharp
     {
         public readonly string Name;
         public readonly uint VertexDataSize;
-        public readonly float[] VertexDataBuffer;
-        public readonly uint ImgDataSize;
-        public readonly byte[] ImgDataBuffer;
-        public readonly int Width;
+		//public readonly float[] VertexDataBuffer;
+		public float[] VertexDataBuffer { get; private set; }
+		public readonly uint ImgDataSize;
+		//public readonly byte[] ImgDataBuffer;
+		public byte[] ImgDataBuffer { get; private set; }
+		public readonly int Width;
         public readonly int Height;
         public readonly int SliceCount;
         public SdoaqPointCloudInfo(string name, 
@@ -59,6 +61,12 @@ namespace SDOAQCSharp
         {
             Dispose(true);
         }
-        #endregion
-    }
+
+		public void NullifyArray()
+		{
+			ImgDataBuffer = null;
+			VertexDataBuffer = null;
+		}
+		#endregion
+	}
 }

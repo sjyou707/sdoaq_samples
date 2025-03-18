@@ -327,10 +327,10 @@ namespace SDOAQCSharp.Component
 
 			foreach (var view in _imageList)
 			{
-				view.Dispose();
+				view.NullifyArray();
 			}
 
-			_pointCloudInfoInfo?.Dispose();
+			_pointCloudInfoInfo?.NullifyArray();
 
 			if (pb_ImageViewer.Tag != null)
 			{
