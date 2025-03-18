@@ -247,26 +247,23 @@ namespace SdoaqMultiWS
             EnableAcqGroup_Idle();
 
             WriteLog($">> SDOAQ DLL Version = {MySdoaq.GetVersion()}");
-            WriteLog($">> sdedof dll Version = {MySdoaq.GetVersion_SdEdofAlgorithm()}");
+            //WriteLog($">> sdedof dll Version = {MySdoaq.GetVersion_SdEdofAlgorithm()}");
 
             _rdoSelWsList[0].Checked = true;
         }
-        
 
-        private void SdoaqMultiWS_FormClosed(object sender, FormClosedEventArgs e)
-        {
-			// Run SDOAQ_Finalize method asynchronously
-			Task.Run(() =>
-			{
-				MySdoaq.SDOAQ_Finalize();
-			});
+		private void SdoaqMultiWS_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			// Run SDOAQ_Finalize method asynchronously, preventing the main UI thread from being blocked.
+			// When the form close button is clicked while image acquisition is in progress in C# application, the SDOAQ finalization is delayed.
+			Task.Run(() => { MySdoaq.SDOAQ_Finalize(); });
 
 			// Loop through all objects in _sdoaqObjList and call Dispose method
 			foreach (var sdoaqObj in _sdoaqObjList.Values)
-            {
-                sdoaqObj.Dispose();
-            }
-        }
+			{
+				sdoaqObj.Dispose();
+			}
+		}
 
         private void SdoaqMultiWS_Resize(object sender, EventArgs e)
         {
@@ -303,9 +300,9 @@ namespace SdoaqMultiWS
             {
                 GetSdoaqObj().AcquisitionStop_FocusStack();
                 //EnableGroup(bEnableParam: true, bEnableAcq: true);
-                EnableAcqGroup_Idle();
-            }
-        }
+                EnableAcqGroup_Idle();				
+			}
+		}
 
         private void btn_AcqMode_Edof_Click(object sender, EventArgs e)
         {

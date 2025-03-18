@@ -188,7 +188,7 @@ namespace SdoaqApiTester
             EnableAcqGroup_Idle();
 
             WriteLog($">> SDOAQ DLL Version = {MySdoaq.GetVersion()}");
-            WriteLog($">> sdedof dll Version = {MySdoaq.GetVersion_SdEdofAlgorithm()}");
+            //WriteLog($">> sdedof dll Version = {MySdoaq.GetVersion_SdEdofAlgorithm()}");
         }
 
         private void SdoaqApiTester_FormClosed(object sender, FormClosedEventArgs e)

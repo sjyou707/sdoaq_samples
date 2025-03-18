@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 using SDOAQ;
 using SDOAQCSharp.Tool;
@@ -173,7 +172,7 @@ namespace SDOAQCSharp
             return s_sdoaqObjList[idx];
         }
 
-        private static void OnSdoaq_Log(SDOAQ_API.eLogSeverity severity, StringBuilder pMessage)
+		private static void OnSdoaq_Log(SDOAQ_API.eLogSeverity severity, StringBuilder pMessage)
         {
             WriteLog(Logger.emLogLevel.API, $"[{severity}]{pMessage.ToString()}");
         }
@@ -192,8 +191,9 @@ namespace SDOAQCSharp
             if (bInitDone)
             {
                 WriteLog(Logger.emLogLevel.API, $"[INIT]Initialize Done");
+				WriteLog(Logger.emLogLevel.API, $">> sdedof dll Version = {GetVersion_SdEdofAlgorithm()}");
 
-                foreach (var sdoaqObj in s_sdoaqObjList.Values)
+				foreach (var sdoaqObj in s_sdoaqObjList.Values)
                 {
                     SelectMultiWS(sdoaqObj.CamIndex);
                         
@@ -253,58 +253,60 @@ namespace SDOAQCSharp
 
             Initialized?.Invoke(null, new SdoaqEventArgs(errorCode, pErrorMessage.ToString()));
         }
-
-        private static void OnSdoaq_PlayFocusStack(SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)
+		
+		private static void OnSdoaq_PlayFocusStack(SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)
         {
-            var sdoaqObj = GetSdoaqObj();
+			var sdoaqObj = GetSdoaqObj();
 
-            if (sdoaqObj == null || sdoaqObj.IsRunPlayer == false)
-            {
-                return;
-            }
+			// If the SDOAQ object is null or the player is not running, exit the function
+			if (sdoaqObj == null || sdoaqObj.IsRunPlayer == false)
+			{
+				//WriteLog(Logger.emLogLevel.Info, $"OnSdoaq_PlayFocusStack(), check status of the SDOAQ object.");
+				return;
+			}
 
-            if (errorCode != SDOAQ_API.eErrorCode.ecNoError)
-            {
-                WriteLog(Logger.emLogLevel.API, $"OnSdoaq_PlayFocusStack(), Error = {errorCode}");
-                return;
-            }
+			if (errorCode != SDOAQ_API.eErrorCode.ecNoError)
+			{
+				WriteLog(Logger.emLogLevel.API, $"OnSdoaq_PlayFocusStack(), Error = {errorCode}");
+				return;
+			}
 
-            var foucsList = sdoaqObj.FocusList.GetStepList();
+			var foucsList = sdoaqObj.FocusList.GetStepList();
 
-            int idxRingBuffer = lastFilledRingBufferEntry * foucsList.Length;
-            var camInfo = sdoaqObj.CamInfo;
-            var acqParam = camInfo.AcqParam;
+			int idxRingBuffer = lastFilledRingBufferEntry * foucsList.Length;
+			var camInfo = sdoaqObj.CamInfo;
+			var acqParam = camInfo.AcqParam;
 
-            byte[][] resultImgList = new byte[sdoaqObj._playerFoucsStepCount][];
-            unsafe
-            {
-                for (int i = 0; i < resultImgList.Length; i++)
-                {
-                    int idx = idxRingBuffer + i;
-                    int size = (int)sdoaqObj._ringBuffer.Sizes[idx];
-                    byte[] buffer = new byte[size];
+			byte[][] resultImgList = new byte[sdoaqObj._playerFoucsStepCount][];
+			unsafe
+			{
+				for (int i = 0; i < resultImgList.Length; i++)
+				{
+					int idx = idxRingBuffer + i;
+					int size = (int)sdoaqObj._ringBuffer.Sizes[idx];
+					byte[] buffer = new byte[size];
 
-                    if (size > 0)
-                    {
-                        var ptrSrc = (float*)sdoaqObj._ringBuffer.Buffer[idx];
+					if (size > 0)
+					{
+						var ptrSrc = (float*)sdoaqObj._ringBuffer.Buffer[idx];
 
-                        fixed (byte* ptrDst = buffer)
-                        {
-                            Buffer.MemoryCopy(ptrSrc, ptrDst, size, size);
-                        }
-                    }
-                    resultImgList[i] = buffer;
-                }
-            }
+						fixed (byte* ptrDst = buffer)
+						{
+							Buffer.MemoryCopy(ptrSrc, ptrDst, size, size);
+						}
+					}
+					resultImgList[i] = buffer;
+				}
+			}
 
-            var imgInfoList = new List<SdoaqImageInfo>();
+			var imgInfoList = new List<SdoaqImageInfo>();
 
-            for (int i = 0; i < resultImgList.Length; i++)
-            {
-                imgInfoList.Add(new SdoaqImageInfo($"F-{foucsList[i]}", camInfo.PixelWidth, camInfo.PixelHeight, camInfo.ColorByte, resultImgList[i]));
-            }
+			for (int i = 0; i < resultImgList.Length; i++)
+			{
+				imgInfoList.Add(new SdoaqImageInfo($"F-{foucsList[i]}", camInfo.PixelWidth, camInfo.PixelHeight, camInfo.ColorByte, resultImgList[i]));
+			}
 
-            sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.FocusStack, new object[] { imgInfoList }));
+			sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.FocusStack, new object[] { imgInfoList }));
         }
 
         private static void OnSdoaq_PlayEdof(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)

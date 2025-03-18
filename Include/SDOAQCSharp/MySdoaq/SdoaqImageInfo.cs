@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SDOAQCSharp
 {
-    public class SdoaqImageInfo : ICloneable, IDisposable
+	public class SdoaqImageInfo : ICloneable, IDisposable
     {
         public readonly string Name;
         public readonly int Width;

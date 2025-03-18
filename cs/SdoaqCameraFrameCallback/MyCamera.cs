@@ -145,8 +145,9 @@ namespace SdoaqCameraFrameCallback
                 return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
 
-            return SDOAQ_API.SDOAQ_SetCameraParameter(width, height, 1);
-        }
+			//return SDOAQ_API.SDOAQ_SetCameraParameter(width, height, 1);
+			return SDOAQ_API.SDOAQ_SetCameraRoiParameter(width, height, 0, 0, 1);
+		}
 
         public SDOAQ_API.eErrorCode GetFOV(out int width, out int height)
         {
