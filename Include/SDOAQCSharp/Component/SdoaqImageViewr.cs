@@ -323,6 +323,7 @@ namespace SDOAQCSharp.Component
 			if (_sdoaqObj != null)
 			{
 				_sdoaqObj.CallBackMsgLoop -= SdoaqObj_CallBackMsgLoop;
+				_sdoaqObj = null;
 			}
 
 			foreach (var view in _imageList)

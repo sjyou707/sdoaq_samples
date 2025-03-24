@@ -9,144 +9,151 @@ using SDOAQCSharp.Tool;
 
 namespace SDOAQCSharp
 {
-    public partial class MySdoaq : IDisposable
-    {
-        public enum emEofImgViewOption
-        {
-            StepMap,
-            QuaalityMap,
-            HeightMap,
-            PointClound,
-            Edof,
-        }
+	public partial class MySdoaq : IDisposable
+	{
+		public enum emEofImgViewOption
+		{
+			StepMap,
+			QuaalityMap,
+			HeightMap,
+			PointClound,
+			Edof,
+		}
 
-        public enum emCallBackMessage
-        {
-            FocusStack,
-            Edof,
-            Af,
-            Snap,
-        }
-        
-        public enum emPlayerMode
-        {
-            None,
-            FocusStack,
-            Af,
-            Edof,
-        }
+		public enum emCallBackMessage
+		{
+			FocusStack,
+			Edof,
+			Af,
+			Snap,
+		}
 
-        public enum emPlayerMethod
-        {
-            CallBackFunc,
-            Thread,
-        }
+		public enum emPlayerMode
+		{
+			None,
+			FocusStack,
+			Af,
+			Edof,
+		}
 
-        public class EdofImageList
-        {
-            public bool EnableEdofImg = false;
-            public bool EnableStepMapImg = false; 
-            public bool EnableQualityMap = false;
-            public bool EnableHeightMap = false;
-            public bool EnablePointCloud = false;
-        }
+		public enum emPlayerMethod
+		{
+			CallBackFunc,
+			Thread,
+		}
 
-        public readonly int CamIndex;
-        public readonly emPlayerMethod PlayerMethod;
-        public bool IsRunPlayer { get; private set; } = false;
-        public emPlayerMode PlayerMode { get; private set; } = emPlayerMode.None;
-       
-        public SdoaqCamInfo CamInfo { get; private set; } = new SdoaqCamInfo();
+		public class EdofImageList
+		{
+			public bool EnableEdofImg = false;
+			public bool EnableStepMapImg = false;
+			public bool EnableQualityMap = false;
+			public bool EnableHeightMap = false;
+			public bool EnablePointCloud = false;
+		}
 
-        public FocusLHU FocusList { get; private set; } = new FocusLHU();
-        public FocusLHU SnapFocusList { get; private set; } = new FocusLHU();
+		public readonly int CamIndex;
+		public readonly emPlayerMethod PlayerMethod;
+		public bool IsRunPlayer { get; private set; } = false;
+		public emPlayerMode PlayerMode { get; private set; } = emPlayerMode.None;
 
-        public int PlayerRingBufferSize { get; set; } = DFLT_RING_BUFFER_SIZE;
+		public SdoaqCamInfo CamInfo { get; private set; } = new SdoaqCamInfo();
 
-        private MyQueue<(emCallBackMessage msg, object[] objs)> _callBackMsgQueue = new MyQueue<(emCallBackMessage msg, object[] objs)>();
+		public FocusLHU FocusList { get; private set; } = new FocusLHU();
+		public FocusLHU SnapFocusList { get; private set; } = new FocusLHU();
 
-        public MyQueue<(emCallBackMessage msg, object[] objs)>.MsgLoopCallBack CallBackMsgLoop
-        {
-            get
-            {
-                return _callBackMsgQueue.CallBackMsgLoop;
-            }
-            set
-            {
-                _callBackMsgQueue.CallBackMsgLoop = value;
-            }
-        }
-        
-        private RingBuffer _ringBuffer = new RingBuffer();
-        private int _playerFoucsStepCount = 0;
-        private EdofImageList _edofImageList = new EdofImageList();
+		public int PlayerRingBufferSize { get; set; } = DFLT_RING_BUFFER_SIZE;
 
-        private bool _disposedValue = false;
+		private MyQueue<(emCallBackMessage msg, object[] objs)> _callBackMsgQueue = new MyQueue<(emCallBackMessage msg, object[] objs)>();
 
-        public const int DFLT_FOCUS_STEP = 160; //320 Step WiseScope Base (320/2)
-        public const int MAX_FOCUS_STEP = 319; //320 Step WiseScope Base
-        
-        public const double RESIZE_RATIO_ORIGINAL = 1;
-        public const double RESIZE_RATIO_HALF = 0.5;
-        public const double RESIZE_RATIO_QUARTER = 0.25;
+		public MyQueue<(emCallBackMessage msg, object[] objs)>.MsgLoopCallBack CallBackMsgLoop
+		{
+			get
+			{
+				return _callBackMsgQueue.CallBackMsgLoop;
+			}
+			set
+			{
+				_callBackMsgQueue.CallBackMsgLoop = value;
+			}
+		}
 
-        public const int EDOF_RESULT_IMG_COUNT = 5;
+		private RingBuffer _ringBuffer = new RingBuffer();
+		private int _playerFoucsStepCount = 0;
+		private EdofImageList _edofImageList = new EdofImageList();
 
-        public const int DFLT_RING_BUFFER_SIZE = 3;
-        
-        public const string DFLT_FOCUS_LIST = "0-319-35";
-        public const string DFLT_AF_ROI = "0,0,100,100";
+		private bool _disposedValue = false;
 
-        public MySdoaq(emPlayerMethod playerMethod)
-        {
-            if (s_isFirstInitialize)
-            {
-                Add_CallbackFunction();
-                s_isFirstInitialize = false;
-            }
+		public const int DFLT_FOCUS_STEP = 160; //320 Step WiseScope Base (320/2)
+		public const int MAX_FOCUS_STEP = 319; //320 Step WiseScope Base
 
-            CamIndex = s_sdoaqObjList.Count;
-            PlayerMethod = playerMethod;
+		public const double RESIZE_RATIO_ORIGINAL = 1;
+		public const double RESIZE_RATIO_HALF = 0.5;
+		public const double RESIZE_RATIO_QUARTER = 0.25;
 
-            if (PlayerMethod == emPlayerMethod.Thread)
-            {
-                CreateContinuosAcqThread();
-            }
-        }
+		public const int EDOF_RESULT_IMG_COUNT = 5;
 
-        ~MySdoaq()
-        {
-            Dispose();
-        }
+		public const int DFLT_RING_BUFFER_SIZE = 3;
 
-        #region IDisposable Support
-        
+		public const string DFLT_FOCUS_LIST = "0-319-35";
+		public const string DFLT_AF_ROI = "0,0,100,100";
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    if (PlayerMethod == emPlayerMethod.Thread)
-                    {
-                        DisposeContinuosAcqThread();
-                    }
-                    
-                    _ringBuffer.Dispose();
-                    _ringBuffer = null;
-                    
-                }
+		public MySdoaq(emPlayerMethod playerMethod)
+		{
+			if (s_isFirstInitialize)
+			{
+				Add_CallbackFunction();
+				s_isFirstInitialize = false;
+			}
 
-                _disposedValue = true;
-            }
-        }
-        
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-    }
+			CamIndex = s_sdoaqObjList.Count;
+			PlayerMethod = playerMethod;
+
+			if (PlayerMethod == emPlayerMethod.Thread)
+			{
+				CreateContinuosAcqThread();
+			}
+		}
+
+		~MySdoaq()
+		{
+			Dispose();
+		}
+
+		#region IDisposable Support
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!_disposedValue)
+			{
+				if (disposing)
+				{
+					if (PlayerMethod == emPlayerMethod.Thread)
+					{
+						DisposeContinuosAcqThread();
+					}
+
+					_ringBuffer.Dispose();
+					_ringBuffer = null;
+
+					s_sdoaqObjList = null;
+
+					// clear static variables
+					if (s_logger != null)
+					{
+						s_logger.Dispose();
+						s_logger = null;
+					}
+				}
+
+				_disposedValue = true;
+			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
+	}
 }

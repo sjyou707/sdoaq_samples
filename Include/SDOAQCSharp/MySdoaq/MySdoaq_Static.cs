@@ -110,6 +110,9 @@ namespace SDOAQCSharp
 
         public static void WriteLog(Logger.emLogLevel logLevel, string format, params object[] args)
         {
+			if (s_logger == null)
+				return;
+
             if (string.IsNullOrEmpty(format))
             {
                 return;

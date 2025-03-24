@@ -6,53 +6,56 @@ using System.Threading.Tasks;
 
 namespace SDOAQCSharp.Tool
 {
-    public class LoggerEventArgs : EventArgs
-    {
-        public string Data;
+	public class LoggerEventArgs : EventArgs
+	{
+		public string Data;
 
-        public LoggerEventArgs(string data)
-        {
-            Data = data;
-        }
-    }
+		public LoggerEventArgs(string data)
+		{
+			Data = data;
+		}
+	}
 
-    public class Logger : IDisposable
-    {
-        public enum emLogLevel
-        {
-            Info,
-            API,
-            Warning,
-            Error,
-            Exception,
-        };
+	public class Logger : IDisposable
+	{
+		public enum emLogLevel
+		{
+			Info,
+			API,
+			Warning,
+			Error,
+			Exception,
+		};
 
-        public event EventHandler<LoggerEventArgs> DataReceived;
+		public event EventHandler<LoggerEventArgs> DataReceived;
+		private static MyQueue<string> _queue;
 
-        private static MyQueue<string> _queue;
+		public Logger()
+		{
+			_queue = new MyQueue<string>();
 
+			_queue.CallBackMsgLoop += CallBackMsgLoop;
+		}
 
-        public Logger()
-        {
-            _queue = new MyQueue<string>();
+		public void WriteLog(string log)
+		{
+			if (_queue != null)
+				_queue.Enq_Msg($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]{log}{Environment.NewLine}");
+		}
 
-            _queue.CallBackMsgLoop += CallBackMsgLoop;
-        }
+		private void CallBackMsgLoop(string log)
+		{
+			DataReceived?.Invoke(this, new LoggerEventArgs(log));
+		}
 
-        public void WriteLog(string log)
-        {
-            _queue.Enq_Msg($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]{log}{Environment.NewLine}");
-        }
-        
-
-        private void CallBackMsgLoop(string log)
-        {
-            DataReceived?.Invoke(this, new LoggerEventArgs(log));
-        }
-
-        public void Dispose()
-        {
-            _queue.Stop();
-        }
-    }
+		public void Dispose()
+		{
+			if (_queue != null)
+			{
+				_queue.Stop();
+				_queue.CallBackMsgLoop -= CallBackMsgLoop;
+				_queue = null;
+			}
+		}
+	}
 }

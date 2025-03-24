@@ -258,14 +258,19 @@ namespace SdoaqMultiWS
 			// When the form close button is clicked while image acquisition is in progress in C# application, the SDOAQ finalization is delayed.
 			Task.Run(() => { MySdoaq.SDOAQ_Finalize(); });
 
+			MySdoaq.LogReceived -= Sdoaq_LogDataReceived;
+			MySdoaq.Initialized -= Sdoaq_Initialized;
+
+			_logBuffer = null;
+
 			// Loop through all objects in _sdoaqObjList and call Dispose method
 			foreach (var sdoaqObj in _sdoaqObjList.Values)
 			{
 				sdoaqObj.Dispose();
-			}
+			}			
 		}
 
-        private void SdoaqMultiWS_Resize(object sender, EventArgs e)
+		private void SdoaqMultiWS_Resize(object sender, EventArgs e)
         {
             LayoutUpdate();
         }
