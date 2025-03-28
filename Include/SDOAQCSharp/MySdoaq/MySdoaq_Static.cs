@@ -19,6 +19,10 @@ namespace SDOAQCSharp
         {
             add
             {
+				if (s_logger == null)
+				{
+					s_logger = new Logger();
+				}
                 s_logger.DataReceived += value;
             }
 
@@ -54,6 +58,10 @@ namespace SDOAQCSharp
 
             numOfWiseScope = Math.Max(1, numOfWiseScope);
             
+			if (s_sdoaqObjList == null)
+			{
+				s_sdoaqObjList = new Dictionary<int, MySdoaq>();
+			}
             s_sdoaqObjList.Clear();
             
             for (int i = 0; i< numOfWiseScope; i++)
