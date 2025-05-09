@@ -647,12 +647,16 @@ void CSDOAQ_Dlg::BuildEnvironment(void)
 
 	Log(FString(_T(">> SDOAQ dll version: %d.%d.%d"), nMajorVersion, nMinorVersion, nPatchVersion));
 
+	// specify the script file name including the full file path.
 	if (m_sScriptFile.GetLength())
 	{
 		::SDOAQ_SetSystemScriptFilename((CStringA)m_sScriptFile);
 		Log(FString(_T(">> Script file: %s"), m_sScriptFile));
 	}
 	Log(FString(_T(">> Log path: %s"), m_sLogPath));
+
+	// set the path to the cam files folder
+	::SDOAQ_SetCamfilePath(FStringA("%s\\..\\..\\Include\\SDOAQ\\CamFiles", (CStringA)GetCurrentDir()));
 }
 
 //----------------------------------------------------------------------------
@@ -758,9 +762,6 @@ void CSDOAQ_Dlg::OnSdoaqInitialize()
 	{
 		each.rb.active = false;
 	}
-
-	// set the path to the cam files folder
-	::SDOAQ_SetCamfilePath(FStringA("%s\\..\\..\\Include\\SDOAQ\\CamFiles", (CStringA)GetCurrentDir()));
 
 	eErrorCode rv_sdoaq = ::SDOAQ_Initialize(g_LogCallback, g_ErrorCallback, g_InitDoneCallback);
 	if (ecNoError != rv_sdoaq)

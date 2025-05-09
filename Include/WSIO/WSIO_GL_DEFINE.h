@@ -30,6 +30,7 @@ enum EKey
 	//enum surface mode (surfacer - mouse left button)
 	ESFM_RAWDATA = 101,
 
+	ESFM_GROUP = 110,
 	ESFM_CMAP_RAINBOW = 111,
 	ESFM_CMAP_RGB = 112,
 	ESFM_CMAP_GREY = 113,
@@ -43,12 +44,14 @@ enum EKey
 	/////////////////////////////////////
 
 	//enum function mode (guider - mouse left button)
+	EFUN_GROUP = 0x10100,
 	EFUN_NAVIGATION = 0x10101,
 	EFUN_MEASURE = 0x10102,
 	EFUN_PROFILE = 0x10103,
 	EFUN_COMPARE = 0x10104,
 
 	//enum rotation type (guider - mouse right button)
+	EROT_GROUP = 0x10200,
 	EROT_3D = 0x10201,
 	EROT_PLAIN_XY = 0x10202,
 
@@ -59,8 +62,12 @@ enum EKey
 	EPFT_RZ_XY = 0x10303, // activation key
 
 	//enum projection mode
+	EPJM_GROUP = 0x10400,
 	EPJM_ORTHOGRAPHIC = 0x10401,
 	EPJM_PERSPECTIVE = 0x10402,
+	EPJM_STEREOSCOPIC_ROWINTERLEAVED = 0x10405,
+	EPJM_STEREOSCOPIC_QUADBUFFERING = 0x10403,
+	EPJM_ANAGLYPH = 0x10404,
 
 	//enum matrix direction
 	EDIR_XY = 0x105C0,

@@ -563,6 +563,9 @@ void CSDOAQ_Dlg::BuildEnvironment(void)
 		Log(FString(_T(">> Script file: %s"), m_sScriptFile));
 	}
 	Log(FString(_T(">> Log path: %s"), m_sLogPath));
+
+	// set the cam files folder path
+	::SDOAQ_SetCamfilePath(FStringA("%s\\..\\..\\Include\\SDOAQ\\CamFiles", (CStringA)GetCurrentDir()));
 }
 
 //----------------------------------------------------------------------------
@@ -621,9 +624,6 @@ LRESULT CSDOAQ_Dlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 void CSDOAQ_Dlg::OnSdoaqInitialize()
 {
 	SET.rb.active = false;
-
-	// set the cam files folder path
-	::SDOAQ_SetCamfilePath(FStringA("%s\\..\\..\\Include\\SDOAQ\\CamFiles", (CStringA)GetCurrentDir()));
 
 	eErrorCode rv_sdoaq = ::SDOAQ_Initialize(g_LogCallback, g_ErrorCallback, g_InitDoneCallback);
 	if (ecNoError != rv_sdoaq)

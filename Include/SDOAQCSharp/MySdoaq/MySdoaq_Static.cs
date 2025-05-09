@@ -81,9 +81,13 @@ namespace SDOAQCSharp
                 SDOAQ_API.SDOAQ_RegisterMultiWsApi();
             }
 
+			// specify the script file name including the full file path.
+			string scriptFile = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wisescope.script.txt");
+			SDOAQ_API.SDOAQ_SetSystemScriptFilename(scriptFile);
+
 			// set the path to the cam files folder
-			//string path = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "CamFiles");
-			//SDOAQ_API.SDOAQ_SetCamfilePath(path);
+			string CamFilesPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "CamFiles");
+			SDOAQ_API.SDOAQ_SetCamfilePath(CamFilesPath);
 
 			var rv = SDOAQ_API.SDOAQ_Initialize(CallBack_SDOAQ_Log, CallBack_SDOAQ_Error, CallBack_InitDone);
 

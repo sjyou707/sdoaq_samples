@@ -341,6 +341,16 @@ WSIODLL_API	WSIORV			WSUT_IV_SetFunctionRectData(
 			);
 
 //----------------------------------------------------------------------------
+WSIODLL_API	WSIORV			WSUT_IV_GetFunctionRectData(
+	WSIOVOID				viewer_hwnd,
+	WSUTIVRESOURCE			resource_id,
+	WSIOINT*				ptr_position_left,
+	WSIOINT*				ptr_position_top,
+	WSIOINT*				ptr_position_right,
+	WSIOINT*				ptr_position_bottom
+);
+
+//----------------------------------------------------------------------------
 WSIODLL_API	WSIORV			WSUT_IV_SetFunctionLineData(
 			WSIOVOID				viewer_hwnd,
 			WSUTIVRESOURCE			resource_id,
@@ -481,6 +491,15 @@ WSIODLL_API WSIORV			WSUT_StringFromLineScript(
 			WSIOPSTR				value_buffer,
 			WSIOUINT				size_of_value_buffer
 			);
+
+//----------------------------------------------------------------------------
+WSIODLL_API WSIORV			WSUT_MultiStringFromLineScript(
+			WSIOCSTR				data_or_path_str,
+			WSIOCSTR				token_str,
+			WSIOPSTR*				ptr_value_buffers,
+			WSIOUINT*				ptr_number_of_value_buffer,
+			WSIOUINT				size_of_value_buffer
+);
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_IntFromLineScript(

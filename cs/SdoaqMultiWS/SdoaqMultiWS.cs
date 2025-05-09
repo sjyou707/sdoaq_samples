@@ -305,7 +305,7 @@ namespace SdoaqMultiWS
             {
                 GetSdoaqObj().AcquisitionStop_FocusStack();
                 //EnableGroup(bEnableParam: true, bEnableAcq: true);
-                EnableAcqGroup_Idle();				
+                EnableAcqGroup_Idle();
 			}
 		}
 

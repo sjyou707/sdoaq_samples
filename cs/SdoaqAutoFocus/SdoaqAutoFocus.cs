@@ -29,7 +29,7 @@ namespace SdoaqAutoFocus
             _sdoaqObjList = MySdoaq.LoadScript();
             _imgViewer.Set_SdoaqObj(GetSdoaqObj());
 
-            MySdoaq.LogReceived += Sdoaq_LogDataReceived;            
+            MySdoaq.LogReceived += Sdoaq_LogDataReceived;
         }
 
         private void SdoaqAutoFocus_Load(object sender, EventArgs e)
@@ -41,7 +41,7 @@ namespace SdoaqAutoFocus
         private void Frm_Load()
         {
             MySdoaq.SDOAQ_Initialize();
-        }               
+        }
 
         private void btn_SetROI_Click(object sender, EventArgs e)
         {

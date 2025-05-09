@@ -162,6 +162,15 @@ using System.Text;
 										- Improve high-resolution camera acquisition speed
 										- Fix an issue that FFC is not applied when using an MALS trigger
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.7  2025.03.17  YoungJu Lee		- Support Basler camera a2A5328-15ucBAS and SVS fxo992MCX
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.8  2025.04.18  YoungJu Lee		- Support ICORE iPulse LED lighting controller (IP-HYBRID-M1)
+	 									- Add parameter to specify lighting duration (piLightingPulseDuration)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.7.9  2025.05.09  YoungJu Lee		- Fixed auto-focus area not updating during multi-focus
+										- Supported multi-lighting models
+										- Built default NULL light driver when no lighting device in script file
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 
@@ -776,6 +785,9 @@ namespace SDOAQ
 			/// <summary>Reserved for light channel expansion.</summary>
 			//piIntensityGeneralChannel_32 = 65,// D - R/W	 (%)
 
+			/// <summary>Sets the pulse duration(width)</summary>
+			piLightingPulseDuration = 93,       // D - R/W	 (microseconds)
+
 			/// <summary>Defines the cycle, in second, that determines how often vps reports will be logged for debug purposes.</summary>
 			piVpsReportCycleSeconds = 70,       // D - R/W  (seconds)
 
@@ -800,7 +812,7 @@ namespace SDOAQ
 			/// <summary>By specifying a log level, only log messages with a higher severity level than the specified log level are provided.</summary>
 			piLogLevel = 92,                    // I - R/W	 (log severity)
 
-			//piNextParameterValue = 93, //240618
+			//piNextParameterValue = 94, //250421
 
 			/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 			piInvalidParameter = 100

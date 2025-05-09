@@ -152,3 +152,12 @@
                                             - Improve high-resolution camera acquisition speed
                                             - Fix an issue that FFC is not applied when using an MALS trigger
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.7.7  2025.03.17    YoungJu Lee    - Support Basler camera a2A5328-15ucBAS and SVS fxo992MCX
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.7.8  2025.04.18    YoungJu Lee    - Support ICORE iPulse LED lighting controller (IP-HYBRID-M1)
+                                            - Add parameter to specify lighting duration (piLightingPulseDuration)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ SDOAQ_v2.7.9  2025.05.09    YoungJu Lee    - Fixed auto-focus area not updating during multi-focus
+                                            - Supported multi-lighting models
+                                            - Built default NULL light driver when no lighting device in script file
+---------------------------------------------------------------------------------------------------------------------------------------------------------------

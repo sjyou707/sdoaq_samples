@@ -170,6 +170,21 @@ WSIODLL_API WSIORV			WSGL_GetDisplayAttributes(
 			int*			p_attributes
 			);
 
+WSIODLL_API WSIORV			WSGL_SetMode(
+			WSGLHANDLE		hd3v,
+			WSGLKEY			mode_group,
+			WSGLKEY			mode,
+			const int*		p_mode_list,
+			int				mode_nums
+);
+
+WSIODLL_API WSIORV			WSGL_RegisterModeCallback(
+			WSGLHANDLE		hd3v,
+			WSGLKEY			mode_group,
+			WSIOVOID		hwnd,
+			unsigned		msg
+);
+
 WSIODLL_API WSIORV			WSGL_RotationType(
 			WSGLHANDLE		hd3v,
 			WSGLKEY*		p_rotation_type
