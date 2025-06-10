@@ -61,6 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Include\SDOAQ\SDOAQ_MULTIWS.cs">
+      <Link>SDOAQ\SDOAQ_MULTIWS.cs</Link>
+    </Compile>
     <Compile Include="..\..\Include\SDOAQ\SDOAQ_WS.cs">
       <Link>SDOAQ\SDOAQ_WS.cs</Link>
     </Compile>
@@ -79,7 +82,28 @@
     <Compile Include="..\..\Include\SDOAQCSharp\Tool\SdoaqImageInfo.cs">
       <Link>SDOAQCSharp\Tool\SdoaqImageInfo.cs</Link>
     </Compile>
-    <Compile Include="Utils.cs">
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqCameraPredefinedParams.cs">
+      <Link>SDOAQCSharp\Component\SdoaqCameraPredefinedParams.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\Component\SdoaqCameraPredefinedParams.Designer.cs">
+      <Link>SDOAQCSharp\Component\SdoaqCameraPredefinedParams.Designer.cs</Link>
+      <DependentUpon>SdoaqCameraPredefinedParams.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqEventArgs.cs">
+      <Link>SDOAQCSharp\MySdoaq\SdoaqEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MyCamera.cs">
+      <Link>SDOAQCSharp\MySdoaq\MyCamera.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\MyCamera_Static.cs">
+      <Link>SDOAQCSharp\MySdoaq\MyCamera_Static.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\MySdoaq\SdoaqScriptReader.cs">
+      <Link>SDOAQCSharp\MySdoaq\SdoaqScriptReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Include\SDOAQCSharp\Tool\Utils.cs">
+      <Link>SDOAQCSharp\Tool\Utils.cs</Link>
     </Compile>
     <Compile Include="..\..\Include\WSIO\WSIO.cs">
       <Link>WSIO\WSIO.cs</Link>
@@ -93,13 +117,19 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MyCamera.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\Include\SDOAQCSharp\Component\SdoaqCameraPredefinedParams.resx">
+      <Link>SDOAQCSharp\Component\SdoaqCameraPredefinedParams.resx</Link>
+      <DependentUpon>SdoaqCameraPredefinedParams.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -126,4 +156,8 @@
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

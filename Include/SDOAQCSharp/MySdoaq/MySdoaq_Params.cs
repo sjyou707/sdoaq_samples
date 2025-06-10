@@ -24,16 +24,11 @@ namespace SDOAQCSharp
         {
             min = 0;
             max = 0;
-            var tmp_min = new int[1] { 0 };
-            var tmp_max = new int[1] { 0 };
 
             SelectMultiWS(CamIndex);
 
-            var rv = SDOAQ_API.SDOAQ_GetIntParameterRange(param, tmp_min, tmp_max);
-
-            min = tmp_min[0];
-            max = tmp_max[0];
-
+            var rv = SDOAQ_API.SDOAQ_GetIntParameterRange(param, ref min, ref max);
+            
             if (rv != SDOAQ_API.eErrorCode.ecNoError)
             {
                 WriteLog(Logger.emLogLevel.API, $"###SDOAQ_GetIntParameterRange(), ErrorCode = {rv}");
@@ -45,16 +40,11 @@ namespace SDOAQCSharp
         {
             min = 0;
             max = 0;
-            var tmp_min = new double[1] { 0 };
-            var tmp_max = new double[1] { 0 };
 
             SelectMultiWS(CamIndex);
 
-            var rv = SDOAQ_API.SDOAQ_GetDblParameterRange(param, tmp_min, tmp_max);
-
-            min = tmp_min[0];
-            max = tmp_max[0];
-
+            var rv = SDOAQ_API.SDOAQ_GetDblParameterRange(param, ref min, ref max);
+            
             if (rv != SDOAQ_API.eErrorCode.ecNoError)
             {
                 WriteLog(Logger.emLogLevel.API, $"###SDOAQ_GetDblParameterRange(), ErrorCode = {rv}");
@@ -75,7 +65,7 @@ namespace SDOAQCSharp
 
         public bool SetRoi(int[] params_roi)
         {
-            var acqParams = new SDOAQ_API.AcquisitionFixedParameters();
+            var acqParams = new SDOAQ_API.AcquisitionFixedParametersEx();
             var rv = GetAcqParamByRoi(params_roi, ref acqParams);
 
             if (rv && IsRunPlayer == false)
@@ -97,7 +87,7 @@ namespace SDOAQCSharp
 
         public bool SetRoi_AF(int[] params_roi)
         {
-            var acqParams = new SDOAQ_API.AcquisitionFixedParameters();
+            var acqParams = new SDOAQ_API.AcquisitionFixedParametersEx();
             var rv = GetAcqParamByRoi(params_roi, ref acqParams);
 
             if (rv && IsRunPlayer == false)
@@ -117,23 +107,23 @@ namespace SDOAQCSharp
         {
             params_roi = new int[4];
 
-            int[] leftTop = new int[] { 0 };
-            int[] rightBottom = new int[] { 0 };
+            int leftTop = 0;
+            int rightBottom = 0;
 
-            SDOAQ_API.SDOAQ_GetIntParameterValue(SDOAQ_API.eParameterId.piFocusLeftTop, leftTop);
-            SDOAQ_API.SDOAQ_GetIntParameterValue(SDOAQ_API.eParameterId.piFocusRightBottom, rightBottom);
+            SDOAQ_API.SDOAQ_GetIntParameterValue(SDOAQ_API.eParameterId.piFocusLeftTop, ref leftTop);
+            SDOAQ_API.SDOAQ_GetIntParameterValue(SDOAQ_API.eParameterId.piFocusRightBottom, ref rightBottom);
 
             int i = 0;
 
-            params_roi[i++] = (leftTop[0] >> 16) & 0x0000FFFF; // left;
-            params_roi[i++] = (leftTop[0] >> 0) & 0x0000FFFF; // top;
-            params_roi[i++] = (rightBottom[0] >> 16) & 0x0000FFFF; // right;
-            params_roi[i++] = (rightBottom[0] >> 0) & 0x0000FFFF; // bottom;
+            params_roi[i++] = (leftTop >> 16) & 0x0000FFFF; // left;
+            params_roi[i++] = (leftTop >> 0) & 0x0000FFFF; // top;
+            params_roi[i++] = (rightBottom >> 16) & 0x0000FFFF; // right;
+            params_roi[i++] = (rightBottom >> 0) & 0x0000FFFF; // bottom;
 
             return true;
         }
 
-        private bool GetAcqParamByRoi(int[] params_roi, ref SDOAQ_API.AcquisitionFixedParameters acqParams)
+        private bool GetAcqParamByRoi(int[] params_roi, ref SDOAQ_API.AcquisitionFixedParametersEx acqParams)
         {
             if (params_roi == null || params_roi.Length < 4)
             {
@@ -187,6 +177,12 @@ namespace SDOAQCSharp
         #endregion
 
         #region Focus
+        /// <summary>
+        /// stack image acquisition low ~ high interval unit
+        /// focus name patternlow-high-unit
+        /// </summary>
+        /// <param name="focus">low-high-unit</param>
+        /// <returns></returns>
         public bool SetFocus(string focus)
         {
             if (ConvertStrPara_FocusList(focus, out int low, out int high, out int unit))
@@ -196,8 +192,23 @@ namespace SDOAQCSharp
             }
             return false;
         }
-        
 
+        /// <summary>
+        /// stack image acquisition one 1 image
+        /// </summary>
+        /// <param name="focus"></param>
+        /// <returns></returns>
+        public bool SetFocus(int focus)
+        {
+            FocusList.SetFocusList(focus, focus, 1);
+            return true;
+        }
+
+        /// <summary>
+        /// snap cpature image focus
+        /// </summary>
+        /// <param name="focus"></param>
+        /// <returns></returns>
         public bool SetSnapFocus(string focus)
         {
             if (ConvertStrPara_FocusList(focus, out int low, out int high, out int unit))
@@ -207,9 +218,29 @@ namespace SDOAQCSharp
 			}
             return false;
         }
-        
+
         #endregion
 
+        #region Lighting
+        public string[] GetLightingList()
+        {
+            var lightingList = new List<string>();
+
+            var pid = SDOAQ_API.eParameterId.piLightingList;
+            if (GetParam(pid, out var isWritable, out var val) == false)
+            {
+                return lightingList.ToArray();
+            }
+
+            foreach (var name in val.Split(' '))
+            {
+                lightingList.Add(name);
+            }
+            return lightingList.ToArray();
+        }
+
+        #endregion
+        
         public bool SetCalibrationFile(string fileName)
         {
             if (System.IO.File.Exists(fileName))
@@ -226,8 +257,8 @@ namespace SDOAQCSharp
         public bool SetParam(SDOAQ_API.eParameterId paramID, string paramValue)
         {
             SelectMultiWS(CamIndex);
-            var availables = new int[1] { 0 };
-            var rv = SDOAQ_API.SDOAQ_IsParameterAvailable(paramID, availables);
+            var availables = 0;
+            var rv = SDOAQ_API.SDOAQ_IsParameterAvailable(paramID, ref availables);
 
             if (rv != SDOAQ_API.eErrorCode.ecNoError)
             {
@@ -235,8 +266,8 @@ namespace SDOAQCSharp
                 return false;
             }
 
-            int[] writables = new int[1] { 0 };
-            rv = SDOAQ_API.SDOAQ_IsParameterWritable(paramID, writables);
+            int writables = 0;
+            rv = SDOAQ_API.SDOAQ_IsParameterWritable(paramID, ref writables);
 
             if (rv != SDOAQ_API.eErrorCode.ecNoError)
             {
@@ -244,22 +275,22 @@ namespace SDOAQCSharp
                 return false;
             }
 
-            if (availables[0] == 0)
+            if (availables == 0)
             {
                 WriteLog(Logger.emLogLevel.API, $"SetParam(), param state Unavailable. ParamID = {paramID}, Value = {paramValue}");
                 return false;
             }
             
-            if (writables[0] == 0)
+            if (writables == 0)
             {
                 WriteLog(Logger.emLogLevel.API, $"SetParam(), param state Non-writable. ParamID = {paramID}, Value = {paramValue}");
                 return false;
             }
 
-            var paramTypes = new SDOAQ_API.eParameterType[1];
-            SDOAQ_API.SDOAQ_GetParameterType(paramID, paramTypes);
+            SDOAQ_API.eParameterType paramType = SDOAQ_API.eParameterType.ptInt;
+            SDOAQ_API.SDOAQ_GetParameterType(paramID, ref paramType);
 
-            switch (paramTypes[0])
+            switch (paramType)
             {
                 case SDOAQ_API.eParameterType.ptInt:
                     {
@@ -309,7 +340,7 @@ namespace SDOAQCSharp
                     }
                     break;
                 default:
-                    WriteLog(Logger.emLogLevel.API, $"SetParam(), Invalid Param Type({paramTypes[0]}). ParamID = {paramID}, Value = {paramValue}");
+                    WriteLog(Logger.emLogLevel.API, $"SetParam(), Invalid Param Type({paramType}). ParamID = {paramID}, Value = {paramValue}");
                     return false;
             }
             return true;
@@ -324,8 +355,8 @@ namespace SDOAQCSharp
             isWritable = false;
             paramValue = string.Empty;
 
-            var availables = new int[1] { 0 };
-            var rv = SDOAQ_API.SDOAQ_IsParameterAvailable(paramID, availables);
+            int availables = 0;
+            var rv = SDOAQ_API.SDOAQ_IsParameterAvailable(paramID, ref availables);
 
             if (rv != SDOAQ_API.eErrorCode.ecNoError)
             {
@@ -333,8 +364,8 @@ namespace SDOAQCSharp
                 return false;
             }
 
-            int[] writables = new int[1] { 0 };
-            rv = SDOAQ_API.SDOAQ_IsParameterWritable(paramID, writables);
+            int writables = 0;
+            rv = SDOAQ_API.SDOAQ_IsParameterWritable(paramID, ref writables);
 
             if (rv != SDOAQ_API.eErrorCode.ecNoError)
             {
@@ -342,51 +373,51 @@ namespace SDOAQCSharp
                 return false;
             }
 
-            isWritable = Convert.ToBoolean(writables[0]);
+            isWritable = Convert.ToBoolean(writables);
 
-            if (availables[0] == 0)
+            if (availables == 0)
             {
                 WriteLog(Logger.emLogLevel.API, $"SetParam(), param state Unavailable. ParamID = {paramID}");
                 return false;
             }
 
-            var paramTypes = new SDOAQ_API.eParameterType[1];
-            SDOAQ_API.SDOAQ_GetParameterType(paramID, paramTypes);
+            SDOAQ_API.eParameterType paramType = SDOAQ_API.eParameterType.ptInt;
+            SDOAQ_API.SDOAQ_GetParameterType(paramID, ref paramType);
 
-            switch(paramTypes[0])
+            switch (paramType)
             {
                 case SDOAQ_API.eParameterType.ptInt:
                     {
-                        var values = new int[] { 0 };
-                        SDOAQ_API.SDOAQ_GetIntParameterValue(paramID, values);
+                        int values = 0;
+                        SDOAQ_API.SDOAQ_GetIntParameterValue(paramID, ref values);
 
                         if (paramID == SDOAQ_API.eParameterId.piReflexCorrectionPattern)
                         {
-                            paramValue = $"0x{values[0]:x2}";
+                            paramValue = $"0x{values:x2}";
                         }
                         else
                         {
-                            paramValue = values[0].ToString();
+                            paramValue = values.ToString();
                         }
                     }
                     break;
                 case SDOAQ_API.eParameterType.ptDouble:
                     {
-                        var values = new double[] { 0 };
-                        SDOAQ_API.SDOAQ_GetDblParameterValue(paramID, values);
-                        paramValue = values[0].ToString();
+                        double values = 0;
+                        SDOAQ_API.SDOAQ_GetDblParameterValue(paramID, ref values);
+                        paramValue = values.ToString();
                     }
                     break;
                 case SDOAQ_API.eParameterType.ptString:
                     {
-                        var size = new int[] { 1024 };
-                        var value = new StringBuilder(size[0]);
-                        SDOAQ_API.SDOAQ_GetStringParameterValue(paramID, value, size);
+                        int size = 1024;
+                        StringBuilder value = new StringBuilder(size);
+                        SDOAQ_API.SDOAQ_GetStringParameterValue(paramID, value, ref size);
                         paramValue = value.ToString();
                     }
                     break;
                 default:
-                    WriteLog(Logger.emLogLevel.API, $"GetParam(), Invalid Param Type({paramTypes[0]}). ParamID = {paramID}");
+                    WriteLog(Logger.emLogLevel.API, $"GetParam(), Invalid Param Type({paramType}). ParamID = {paramID}");
                     return false;
             }
 

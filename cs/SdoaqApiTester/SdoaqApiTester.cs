@@ -204,7 +204,8 @@ namespace SdoaqApiTester
 			{
 				sdoaqObj.Dispose();
 			}
-		}
+            MySdoaq.DisposeStaticResouce();
+        }
 
 		private void SdoaqApiTester_Resize(object sender, EventArgs e)
 		{

@@ -34,6 +34,7 @@ namespace SDOAQCSharp
 			FocusStack,
 			Af,
 			Edof,
+            Mf,
 		}
 
 		public enum emPlayerMethod
@@ -82,7 +83,7 @@ namespace SDOAQCSharp
 		private EdofImageList _edofImageList = new EdofImageList();
 
 		private bool _disposedValue = false;
-
+        
 		public const int DFLT_FOCUS_STEP = 160; //320 Step WiseScope Base (320/2)
 		public const int MAX_FOCUS_STEP = 319; //320 Step WiseScope Base
 
@@ -97,7 +98,7 @@ namespace SDOAQCSharp
 		public const string DFLT_FOCUS_LIST = "0-319-35";
 		public const string DFLT_AF_ROI = "0,0,100,100";
 
-		public MySdoaq(emPlayerMethod playerMethod)
+		public MySdoaq(emPlayerMethod playerMethod, int index)
 		{
 			if (s_isFirstInitialize)
 			{
@@ -105,7 +106,7 @@ namespace SDOAQCSharp
 				s_isFirstInitialize = false;
 			}
 
-			CamIndex = s_sdoaqObjList.Count;
+            CamIndex = index;
 			PlayerMethod = playerMethod;
 
 			if (PlayerMethod == emPlayerMethod.Thread)
@@ -117,7 +118,7 @@ namespace SDOAQCSharp
 		~MySdoaq()
 		{
 			Dispose();
-		}
+        }
 
 		#region IDisposable Support
 
@@ -134,16 +135,7 @@ namespace SDOAQCSharp
 
 					_ringBuffer.Dispose();
 					_ringBuffer = null;
-
-					s_sdoaqObjList = null;
-
-					// clear static variables
-					if (s_logger != null)
-					{
-						s_logger.Dispose();
-						s_logger = null;
-					}
-				}
+                }
 
 				_disposedValue = true;
 			}

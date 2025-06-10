@@ -13,22 +13,43 @@ namespace SDOAQCSharp.Component
 		private readonly bool _visiblePointCloud;
 		public bool VisiblePointCloud => _visiblePointCloud;
 
+        private bool _visiBleImageListBox = true;
+        public bool VisiBleImageListBox
+        {
+            get => _visiBleImageListBox;
+
+            set
+            {
+                if (_visiBleImageListBox != value)
+                {
+                    _visiBleImageListBox = value;
+
+                    listbox_ImageList.Visible = value;
+
+                    LayouyUpdate();
+                }
+            }
+           
+        }
+
 		private MySdoaq _sdoaqObj;
 
 		private List<SdoaqImageInfo> _imageList = new List<SdoaqImageInfo>();
 		private SdoaqPointCloudInfo _pointCloudInfoInfo = null;
-
+        private Rectangle _currentDragArea;
 		private int _lastSelectImageIndex = 0;
 
 		private int _stackImgCount = 0;
 		private int _afImgCount = 0;
 		private int _edofImgCount = 0;
 
-		public SdoaqImageViewr(bool visiblePointCloud)
+        private const int WM_IV_EVENT = 0xA000;
+        private const int ECD_BRIGHTNESS = 0;
+        public SdoaqImageViewr(bool visiblePointCloud)
 		{
 			InitializeComponent();
-
-			_visiblePointCloud = visiblePointCloud;
+            _currentDragArea = Rectangle.Empty;
+            _visiblePointCloud = visiblePointCloud;
 
 			this.Resize += UserControl_Resize;
 			this.Disposed += UserControl_Disposed;
@@ -46,7 +67,65 @@ namespace SDOAQCSharp.Component
 			_sdoaqObj.CallBackMsgLoop += SdoaqObj_CallBackMsgLoop;
 		}
 
-		private void SdoaqObj_CallBackMsgLoop((MySdoaq.emCallBackMessage msg, object[] objs) callBackMsg)
+        public Rectangle GetImageViewrDragArea()
+        {
+#if true // Old Version
+            return _currentDragArea;
+
+#else   //WSIO Ver 3.31.0 ~ 
+            SDOWSIO.WSIO.UTIL.WSUT_IV_GetFunctionRectData((IntPtr)pb_ImageViewer.Tag,
+                WSIO.UTIL.WSUTIVRESOURCE.WSUTIVRESOURCE_MRBRIGHTNESS,
+                out int left, out int top, out int right, out int bottom);
+            return new Rectangle(left, top, right - left, bottom - top);
+#endif
+        }
+
+        public void SetImageViewrDragArea(Rectangle rect)
+        {
+            SDOWSIO.WSIO.UTIL.WSUT_IV_SetFunctionRectData((IntPtr)pb_ImageViewer.Tag,
+                WSIO.UTIL.WSUTIVRESOURCE.WSUTIVRESOURCE_MRBRIGHTNESS,
+                rect.Left, rect.Top, rect.Right, rect.Bottom);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
+                case WM_IV_EVENT:
+                    OnMessage(m.WParam, m.LParam);
+                    break;
+                default:
+                    base.WndProc(ref m);
+                    break;
+            }
+        }
+        private void OnMessage(IntPtr wparam, IntPtr lparam)
+        {
+            UInt16 obj_func;
+            UInt16 cb_data;
+            UInt32 data32;
+
+            WSIO.UTIL.WSUT_IV_DecodeWparam((ulong)wparam, out obj_func, out cb_data, out data32);
+
+            switch (cb_data)
+            {
+                case ECD_BRIGHTNESS:
+                    if (((int)obj_func & (int)WSIO.UTIL.WSUTIVOBJFUNC.WSUTIVOBJFUNC_UPDATERECT) != 0)
+                    {
+                        WSIO.UTIL.WSUT_IV_DecodeRect((ulong)lparam, out var left, out var top, out var right, out var bottom);
+
+                        var rc = new Rectangle(left, top, right - left, bottom - top);
+
+                        if (rc.Equals(_currentDragArea) == false)
+                        {
+                            _currentDragArea = rc;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void SdoaqObj_CallBackMsgLoop((MySdoaq.emCallBackMessage msg, object[] objs) callBackMsg)
 		{
 			switch (callBackMsg.msg)
 			{
@@ -181,25 +260,23 @@ namespace SDOAQCSharp.Component
 				return;
 			}
 
-			var paraDisplay25D = new WSIO.GL.tPara_Display25D[]
-			{
-				new WSIO.GL.tPara_Display25D()
-				{
-					 width = (uint)_pointCloudInfoInfo.Width,
-					 height= (uint)_pointCloudInfoInfo.Height,
-					 z_offset1 = 0,
-					 z_offset2 = 0,
-					 z_slices = (uint)_pointCloudInfoInfo.SliceCount,
-					 scx1 = 0,
-					 scx2 = 0,
-					 scy1 = 0,
-					 scy2 = 0,
-					 scz1 = 0,
-					 scz2 = 0,
-				}
-			};
+            var paraDisplay25D = new WSIO.GL.tPara_Display25D()
+            {
+                width = (uint)_pointCloudInfoInfo.Width,
+                height = (uint)_pointCloudInfoInfo.Height,
+                z_offset1 = 0,
+                z_offset2 = 0,
+                z_slices = (uint)_pointCloudInfoInfo.SliceCount,
+                scx1 = 0,
+                scx2 = 0,
+                scy1 = 0,
+                scy2 = 0,
+                scz1 = 0,
+                scz2 = 0,
+            };
 
-			int displyMode = (int)(WSIO.GL.EDisplayMode.EDM_BGR_BYTE
+
+            int displyMode = (int)(WSIO.GL.EDisplayMode.EDM_BGR_BYTE
 				| WSIO.GL.EDisplayMode.EDM_DIMENSION_CALXY_25D
 				| WSIO.GL.EDisplayMode.EDM_NDC_XY_ONLY);
 
@@ -208,7 +285,8 @@ namespace SDOAQCSharp.Component
 			WSIO.GL.WSGL_Display_25D(hwnd3DViewer, WSIO.GL.GL_MG_ONSTAGE, "main",
 				_pointCloudInfoInfo.VertexDataBuffer, imageSize * 3,
 				_pointCloudInfoInfo.ImgDataBuffer, imageSize,
-				displyMode, 1.0f, paraDisplay25D);
+				displyMode, 1.0f, 
+                ref paraDisplay25D);
 		}
 
 		private void UpdateImage(int idx)
@@ -242,10 +320,12 @@ namespace SDOAQCSharp.Component
 
 				pnl_PointCloudViewerGroup.Visible = false;
 			}
+            
+            int imageListBoxWidth = VisiBleImageListBox ? listbox_ImageList.Width : 0;
 
-			var rectImageViewer = new Rectangle(0,
+            var rectImageViewer = new Rectangle(0,
 				lbl_ImageViewer.Bottom,
-				pnl_ImageViewerGroup.Width - listbox_ImageList.Width,
+				pnl_ImageViewerGroup.Width - imageListBoxWidth,
 				pnl_ImageViewerGroup.Height - lbl_ImageViewer.Height);
 
 			pb_ImageViewer.SetBounds(rectImageViewer);
@@ -290,7 +370,16 @@ namespace SDOAQCSharp.Component
 					, 0
 					, attributes_ImageViewer);
 
-			MySdoaq.WriteLog(Logger.emLogLevel.API, $"WSUT_IV_CreateImageViewer(), rv = {rvWsio}");
+
+            WSIO.UTIL.WSUT_IV_ActivateFunction(hwndImageViewr,
+                WSIO.UTIL.WSUTIVRESOURCE.WSUTIVRESOURCE_MRBRIGHTNESS,
+                (ushort)WSIO.UTIL.WSUTIVOBJFUNC.WSUTIVOBJFUNC_UPDATERECT,
+                ECD_BRIGHTNESS,
+                null,
+                this.Handle,
+                WM_IV_EVENT);
+
+            MySdoaq.WriteLog(Logger.emLogLevel.API, $"WSUT_IV_CreateImageViewer(), rv = {rvWsio}");
 
 			pb_ImageViewer.Tag = hwndImageViewr;
 

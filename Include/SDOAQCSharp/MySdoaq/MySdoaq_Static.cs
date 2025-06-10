@@ -37,10 +37,11 @@ namespace SDOAQCSharp
         private static SDOAQ.SDOAQ_API.SDOAQ_LogCallback CallBack_SDOAQ_Log;
         private static SDOAQ.SDOAQ_API.SDOAQ_ErrorCallback CallBack_SDOAQ_Error;
         private static SDOAQ.SDOAQ_API.SDOAQ_InitDoneCallback CallBack_InitDone;
-        private static SDOAQ.SDOAQ_API.SDOAQ_PlayCallback CallBack_SDOAQ_PlayFocusStack;
-        private static SDOAQ.SDOAQ_API.SDOAQ_PlayCallback CallBack_SDOAQ_PlayEdof;
-        private static SDOAQ.SDOAQ_API.SDOAQ_PlayAfCallback CallBack_SDOAQ_PlayAf;
-        private static SDOAQ.SDOAQ_API.SDOAQ_SnapCallback CallBack_SDOAQ_Snap;
+        private static SDOAQ.SDOAQ_API.SDOAQ_PlayCallbackEx CallBack_SDOAQ_PlayFocusStack;
+        private static SDOAQ.SDOAQ_API.SDOAQ_PlayCallbackEx CallBack_SDOAQ_PlayEdof;
+        private static SDOAQ.SDOAQ_API.SDOAQ_PlayAfCallbackEx2 CallBack_SDOAQ_PlayAf;
+        private static SDOAQ.SDOAQ_API.SDOAQ_PlayMfCallbackEx CallBack_SDOAQ_PlayMf;
+        private static SDOAQ.SDOAQ_API.SDOAQ_SnapCallbackEx CallBack_SDOAQ_Snap;
 
         private static bool s_isFirstInitialize = true;
         private static Dictionary<int, MySdoaq> s_sdoaqObjList = new Dictionary<int, MySdoaq>();
@@ -66,7 +67,7 @@ namespace SDOAQCSharp
             
             for (int i = 0; i< numOfWiseScope; i++)
             {
-                s_sdoaqObjList.Add(i, new MySdoaq(playerMethod));
+                s_sdoaqObjList.Add(i, new MySdoaq(playerMethod, i));
             }
 
             return s_sdoaqObjList;
@@ -86,8 +87,8 @@ namespace SDOAQCSharp
 			SDOAQ_API.SDOAQ_SetSystemScriptFilename(scriptFile);
 
 			// set the path to the cam files folder
-			string CamFilesPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "CamFiles");
-			SDOAQ_API.SDOAQ_SetCamfilePath(CamFilesPath);
+			string camFilesPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "CamFiles");
+			SDOAQ_API.SDOAQ_SetCamfilePath(camFilesPath);
 
 			var rv = SDOAQ_API.SDOAQ_Initialize(CallBack_SDOAQ_Log, CallBack_SDOAQ_Error, CallBack_InitDone);
 
@@ -107,6 +108,21 @@ namespace SDOAQCSharp
             IsInitialize = false;
 
             return SDOAQ_API.SDOAQ_Finalize() == SDOAQ_API.eErrorCode.ecNoError;
+        }
+
+        public static void DisposeStaticResouce()
+        {
+            if (s_sdoaqObjList != null)
+            {
+                foreach (var key in s_sdoaqObjList.Keys.ToList())
+                {
+                    s_sdoaqObjList[key].Dispose();
+                }
+            }
+
+
+            s_logger?.Dispose();
+            s_logger = null;
         }
 
         public static string GetVersion()
@@ -167,6 +183,7 @@ namespace SDOAQCSharp
             CallBack_SDOAQ_PlayFocusStack = OnSdoaq_PlayFocusStack;
             CallBack_SDOAQ_PlayEdof = OnSdoaq_PlayEdof;
             CallBack_SDOAQ_PlayAf = OnSdoaq_PlayAf;
+            CallBack_SDOAQ_PlayMf = OnSdoaq_PlayMf;
             CallBack_SDOAQ_Snap = OnSdoaq_Snap;
         }
 
@@ -242,7 +259,7 @@ namespace SDOAQCSharp
                     var camInfo = new SdoaqCamInfo()
                     {
                         ColorByte = bCamColor ? 3 : 1,
-                        AcqParam = new SDOAQ_API.AcquisitionFixedParameters()
+                        AcqParam = new SDOAQ_API.AcquisitionFixedParametersEx()
                         {
                             cameraRoiLeft = 0,
                             cameraRoiTop = 0,
@@ -269,7 +286,7 @@ namespace SDOAQCSharp
             Initialized?.Invoke(null, new SdoaqEventArgs(errorCode, pErrorMessage.ToString()));
         }
 		
-		private static void OnSdoaq_PlayFocusStack(SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)
+		private static void OnSdoaq_PlayFocusStack(SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry, IntPtr callbackUserData)
         {
 			var sdoaqObj = GetSdoaqObj();
 
@@ -324,7 +341,7 @@ namespace SDOAQCSharp
 			sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.FocusStack, new object[] { imgInfoList }));
         }
 
-        private static void OnSdoaq_PlayEdof(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)
+        private static void OnSdoaq_PlayEdof(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry, IntPtr callbackUserData)
         {
             var sdoaqObj = GetSdoaqObj();
 
@@ -417,7 +434,7 @@ namespace SDOAQCSharp
 
         }
 
-        private static void OnSdoaq_PlayAf(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry, double dbBestFocusStep, double dbBestScore)
+        private static void OnSdoaq_PlayAf(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry, IntPtr callbackUserData, double dbBestFocusStep, double dbBestScore, double dbMatchedFocusStep)
         {
             var sdoaqObj = GetSdoaqObj();
 
@@ -428,9 +445,11 @@ namespace SDOAQCSharp
 
             if (errorCode != SDOAQ_API.eErrorCode.ecNoError)
             {
-                WriteLog(Logger.emLogLevel.API, $"OnSdoaq_PlayAf(), Error = {errorCode}");
+                WriteLog(Logger.emLogLevel.API, $"[Cam{sdoaqObj.CamIndex + 1}]OnSdoaq_PlayAf(), Error = {errorCode}");
                 return;
             }
+
+            WriteLog(Logger.emLogLevel.API, $"[Cam{sdoaqObj.CamIndex + 1}]OnSdoaq_PlayAf(), BestFocusStep = {dbBestFocusStep}, BestScore = {dbBestScore}, MatchedFocusStep = {dbMatchedFocusStep}");
 
             int idxRingBuffer = lastFilledRingBufferEntry;
             var camInfo = sdoaqObj.CamInfo;
@@ -468,7 +487,58 @@ namespace SDOAQCSharp
             sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.Af, new object[] { imgInfoList }));
         }
 
-        private static void OnSdoaq_Snap(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry)
+        private static void OnSdoaq_PlayMf(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry, IntPtr callbackUserData, int countRects, int[] pRectIdArray, int[] pRectStepArray)
+        {
+            var sdoaqObj = GetSdoaqObj();
+
+            if (sdoaqObj == null || sdoaqObj.IsRunPlayer == false)
+            {
+                return;
+            }
+
+            if (errorCode != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                WriteLog(Logger.emLogLevel.API, $"[Cam{sdoaqObj.CamIndex + 1}]OnSdoaq_PlayAf(), Error = {errorCode}");
+                return;
+            }
+            
+            int idxRingBuffer = lastFilledRingBufferEntry;
+            var camInfo = sdoaqObj.CamInfo;
+            var acqParam = camInfo.AcqParam;
+
+            byte[][] resultImgList = new byte[1][];
+            unsafe
+            {
+                for (int i = 0; i < resultImgList.Length; i++)
+                {
+                    int idx = idxRingBuffer + i;
+                    int size = (int)sdoaqObj._ringBuffer.Sizes[idx];
+                    byte[] buffer = new byte[size];
+
+                    if (size > 0)
+                    {
+                        var ptrSrc = (float*)sdoaqObj._ringBuffer.Buffer[idx];
+
+                        fixed (byte* ptrDst = buffer)
+                        {
+                            Buffer.MemoryCopy(ptrSrc, ptrDst, size, size);
+                        }
+                    }
+                    resultImgList[i] = buffer;
+                }
+            }
+
+            var imgInfoList = new List<SdoaqImageInfo>();
+
+            for (int i = 0; i < resultImgList.Length; i++)
+            {
+                imgInfoList.Add(new SdoaqImageInfo($"AF", camInfo.PixelWidth, camInfo.PixelHeight, camInfo.ColorByte, resultImgList[i]));
+            }
+
+            sdoaqObj.CallBackMsgLoop.Invoke((emCallBackMessage.Af, new object[] { imgInfoList }));
+        }
+
+        private static void OnSdoaq_Snap(SDOAQ.SDOAQ_API.eErrorCode errorCode, int lastFilledRingBufferEntry, IntPtr callbackUserData)
         {
             var sdoaqObj = GetSdoaqObj();
 
@@ -477,7 +547,7 @@ namespace SDOAQCSharp
                 return;
             }
 
-            WriteLog(Logger.emLogLevel.API, $"[Cam{sdoaqObj.CamIndex}]Snap Received, ErrorCode = {errorCode}");
+            WriteLog(Logger.emLogLevel.API, $"[Cam{sdoaqObj.CamIndex + 1}]Snap Received, ErrorCode = {errorCode}");
         }
 
         private static byte[] ConvertFloatBufferToByteBuffer(int totalPixelSize, float[] data)
