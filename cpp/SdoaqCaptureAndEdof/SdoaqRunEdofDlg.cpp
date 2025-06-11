@@ -539,48 +539,102 @@ void CSdoaqEdofDlg::OnSdoaqCaptureAndRunEdof()
 	copy(m_vFocusSet.begin(), m_vFocusSet.end(), FOCUS.vFocusSet.begin());
 
 	int* pPositions = new int[FOCUS.numsFocus];
-	for (int pos = 0; pos < FOCUS.numsFocus; pos++)
+	unsigned char** ppFocusImages = new unsigned char*[FOCUS.numsFocus];
+	size_t* pFocusImageBufferSizes = new size_t[FOCUS.numsFocus];
+
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
 	{
 		pPositions[pos] = FOCUS.vFocusSet[pos];
-	}
 
-	unsigned char* pEdofImageBuffer = new unsigned char[SET.ImgSize()];
-	size_t edofImageBufferSize = SET.ImgSize();
+		auto size = SET.ImgSize();
+		ppFocusImages[pos] = new unsigned char[size];
+		pFocusImageBufferSizes[pos] = size;
+	}
 
 	const auto tick_begin = GetTickCount64();
 	AFP.callbackUserData = (void*)::GetTickCount64();
-	eErrorCode rv_sdoaq = ::SDOAQ_SingleShotEdofEx(
+	const eErrorCode rv_sdoaq = ::SDOAQ_SingleShotFocusStackEx(
 		&AFP,
 		pPositions, (int)FOCUS.numsFocus,
-		NULL, 0,
-		pEdofImageBuffer, edofImageBufferSize,
-		NULL, 0,
-		NULL, 0,
-		NULL, 0
+		ppFocusImages, pFocusImageBufferSizes
 	);
+
 
 	if (ecNoError == rv_sdoaq)
 	{
-		const auto tick_end = GetTickCount64();
-		//g_LogLine(_T("SDOAQ_SingleShotEdofEx() takes : %llu ms / %d imgs"), tick_end - tick_begin, FOCUS.numsFocus);
+		SDOAQ_EDOF_FocalStackParams input_params;
+		input_params.focus_measure = SDOAQ_EDOF_FocusMeasure::MODIFIED_LAPLACIAN;
+		input_params.image_num = (int)FOCUS.numsFocus;
+		input_params.image_width = AFP.cameraRoiWidth;
+		input_params.image_height = AFP.cameraRoiHeight;
+		input_params.image_offset_x = AFP.cameraRoiLeft;
+		input_params.image_offset_y = AFP.cameraRoiTop;
+		input_params.binning_x = 1;
+		input_params.binning_y = 1;
+		input_params.num_channel = 3; // color, 1,3,4
+		input_params.byte_per_channel = 1;
+		input_params.num_padding_bit = 0;
+		input_params.roi_left = 0;
+		input_params.roi_top = 0;
+		input_params.roi_width = input_params.image_width;
+		input_params.roi_height = input_params.image_height;
+		input_params.resize_ratio = 0.5f;
+		input_params.pixelwise_kernel_size = 3;
+		input_params.pixelwise_iteration = 4;
+		input_params.depthwise_kernel_size = 1;
+		input_params.depth_quality_th = 1.0;
+		input_params.bilateral_sigma_color = 6;
+		input_params.bilateral_sigma_space = 5;
+		input_params.num_thread = -1;
+		input_params.is_scale_correction_enabled = false;
+		input_params.scale_correction_dst_step = pPositions[FOCUS.numsFocus - 1]; // check image scale correction destination step
 
-		++m_nContiEdof;
+		SDOAQ_EDOF_ImageParams edof_image_params;
+		edof_image_params.is_allocated = true;
+		edof_image_params.image_width = input_params.image_width;
+		edof_image_params.image_height = input_params.image_height;
+		edof_image_params.image_offset_x = input_params.image_offset_x;
+		edof_image_params.image_offset_y = input_params.image_offset_y;
+		edof_image_params.binning_x = input_params.binning_x;
+		edof_image_params.binning_y = input_params.binning_y;
+		edof_image_params.is_floating_point = false;
+		edof_image_params.num_channel = input_params.num_channel;
+		edof_image_params.byte_per_channel = input_params.byte_per_channel;
 
-		if (pEdofImageBuffer && edofImageBufferSize)
+		unsigned char* pEdofImageBuffer = new unsigned char[SET.ImgSize()];;
+		auto edofImageBufferSize = SET.ImgSize();
+		auto edof_rv = ::SDOAQ_EDOF_Run(&input_params, ppFocusImages, (unsigned int*)pPositions, &edof_image_params, pEdofImageBuffer);
+
+		if (ecNoError <= edof_rv)
 		{
-			ImageViewer("EDoF", m_nContiEdof, SET, pEdofImageBuffer);
+			++m_nContiEdof;
+
+			if (pEdofImageBuffer && edofImageBufferSize)
+			{
+				ImageViewer("EDoF", m_nContiEdof, SET, pEdofImageBuffer);
+			}
+			else
+			{
+				ImageViewer("EDoF", m_nContiEdof);
+			}
 		}
 		else
 		{
-			ImageViewer("EDoF", m_nContiEdof);
+			g_LogLine(_T("SDOAQ_EDOF_Run() returns error(%d)."), edof_rv);
 		}
+		delete[] pEdofImageBuffer;
 	}
 	else
 	{
 		g_LogLine(_T("SDOAQ_SingleShotEdofEx() returns error(%d)."), rv_sdoaq);
 	}
-
-	delete[] pEdofImageBuffer;
+	
+	delete[] pFocusImageBufferSizes;
+	for (size_t pos = 0; pos < FOCUS.numsFocus; pos++)
+	{
+		delete[] ppFocusImages[pos];
+	}
+	delete[] ppFocusImages;
 	delete[] pPositions;
 }
 
