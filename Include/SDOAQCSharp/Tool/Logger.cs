@@ -21,6 +21,7 @@ namespace SDOAQCSharp.Tool
 		public enum emLogLevel
 		{
 			Info,
+            User,
 			API,
 			Warning,
 			Error,
@@ -39,8 +40,7 @@ namespace SDOAQCSharp.Tool
 
 		public void WriteLog(string log)
 		{
-			if (_queue != null)
-				_queue.Enq_Msg($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]{log}{Environment.NewLine}");
+            _queue?.Enq_Msg($"[{DateTime.Now.ToString("HH:mm:ss.fff")}]{log}{Environment.NewLine}");	
 		}
 
 		private void CallBackMsgLoop(string log)

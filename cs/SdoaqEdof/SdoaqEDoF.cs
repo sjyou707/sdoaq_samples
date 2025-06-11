@@ -44,6 +44,17 @@ namespace SdoaqEdof
             Frm_Load();
         }
 
+        private void SdoaqEDoF_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            MySdoaq.LogReceived -= Sdoaq_LogDataReceived;
+
+            GetSdoaqObj()?.AcquisitionStop();
+
+            MySdoaq.DisposeStaticResouce();
+
+            Task.Run(() => { MySdoaq.SDOAQ_Finalize(); });
+        }
+
         private void Frm_Load()
         {
             MySdoaq.SDOAQ_Initialize();
@@ -53,8 +64,7 @@ namespace SdoaqEdof
         {
             return _sdoaqObjList[0];
         }
-
-        #region [Evet]
+        
         private void tmr_LogUpdate_Tick(object sender, EventArgs e)
         {
             if (_logBuffer.Length == 0)
@@ -82,9 +92,7 @@ namespace SdoaqEdof
         {
             Sdoaq_LogDataReceived(null, new LoggerEventArgs(str));
         }
-
-
-        #endregion
+        
 
         private void btn_SingleShotEDoF_Click(object sender, EventArgs e)
         {
@@ -238,5 +246,7 @@ namespace SdoaqEdof
             openFile.FileName = "";
             openFile.Filter = "csv files (*.csv)|*.csv|All files (*.*)|*.*";
         }
+
+        
     }
 }

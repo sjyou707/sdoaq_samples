@@ -71,17 +71,12 @@ namespace SDOAQCSharp
                 {
                     return;
                 }
-
-                var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-                {
-                    CamInfo.AcqParam
-                };
-
+                
                 var focusList = FocusList.GetStepList();
 
                 while (_evtContinuosAcq_FocusStack.IsWaitSet == false)
                 {
-                    Acq_FocusStack(acqParamList, focusList, false);
+                    Acq_FocusStack(CamInfo.AcqParam, focusList, false);
                 }
 
                 if (_evtContinuosAcq_FocusStack.IsAbort)
@@ -103,17 +98,12 @@ namespace SDOAQCSharp
                 {
                     return;
                 }
-
-                var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-                {
-                    CamInfo.AcqParam
-                };
-
+                
                 var focusList = FocusList.GetStepList();
 
                 while (_evtContinuosAcq_Af.IsWaitSet == false)
                 {
-                    Acq_Af(acqParamList, focusList, false);
+                    Acq_Af(CamInfo.AcqParam, focusList, false);
                 }
 
                 if (_evtContinuosAcq_Af.IsAbort)
@@ -135,17 +125,12 @@ namespace SDOAQCSharp
                 {
                     return;
                 }
-
-                var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-                {
-                    CamInfo.AcqParam
-                };
-
+                
                 var focusList = FocusList.GetStepList();
 
                 while (_evtContinuosAcq_Edof.IsWaitSet == false)
                 {
-                    Acq_Edof(acqParamList, focusList, _edofImageList, false);
+                    Acq_Edof(CamInfo.AcqParam, focusList, _edofImageList, false);
                 }
 
                 if (_evtContinuosAcq_Edof.IsAbort)
@@ -155,5 +140,6 @@ namespace SDOAQCSharp
             }
         }
         #endregion
+        
     }
 }

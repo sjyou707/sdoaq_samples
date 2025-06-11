@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SDOAQCSharp
 {
@@ -55,4 +56,16 @@ namespace SDOAQCSharp
 		}
         #endregion
     }
+
+    public class MsgParaReceiveMf
+    {
+        public struct tRectInfo
+        {
+            public int Id;
+            public int Step;
+        }
+
+        public int LastFilledRingBufferEntry;
+        public IReadOnlyList<tRectInfo> RectInfoList = new List<tRectInfo>();
+    };
 }

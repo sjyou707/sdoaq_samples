@@ -7,6 +7,7 @@ using SDOAQ;
 using SDOAQCSharp.Tool;
 using SDOAQCSharp;
 using SDOAQCSharp.Component;
+using System.Threading.Tasks;
 
 namespace SdoaqAutoFocus
 {
@@ -41,6 +42,17 @@ namespace SdoaqAutoFocus
         private void Frm_Load()
         {
             MySdoaq.SDOAQ_Initialize();
+        }
+
+        private void SdoaqAutoFocus_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            MySdoaq.LogReceived -= Sdoaq_LogDataReceived;
+
+            GetSdoaqObj()?.AcquisitionStop();
+
+            MySdoaq.DisposeStaticResouce();
+            
+            Task.Run(() => { MySdoaq.SDOAQ_Finalize(); });
         }
 
         private void btn_SetROI_Click(object sender, EventArgs e)
@@ -108,8 +120,7 @@ namespace SdoaqAutoFocus
                 }
             }
         }
-
-        #region [Event]
+        
         private void tmr_LogUpdate_Tick(object sender, EventArgs e)
         {
             if (_logBuffer.Length == 0)
@@ -137,6 +148,7 @@ namespace SdoaqAutoFocus
         {
             Sdoaq_LogDataReceived(null, new LoggerEventArgs(str));
         }
-        #endregion
+
+        
     }
 }

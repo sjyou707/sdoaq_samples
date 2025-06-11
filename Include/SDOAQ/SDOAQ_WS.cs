@@ -371,10 +371,10 @@ namespace SDOAQ
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetExternalCalibrationTable(
 			int allocatedSize,
-			double[] pHeight, double[] pPitchX, double[] pPitchY,
-			double[] pScaleX, double[] pScaleY,
-			double[] pShiftX, double[] pShiftY,
-			double[] pCoefficients);
+			ref double pHeight, ref double pPitchX, ref double pPitchY,
+            ref double pScaleX, ref double pScaleY,
+            ref double pShiftX, ref double pShiftY,
+            ref double pCoefficients);
 
 		/// <summary>This function requests the size (height or rows) of the XYZ calibration map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -382,35 +382,35 @@ namespace SDOAQ
 
 		/// <summary>This function requests the XYZ calibration map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationDataMap(eObjectiveId objective, int allocatedSize, double[] pCalX, double[] pCalY, double[] pCalZ);
+		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationDataMap(eObjectiveId objective, int allocatedSize, ref double pCalX, ref double pCalY, ref double pCalZ);
 
 		/// <summary>This function requests the XY calibration scale map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationScaleDataMap(eObjectiveId objective, int allocatedSize, double[] pScaleX, double[] pScaleY);
+		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationScaleDataMap(eObjectiveId objective, int allocatedSize, ref double pScaleX, ref double pScaleY);
 
 		/// <summary>This function requests the XY calibration shift map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationShiftDataMap(eObjectiveId objective, int allocatedSize, double[] pShiftX, double[] pShiftY);
+		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationShiftDataMap(eObjectiveId objective, int allocatedSize, ref double pShiftX, ref double pShiftY);
 
 		/// <summary>This function requests the curvature coefficients example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06 </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationCurvatureData(eObjectiveId objective, int allocatedSize, double[] pCoefficients);
+		/* deprecated */public static extern eErrorCode SDOAQ_GetCalibrationCurvatureData(eObjectiveId objective, int allocatedSize, ref double pCoefficients);
 
 		/// <summary>This function sets the XYZ calibration map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationDataMap(eObjectiveId objective, int allocatedSize, double[] pCalX, double[] pCalY, double[] pCalZ);
+		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationDataMap(eObjectiveId objective, int allocatedSize, ref double pCalX, ref double pCalY, ref double pCalZ);
 
 		/// <summary>This function sets the XY calibration scale map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationScaleDataMap(eObjectiveId objective, int allocatedSize, double[] pScaleX, double[] pScaleY);
+		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationScaleDataMap(eObjectiveId objective, int allocatedSize, ref double pScaleX, ref double pScaleY);
 
 		/// <summary>This function sets the XY calibration shift map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationShiftDataMap(eObjectiveId objective, int allocatedSize, double[] pShiftX, double[] pShiftY);
+		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationShiftDataMap(eObjectiveId objective, int allocatedSize, ref double pShiftX, ref double pShiftY);
 
 		/// <summary>This function sets the curvature coefficients example> p00 = 6.532, p10 = -0.006271, p20 = 3.684e-06 </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationCurvatureData(eObjectiveId objective, int allocatedSize, double[] pCoefficients);
+		/* deprecated */public static extern eErrorCode SDOAQ_SetCalibrationCurvatureData(eObjectiveId objective, int allocatedSize, ref double pCoefficients);
 
 		/// <summary>This function sets the default XYZ calibration map </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -876,25 +876,25 @@ namespace SDOAQ
 
 		// gets information about parameter
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_IsParameterAvailable(eParameterId parameterId, int[] pIsAvailable);
+		public static extern eErrorCode SDOAQ_IsParameterAvailable(eParameterId parameterId, ref int pIsAvailable);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_IsParameterWritable(eParameterId parameterId, int[] pIsWritable);
+		public static extern eErrorCode SDOAQ_IsParameterWritable(eParameterId parameterId, ref int pIsWritable);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetParameterType(eParameterId parameterId, eParameterType[] pParameterType);
+		public static extern eErrorCode SDOAQ_GetParameterType(eParameterId parameterId, ref eParameterType pParameterType);
 
 		// manages integer value parameters
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetIntParameterRange(eParameterId parameterId, int[] pMinValue, int[] pMaxValue);
+		public static extern eErrorCode SDOAQ_GetIntParameterRange(eParameterId parameterId, ref int pMinValue, ref int pMaxValue);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetIntParameterValue(eParameterId parameterId, int[] pValue);
+		public static extern eErrorCode SDOAQ_GetIntParameterValue(eParameterId parameterId, ref int pValue);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetIntParameterValue(eParameterId parameterId, int value);
 
 		// manages double value parameters
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetDblParameterRange(eParameterId parameterId, double[] pMinValue, double[] pMaxValue);
+		public static extern eErrorCode SDOAQ_GetDblParameterRange(eParameterId parameterId, ref double pMinValue, ref double pMaxValue);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetDblParameterValue(eParameterId parameterId, double[] pValue);
+		public static extern eErrorCode SDOAQ_GetDblParameterValue(eParameterId parameterId, ref double pValue);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SetDblParameterValue(eParameterId parameterId, double value);
 
@@ -902,7 +902,7 @@ namespace SDOAQ
 		/// Reads the parameterId value of string type and save it in the memory pointed to by ‘pString’, which has the size of the value indicated by ‘pSize’.
 		/// Updates the actual size of the saved string to ‘pSize’, not including the terminating null character.
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetStringParameterValue(eParameterId parameterId, StringBuilder pString, int[] pSize);
+		public static extern eErrorCode SDOAQ_GetStringParameterValue(eParameterId parameterId, StringBuilder pString, ref int pSize);
 		/// Sets the value of parameterId with the data in the memory pointed to by ‘pString’.
 		/// ‘pString’ must include the terminating null character and cannot be null.
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
@@ -929,9 +929,9 @@ namespace SDOAQ
 		/// Value: 1(=1x1), 2(=2x2), 4(=4x4), Odd-sized matrices (e.g. 3X3) are not supported.
 		/// </param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetCameraParameter(int[] pWidth, int[] pHeight, int[] pBinning);
+		public static extern eErrorCode SDOAQ_GetCameraParameter(ref int pWidth, ref int pHeight, ref int pBinning);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		public static extern eErrorCode SDOAQ_GetCameraRoiParameter(int[] pWidth, int[] pHeight, int[] pOffsetX, int[] pOffsetY, int[] pBinning);
+		public static extern eErrorCode SDOAQ_GetCameraRoiParameter(ref int pWidth, ref int pHeight, ref int pOffsetX, ref int pOffsetY, ref int pBinning);
 
 		/// <summary>
 		/// Specifies the ROI and binning value.
@@ -963,8 +963,9 @@ namespace SDOAQ
 		[StructLayout(LayoutKind.Sequential)]
 		public struct AcquisitionFixedParametersEx
 		{
-			/// <summary>The upper edge of the camera ROI used for acquisition in pixels. This value is 0 if full ROI should be used.</summary>
-			public int cameraRoiTop;
+            public int ver;
+            /// <summary>The upper edge of the camera ROI used for acquisition in pixels. This value is 0 if full ROI should be used.</summary>
+            public int cameraRoiTop;
 			/// <summary>The left edge of the camera ROI used for acquisition in pixels. This value is 0 if full ROI should be used.</summary>
 			public int cameraRoiLeft;
 			/// <summary>The width of the camera ROI used for acquisition in pixels.</summary>
@@ -981,7 +982,18 @@ namespace SDOAQ
 			/// User data is passed as is through the registered callback function.
 			/// </summary>
 			public IntPtr callbackUserData;
-		};		
+
+            public AcquisitionFixedParametersEx(int cameraRoiLeft = 0, int cameraRoiTop = 0,  int cameraRoiWidth = 0, int cameraRoiHeight = 0, int cameraBinning = 0, int version = 3)
+            {
+                this.ver = version;
+                this.cameraRoiTop = cameraRoiLeft;
+                this.cameraRoiLeft = cameraRoiTop;
+                this.cameraRoiWidth = cameraRoiWidth;
+                this.cameraRoiHeight = cameraRoiHeight;
+                this.cameraBinning = cameraBinning;
+                this.callbackUserData = IntPtr.Zero;
+            }
+        };		
 		[StructLayout(LayoutKind.Sequential)]
 		/* deprecated. Instead, use AcquisitionFixedParametersEx */public struct AcquisitionFixedParameters{public int cameraRoiTop;public int cameraRoiLeft;public int cameraRoiWidth;public int cameraRoiHeight;public int cameraBinning;};		
 		[StructLayout(LayoutKind.Sequential)]
@@ -1129,17 +1141,17 @@ namespace SDOAQ
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SingleShotFocusStackEx(
-				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				ref AcquisitionFixedParametersEx pAcquisitionParams,
 				int[] pPositions, int positionsCount,
 				IntPtr[] ppFocusImages,
 				ulong[] pFocusImagesBufferSizes);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_SingleShotFocusStack(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_SingleShotFocusStack(ref AcquisitionFixedParameters pAcquisitionParams,int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_AcquireFocusStack_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_AcquireFocusStack_V2(ref AcquisitionFixedParameters_V2 pAcquisitionParams,int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_AcquireFocusStack(AcquisitionFixedParameters[] pAcquisitionParams, int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_SingleShotFocusStackEx */public static extern eErrorCode SDOAQ_AcquireFocusStack(ref AcquisitionFixedParameters pAcquisitionParams, int[] pPositions, int positionsCount,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
 
 		/// <summary>
 		/// This function starts a focus stack preview. Stack images are produced in a continuous
@@ -1184,7 +1196,7 @@ namespace SDOAQ
 		/// </param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_PlayFocusStackEx(
-				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				ref AcquisitionFixedParametersEx pAcquisitionParams,
 				SDOAQ_PlayCallbackEx stackFinishedCallback,
 				int[] pPositions, int positionsCount,
 				int ringBufferSize,
@@ -1192,11 +1204,11 @@ namespace SDOAQ
 				ulong[] pFocusImagesBufferSizes);   // size of each buffer => size of array == (ringBufferSize * positionsCount);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_PlayFocusStack(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayCallback stackFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_PlayFocusStack(ref AcquisitionFixedParameters pAcquisitionParams,SDOAQ_PlayCallback stackFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_StartContinuousFocusStack_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize, IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_StartContinuousFocusStack_V2(ref AcquisitionFixedParameters_V2 pAcquisitionParams,SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize, IntPtr[] ppFocusImages,ulong[] pFocusImagesBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_StartContinuousFocusStack(AcquisitionFixedParameters[] pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, int[] pPositions, int positionsCount, int ringBufferSize, IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayFocusStackEx */public static extern eErrorCode SDOAQ_StartContinuousFocusStack(ref AcquisitionFixedParameters pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, int[] pPositions, int positionsCount, int ringBufferSize, IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
 
 		/// <summary>
 		/// This function starts a focus stack preview with only one focus.
@@ -1206,16 +1218,16 @@ namespace SDOAQ
 		/// </summary>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_PlaySingleFocusEx(
-				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				ref AcquisitionFixedParametersEx pAcquisitionParams,
 				SDOAQ_PlayCallbackEx singleFinishedCb,
 				int ringBufferSize,
 				IntPtr[] ppFocusImage,               // array of (ringBufferSize) unsigned char* entries
 				ulong[] pFocusImagesBufferSizes);   // size of each buffer => size of array == (ringBufferSize);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */public static extern eErrorCode SDOAQ_PlaySingleFocus(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayCallback singleFinishedCb,int ringBufferSize,IntPtr[] ppFocusImage, ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */public static extern eErrorCode SDOAQ_PlaySingleFocus(ref AcquisitionFixedParameters pAcquisitionParams,SDOAQ_PlayCallback singleFinishedCb,int ringBufferSize,IntPtr[] ppFocusImage, ulong[] pFocusImagesBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */public static extern eErrorCode SDOAQ_StartContinuousSingleFocusStack(AcquisitionFixedParameters_V2[] pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, int ringBufferSize, IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlaySingleFocusEx */public static extern eErrorCode SDOAQ_StartContinuousSingleFocusStack(ref AcquisitionFixedParameters_V2 pAcquisitionParams, SDOAQ_ContinuousAcquisitionCallback stackFinishedCallback, int ringBufferSize, IntPtr[] ppFocusImages, ulong[] pFocusImagesBufferSizes);
 
 		/// <summary>
 		/// This function requests a stop of the running continuous focus stack acquisition. After this function
@@ -1285,7 +1297,7 @@ namespace SDOAQ
 		/// <param name="pointCloudBufferSize">The size of the point cloud buffer</param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SingleShotEdofEx(
-			  AcquisitionFixedParametersEx[] pAcquisitionParams,
+			  ref AcquisitionFixedParametersEx pAcquisitionParams,
 			  int[] pPositions, int positionsCount,
 			  float[] pStepMapBuffer, ulong stepMapBufferSize,
 			  byte[] pEdofImageBuffer, ulong edofImageBufferSize,
@@ -1294,11 +1306,11 @@ namespace SDOAQ
 			  float[] pPointCloudBuffer, ulong pointCloudBufferSize);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_SingleShotEdof(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,float[] pStepMapBuffer, ulong stepMapBufferSize,byte[] pEdofImageBuffer, ulong edofImageBufferSize,float[] pQualityMapBuffer, ulong qualityMapBufferSize,float[] pHeightMapBuffer, ulong heightMapBufferSize,float[] pPointCloudBuffer, ulong pointCloudBufferSize);
+		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_SingleShotEdof(ref AcquisitionFixedParameters pAcquisitionParams,int[] pPositions, int positionsCount,float[] pStepMapBuffer, ulong stepMapBufferSize,byte[] pEdofImageBuffer, ulong edofImageBufferSize,float[] pQualityMapBuffer, ulong qualityMapBufferSize,float[] pHeightMapBuffer, ulong heightMapBufferSize,float[] pPointCloudBuffer, ulong pointCloudBufferSize);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_AcquireEdof_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,EdofCalculationFixedParameters[] pCalculationParams,int[] pPositions, int positionsCount, float[] pStepMapBuffer,ulong stepMapBufferSize, byte[] pEdofImageBuffer,ulong edofImageBufferSize, float[] pQualityMapBuffer, ulong qualityMapBufferSize,float[] pHeightMapBuffer, ulong heightMapBufferSize,float[] pPointCloudBuffer, ulong pointCloudBufferSize);
+		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_AcquireEdof_V2(ref AcquisitionFixedParameters_V2 pAcquisitionParams, ref EdofCalculationFixedParameters pCalculationParams,int[] pPositions, int positionsCount, float[] pStepMapBuffer,ulong stepMapBufferSize, byte[] pEdofImageBuffer,ulong edofImageBufferSize, float[] pQualityMapBuffer, ulong qualityMapBufferSize,float[] pHeightMapBuffer, ulong heightMapBufferSize,float[] pPointCloudBuffer, ulong pointCloudBufferSize);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_AcquireEdof(AcquisitionFixedParameters[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, int[] pPositions, int positionsCount, float[] pStepMapBuffer, ulong stepMapBufferSize, byte[] pEdofImageBuffer, ulong edofImageBufferSize, float[] pQualityMapBuffer, ulong qualityMapBufferSize, float[] pHeightMapBuffer, ulong heightMapBufferSize);
+		/* deprecated. Instead, use SDOAQ_SingleShotEdofEx */public static extern eErrorCode SDOAQ_AcquireEdof(ref AcquisitionFixedParameters pAcquisitionParams, ref EdofCalculationFixedParameters pCalculationParams, int[] pPositions, int positionsCount, float[] pStepMapBuffer, ulong stepMapBufferSize, byte[] pEdofImageBuffer, ulong edofImageBufferSize, float[] pQualityMapBuffer, ulong qualityMapBufferSize, float[] pHeightMapBuffer, ulong heightMapBufferSize);
 
 
 		/// <summary>
@@ -1350,7 +1362,7 @@ namespace SDOAQ
 		/// </param>
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_PlayEdofEx(
-				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				ref AcquisitionFixedParametersEx pAcquisitionParams,
 				SDOAQ_PlayCallbackEx edofFinishedCallback,
 				int[] pPositions, int positionsCount,
 				int ringBufferSize,
@@ -1358,11 +1370,11 @@ namespace SDOAQ
 				ulong[] pRingBufferSizes);       // size of each image buffer => size of array == (ringBufferSize * 5);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_PlayEdof(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayCallback edofFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);		
+		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_PlayEdof(ref AcquisitionFixedParameters pAcquisitionParams,SDOAQ_PlayCallback edofFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);		
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_StartContinuousEdof_V2(AcquisitionFixedParameters_V2[] pAcquisitionParams,EdofCalculationFixedParameters[] pCalculationParams,SDOAQ_ContinuousEdofCallback edofFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages_V2, ulong[] pRingBufferSizes_V2);		
+		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_StartContinuousEdof_V2(ref AcquisitionFixedParameters_V2 pAcquisitionParams,EdofCalculationFixedParameters[] pCalculationParams,SDOAQ_ContinuousEdofCallback edofFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages_V2, ulong[] pRingBufferSizes_V2);		
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_StartContinuousEdof(AcquisitionFixedParameters[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, SDOAQ_ContinuousEdofCallback edofFinishedCallback, int[] pPositions, int positionsCount, int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayEdofEx */public static extern eErrorCode SDOAQ_StartContinuousEdof(ref AcquisitionFixedParameters pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, SDOAQ_ContinuousEdofCallback edofFinishedCallback, int[] pPositions, int positionsCount, int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
 		
 		/// <summary>
 		/// This function requests a stop of the running continuous EDoF acquisition. After this functions returns the ring buffer
@@ -1411,17 +1423,17 @@ namespace SDOAQ
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_SingleShotAFEx(
-				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				ref AcquisitionFixedParametersEx pAcquisitionParams,
 				int[] pPositions, int positionsCount,
 				byte[] pAFImageBuffer, ulong AFImageBufferSize,
-				double[] pBestFocusStep, double[] pBestScore, double[] pMatchedFocusStep);
+				ref double pBestFocusStep, ref double pBestScore, ref double pMatchedFocusStep);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_SingleShotAF_Ex(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,byte[] pAFImageBuffer, ulong AFImageBufferSize,double[] pBestFocusStep, double[] pBestScore, double[] pMatchedFocusStep);
+		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_SingleShotAF_Ex(ref AcquisitionFixedParameters pAcquisitionParams,int[] pPositions, int positionsCount,byte[] pAFImageBuffer, ulong AFImageBufferSize, ref double pBestFocusStep, ref double pBestScore, ref double pMatchedFocusStep);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_SingleShotAF(AcquisitionFixedParameters[] pAcquisitionParams,int[] pPositions, int positionsCount,byte[] pAFImageBuffer, ulong AFImageBufferSize,double[] pBestFocusStep, double[] pBestScore);		
+		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_SingleShotAF(ref AcquisitionFixedParameters pAcquisitionParams,int[] pPositions, int positionsCount,byte[] pAFImageBuffer, ulong AFImageBufferSize, ref double pBestFocusStep, ref double pBestScore);		
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_AcquireAF(AcquisitionFixedParameters_V2[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, int[] pPositions, int positionsCount, byte[] pAFImageBuffer, ulong AFImageBufferSize, double[] pBestFocusStep, double[] pBestScore);
+		/* deprecated. Instead, use SDOAQ_SingleShotAFEx */public static extern eErrorCode SDOAQ_AcquireAF(ref AcquisitionFixedParameters_V2 pAcquisitionParams, ref EdofCalculationFixedParameters pCalculationParams, int[] pPositions, int positionsCount, byte[] pAFImageBuffer, ulong AFImageBufferSize, ref double pBestFocusStep, ref double pBestScore);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_PlayAFEx(
@@ -1433,11 +1445,11 @@ namespace SDOAQ
 				ulong[] pRingBufferSizes);     // size of each image buffer => size of array == (ringBufferSize * 1);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_PlayAF_Ex(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayAfCallbackEx afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_PlayAF_Ex(ref AcquisitionFixedParameters pAcquisitionParams,SDOAQ_PlayAfCallbackEx afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_PlayAF(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayAfCallback afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);		
+		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_PlayAF(ref AcquisitionFixedParameters pAcquisitionParams,SDOAQ_PlayAfCallback afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);		
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_StartContinuousAF(AcquisitionFixedParameters_V2[] pAcquisitionParams,EdofCalculationFixedParameters[] pCalculationParams,SDOAQ_ContinuousAfCallback afFinishedCallback,int[] pPositions, int positionsCount,int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayAFEx */public static extern eErrorCode SDOAQ_StartContinuousAF(ref AcquisitionFixedParameters_V2 pAcquisitionParams, ref EdofCalculationFixedParameters pCalculationParams, SDOAQ_ContinuousAfCallback afFinishedCallback, int[] pPositions, int positionsCount,int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_StopAF();
@@ -1483,7 +1495,7 @@ namespace SDOAQ
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_PlayMFEx(
-				AcquisitionFixedParametersEx[] pAcquisitionParams,
+				ref AcquisitionFixedParametersEx pAcquisitionParams,
 				SDOAQ_PlayMfCallbackEx mfFinishedCallback,
 				int[] pPositions, int positionsCount,
 				[MarshalAs(UnmanagedType.LPStr)] string sFunctionScript,
@@ -1492,9 +1504,9 @@ namespace SDOAQ
 				ulong[] pRingBufferSizes);      // size of each image buffer => size of array == (ringBufferSize * 1);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayMFEx */public static extern eErrorCode SDOAQ_PlayMF(AcquisitionFixedParameters[] pAcquisitionParams,SDOAQ_PlayMfCallback mfFinishedCallback,int[] pPositions, int positionsCount,[MarshalAs(UnmanagedType.LPStr)] string sFunctionScript,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayMFEx */public static extern eErrorCode SDOAQ_PlayMF(ref AcquisitionFixedParameters pAcquisitionParams,SDOAQ_PlayMfCallback mfFinishedCallback, int[] pPositions, int positionsCount,[MarshalAs(UnmanagedType.LPStr)] string sFunctionScript,int ringBufferSize,IntPtr[] ppRingBufferImages,ulong[] pRingBufferSizes);
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
-		/* deprecated. Instead, use SDOAQ_PlayMFEx */public static extern eErrorCode SDOAQ_StartContinuousMF(AcquisitionFixedParameters_V2[] pAcquisitionParams, EdofCalculationFixedParameters[] pCalculationParams, SDOAQ_ContinuousMfCallback mfFinishedCallback, int[] pPositions, int positionsCount, [MarshalAs(UnmanagedType.LPStr)] string sFunctionScript, int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
+		/* deprecated. Instead, use SDOAQ_PlayMFEx */public static extern eErrorCode SDOAQ_StartContinuousMF(ref AcquisitionFixedParameters_V2 pAcquisitionParams, ref EdofCalculationFixedParameters pCalculationParams, SDOAQ_ContinuousMfCallback mfFinishedCallback, int[] pPositions, int positionsCount, [MarshalAs(UnmanagedType.LPStr)] string sFunctionScript, int ringBufferSize, IntPtr[] ppRingBufferImages, ulong[] pRingBufferSizes);
 
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]
 		public static extern eErrorCode SDOAQ_StopMF();

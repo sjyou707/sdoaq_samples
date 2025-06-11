@@ -51,9 +51,12 @@
             this.rdo_Grab_OFF = new System.Windows.Forms.RadioButton();
             this.rdo_Grab_ON = new System.Windows.Forms.RadioButton();
             this.gr_TriggerMode = new System.Windows.Forms.GroupBox();
-            this.rdo_TrigeerMode_External = new System.Windows.Forms.RadioButton();
-            this.rdo_TrigeerMode_Software = new System.Windows.Forms.RadioButton();
-            this.rdo_TrigeerMode_FreeRun = new System.Windows.Forms.RadioButton();
+            this.rdo_TrigeerMode_Grabber_External = new System.Windows.Forms.RadioButton();
+            this.rdo_TrigeerMode_Cam_External = new System.Windows.Forms.RadioButton();
+            this.rdo_TrigeerMode_Grabber_Software = new System.Windows.Forms.RadioButton();
+            this.rdo_TrigeerMode_Cam_Software = new System.Windows.Forms.RadioButton();
+            this.rdo_TrigeerMode_Grabber_FreeRun = new System.Windows.Forms.RadioButton();
+            this.rdo_TrigeerMode_Cam_FreeRun = new System.Windows.Forms.RadioButton();
             this.gr_AcquisitionControl = new System.Windows.Forms.GroupBox();
             this.cb_EnableCameraFrameCallBack = new System.Windows.Forms.CheckBox();
             this.btn_SwTrigger = new System.Windows.Forms.Button();
@@ -62,6 +65,10 @@
             this.lbl_ImageStatus = new System.Windows.Forms.Label();
             this.tmr_LogUpdate = new System.Windows.Forms.Timer(this.components);
             this.tmr_GrabStatus = new System.Windows.Forms.Timer(this.components);
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txt_FOV_Offset_X = new System.Windows.Forms.TextBox();
+            this.txt_FOV_Offset_Y = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -98,7 +105,7 @@
             this.splitContainer.Panel2.Controls.Add(this.pb_CamImage);
             this.splitContainer.Panel2.Controls.Add(this.lbl_ImageStatus);
             this.splitContainer.Size = new System.Drawing.Size(1264, 681);
-            this.splitContainer.SplitterDistance = 610;
+            this.splitContainer.SplitterDistance = 722;
             this.splitContainer.SplitterWidth = 3;
             this.splitContainer.TabIndex = 0;
             this.splitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_SplitterMoved);
@@ -111,7 +118,7 @@
             this.gr_Image.Controls.Add(this.btn_ExposureTime_Set);
             this.gr_Image.Controls.Add(this.label4);
             this.gr_Image.Controls.Add(this.label3);
-            this.gr_Image.Location = new System.Drawing.Point(222, 196);
+            this.gr_Image.Location = new System.Drawing.Point(402, 196);
             this.gr_Image.Name = "gr_Image";
             this.gr_Image.Size = new System.Drawing.Size(286, 100);
             this.gr_Image.TabIndex = 4;
@@ -174,14 +181,18 @@
             // 
             // gr_FOV
             // 
+            this.gr_FOV.Controls.Add(this.txt_FOV_Offset_Y);
             this.gr_FOV.Controls.Add(this.txt_FOV_Height);
+            this.gr_FOV.Controls.Add(this.txt_FOV_Offset_X);
             this.gr_FOV.Controls.Add(this.txt_FOV_Width);
             this.gr_FOV.Controls.Add(this.btn_FOV_Set);
+            this.gr_FOV.Controls.Add(this.label6);
             this.gr_FOV.Controls.Add(this.label2);
+            this.gr_FOV.Controls.Add(this.label5);
             this.gr_FOV.Controls.Add(this.label1);
             this.gr_FOV.Location = new System.Drawing.Point(16, 196);
             this.gr_FOV.Name = "gr_FOV";
-            this.gr_FOV.Size = new System.Drawing.Size(200, 100);
+            this.gr_FOV.Size = new System.Drawing.Size(355, 100);
             this.gr_FOV.TabIndex = 4;
             this.gr_FOV.TabStop = false;
             this.gr_FOV.Text = "FOV";
@@ -203,7 +214,7 @@
             // btn_FOV_Set
             // 
             this.btn_FOV_Set.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btn_FOV_Set.Location = new System.Drawing.Point(130, 28);
+            this.btn_FOV_Set.Location = new System.Drawing.Point(285, 29);
             this.btn_FOV_Set.Name = "btn_FOV_Set";
             this.btn_FOV_Set.Size = new System.Drawing.Size(64, 56);
             this.btn_FOV_Set.TabIndex = 0;
@@ -272,11 +283,11 @@
             this.gr_GrabState.Controls.Add(this.btn_GrabStatus);
             this.gr_GrabState.Controls.Add(this.rdo_Grab_OFF);
             this.gr_GrabState.Controls.Add(this.rdo_Grab_ON);
-            this.gr_GrabState.Location = new System.Drawing.Point(391, 11);
+            this.gr_GrabState.Location = new System.Drawing.Point(265, 83);
             this.gr_GrabState.Margin = new System.Windows.Forms.Padding(2);
             this.gr_GrabState.Name = "gr_GrabState";
             this.gr_GrabState.Padding = new System.Windows.Forms.Padding(2);
-            this.gr_GrabState.Size = new System.Drawing.Size(122, 180);
+            this.gr_GrabState.Size = new System.Drawing.Size(124, 108);
             this.gr_GrabState.TabIndex = 1;
             this.gr_GrabState.TabStop = false;
             this.gr_GrabState.Text = "Grab Status";
@@ -287,7 +298,7 @@
             this.btn_GrabStatus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_GrabStatus.Location = new System.Drawing.Point(5, 23);
             this.btn_GrabStatus.Name = "btn_GrabStatus";
-            this.btn_GrabStatus.Size = new System.Drawing.Size(106, 60);
+            this.btn_GrabStatus.Size = new System.Drawing.Size(113, 36);
             this.btn_GrabStatus.TabIndex = 0;
             this.btn_GrabStatus.Text = "IDLE";
             this.btn_GrabStatus.UseVisualStyleBackColor = true;
@@ -296,10 +307,10 @@
             // rdo_Grab_OFF
             // 
             this.rdo_Grab_OFF.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rdo_Grab_OFF.Location = new System.Drawing.Point(5, 132);
+            this.rdo_Grab_OFF.Location = new System.Drawing.Point(64, 64);
             this.rdo_Grab_OFF.Margin = new System.Windows.Forms.Padding(2);
             this.rdo_Grab_OFF.Name = "rdo_Grab_OFF";
-            this.rdo_Grab_OFF.Size = new System.Drawing.Size(106, 37);
+            this.rdo_Grab_OFF.Size = new System.Drawing.Size(54, 37);
             this.rdo_Grab_OFF.TabIndex = 0;
             this.rdo_Grab_OFF.TabStop = true;
             this.rdo_Grab_OFF.Text = "OFF";
@@ -310,10 +321,10 @@
             // rdo_Grab_ON
             // 
             this.rdo_Grab_ON.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rdo_Grab_ON.Location = new System.Drawing.Point(5, 88);
+            this.rdo_Grab_ON.Location = new System.Drawing.Point(5, 64);
             this.rdo_Grab_ON.Margin = new System.Windows.Forms.Padding(2);
             this.rdo_Grab_ON.Name = "rdo_Grab_ON";
-            this.rdo_Grab_ON.Size = new System.Drawing.Size(106, 37);
+            this.rdo_Grab_ON.Size = new System.Drawing.Size(54, 37);
             this.rdo_Grab_ON.TabIndex = 0;
             this.rdo_Grab_ON.TabStop = true;
             this.rdo_Grab_ON.Text = "ON";
@@ -323,56 +334,98 @@
             // 
             // gr_TriggerMode
             // 
-            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_External);
-            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_Software);
-            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_FreeRun);
-            this.gr_TriggerMode.Location = new System.Drawing.Point(265, 73);
+            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_Grabber_External);
+            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_Cam_External);
+            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_Grabber_Software);
+            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_Cam_Software);
+            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_Grabber_FreeRun);
+            this.gr_TriggerMode.Controls.Add(this.rdo_TrigeerMode_Cam_FreeRun);
+            this.gr_TriggerMode.Location = new System.Drawing.Point(393, 11);
             this.gr_TriggerMode.Margin = new System.Windows.Forms.Padding(2);
             this.gr_TriggerMode.Name = "gr_TriggerMode";
             this.gr_TriggerMode.Padding = new System.Windows.Forms.Padding(2);
-            this.gr_TriggerMode.Size = new System.Drawing.Size(122, 118);
+            this.gr_TriggerMode.Size = new System.Drawing.Size(313, 117);
             this.gr_TriggerMode.TabIndex = 1;
             this.gr_TriggerMode.TabStop = false;
             this.gr_TriggerMode.Text = "Trigger mode";
             // 
-            // rdo_TrigeerMode_External
+            // rdo_TrigeerMode_Grabber_External
             // 
-            this.rdo_TrigeerMode_External.AutoSize = true;
-            this.rdo_TrigeerMode_External.Location = new System.Drawing.Point(20, 79);
-            this.rdo_TrigeerMode_External.Margin = new System.Windows.Forms.Padding(2);
-            this.rdo_TrigeerMode_External.Name = "rdo_TrigeerMode_External";
-            this.rdo_TrigeerMode_External.Size = new System.Drawing.Size(81, 19);
-            this.rdo_TrigeerMode_External.TabIndex = 0;
-            this.rdo_TrigeerMode_External.TabStop = true;
-            this.rdo_TrigeerMode_External.Text = "External";
-            this.rdo_TrigeerMode_External.UseVisualStyleBackColor = true;
-            this.rdo_TrigeerMode_External.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
+            this.rdo_TrigeerMode_Grabber_External.AutoSize = true;
+            this.rdo_TrigeerMode_Grabber_External.Location = new System.Drawing.Point(158, 79);
+            this.rdo_TrigeerMode_Grabber_External.Margin = new System.Windows.Forms.Padding(2);
+            this.rdo_TrigeerMode_Grabber_External.Name = "rdo_TrigeerMode_Grabber_External";
+            this.rdo_TrigeerMode_Grabber_External.Size = new System.Drawing.Size(137, 19);
+            this.rdo_TrigeerMode_Grabber_External.TabIndex = 0;
+            this.rdo_TrigeerMode_Grabber_External.TabStop = true;
+            this.rdo_TrigeerMode_Grabber_External.Text = "Grabber External";
+            this.rdo_TrigeerMode_Grabber_External.UseVisualStyleBackColor = true;
+            this.rdo_TrigeerMode_Grabber_External.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
             // 
-            // rdo_TrigeerMode_Software
+            // rdo_TrigeerMode_Cam_External
             // 
-            this.rdo_TrigeerMode_Software.AutoSize = true;
-            this.rdo_TrigeerMode_Software.Location = new System.Drawing.Point(20, 51);
-            this.rdo_TrigeerMode_Software.Margin = new System.Windows.Forms.Padding(2);
-            this.rdo_TrigeerMode_Software.Name = "rdo_TrigeerMode_Software";
-            this.rdo_TrigeerMode_Software.Size = new System.Drawing.Size(81, 19);
-            this.rdo_TrigeerMode_Software.TabIndex = 0;
-            this.rdo_TrigeerMode_Software.TabStop = true;
-            this.rdo_TrigeerMode_Software.Text = "Software";
-            this.rdo_TrigeerMode_Software.UseVisualStyleBackColor = true;
-            this.rdo_TrigeerMode_Software.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
+            this.rdo_TrigeerMode_Cam_External.AutoSize = true;
+            this.rdo_TrigeerMode_Cam_External.Location = new System.Drawing.Point(20, 79);
+            this.rdo_TrigeerMode_Cam_External.Margin = new System.Windows.Forms.Padding(2);
+            this.rdo_TrigeerMode_Cam_External.Name = "rdo_TrigeerMode_Cam_External";
+            this.rdo_TrigeerMode_Cam_External.Size = new System.Drawing.Size(130, 19);
+            this.rdo_TrigeerMode_Cam_External.TabIndex = 0;
+            this.rdo_TrigeerMode_Cam_External.TabStop = true;
+            this.rdo_TrigeerMode_Cam_External.Text = "Camera External";
+            this.rdo_TrigeerMode_Cam_External.UseVisualStyleBackColor = true;
+            this.rdo_TrigeerMode_Cam_External.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
             // 
-            // rdo_TrigeerMode_FreeRun
+            // rdo_TrigeerMode_Grabber_Software
             // 
-            this.rdo_TrigeerMode_FreeRun.AutoSize = true;
-            this.rdo_TrigeerMode_FreeRun.Location = new System.Drawing.Point(20, 23);
-            this.rdo_TrigeerMode_FreeRun.Margin = new System.Windows.Forms.Padding(2);
-            this.rdo_TrigeerMode_FreeRun.Name = "rdo_TrigeerMode_FreeRun";
-            this.rdo_TrigeerMode_FreeRun.Size = new System.Drawing.Size(81, 19);
-            this.rdo_TrigeerMode_FreeRun.TabIndex = 0;
-            this.rdo_TrigeerMode_FreeRun.TabStop = true;
-            this.rdo_TrigeerMode_FreeRun.Text = "Free-run";
-            this.rdo_TrigeerMode_FreeRun.UseVisualStyleBackColor = true;
-            this.rdo_TrigeerMode_FreeRun.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
+            this.rdo_TrigeerMode_Grabber_Software.AutoSize = true;
+            this.rdo_TrigeerMode_Grabber_Software.Location = new System.Drawing.Point(158, 51);
+            this.rdo_TrigeerMode_Grabber_Software.Margin = new System.Windows.Forms.Padding(2);
+            this.rdo_TrigeerMode_Grabber_Software.Name = "rdo_TrigeerMode_Grabber_Software";
+            this.rdo_TrigeerMode_Grabber_Software.Size = new System.Drawing.Size(137, 19);
+            this.rdo_TrigeerMode_Grabber_Software.TabIndex = 0;
+            this.rdo_TrigeerMode_Grabber_Software.TabStop = true;
+            this.rdo_TrigeerMode_Grabber_Software.Text = "Grabber Software";
+            this.rdo_TrigeerMode_Grabber_Software.UseVisualStyleBackColor = true;
+            this.rdo_TrigeerMode_Grabber_Software.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
+            // 
+            // rdo_TrigeerMode_Cam_Software
+            // 
+            this.rdo_TrigeerMode_Cam_Software.AutoSize = true;
+            this.rdo_TrigeerMode_Cam_Software.Location = new System.Drawing.Point(20, 51);
+            this.rdo_TrigeerMode_Cam_Software.Margin = new System.Windows.Forms.Padding(2);
+            this.rdo_TrigeerMode_Cam_Software.Name = "rdo_TrigeerMode_Cam_Software";
+            this.rdo_TrigeerMode_Cam_Software.Size = new System.Drawing.Size(130, 19);
+            this.rdo_TrigeerMode_Cam_Software.TabIndex = 0;
+            this.rdo_TrigeerMode_Cam_Software.TabStop = true;
+            this.rdo_TrigeerMode_Cam_Software.Text = "Camera Software";
+            this.rdo_TrigeerMode_Cam_Software.UseVisualStyleBackColor = true;
+            this.rdo_TrigeerMode_Cam_Software.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
+            // 
+            // rdo_TrigeerMode_Grabber_FreeRun
+            // 
+            this.rdo_TrigeerMode_Grabber_FreeRun.AutoSize = true;
+            this.rdo_TrigeerMode_Grabber_FreeRun.Location = new System.Drawing.Point(158, 23);
+            this.rdo_TrigeerMode_Grabber_FreeRun.Margin = new System.Windows.Forms.Padding(2);
+            this.rdo_TrigeerMode_Grabber_FreeRun.Name = "rdo_TrigeerMode_Grabber_FreeRun";
+            this.rdo_TrigeerMode_Grabber_FreeRun.Size = new System.Drawing.Size(137, 19);
+            this.rdo_TrigeerMode_Grabber_FreeRun.TabIndex = 0;
+            this.rdo_TrigeerMode_Grabber_FreeRun.TabStop = true;
+            this.rdo_TrigeerMode_Grabber_FreeRun.Text = "Grabber Free-run";
+            this.rdo_TrigeerMode_Grabber_FreeRun.UseVisualStyleBackColor = true;
+            this.rdo_TrigeerMode_Grabber_FreeRun.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
+            // 
+            // rdo_TrigeerMode_Cam_FreeRun
+            // 
+            this.rdo_TrigeerMode_Cam_FreeRun.AutoSize = true;
+            this.rdo_TrigeerMode_Cam_FreeRun.Location = new System.Drawing.Point(20, 23);
+            this.rdo_TrigeerMode_Cam_FreeRun.Margin = new System.Windows.Forms.Padding(2);
+            this.rdo_TrigeerMode_Cam_FreeRun.Name = "rdo_TrigeerMode_Cam_FreeRun";
+            this.rdo_TrigeerMode_Cam_FreeRun.Size = new System.Drawing.Size(130, 19);
+            this.rdo_TrigeerMode_Cam_FreeRun.TabIndex = 0;
+            this.rdo_TrigeerMode_Cam_FreeRun.TabStop = true;
+            this.rdo_TrigeerMode_Cam_FreeRun.Text = "Camera Free-run";
+            this.rdo_TrigeerMode_Cam_FreeRun.UseVisualStyleBackColor = true;
+            this.rdo_TrigeerMode_Cam_FreeRun.CheckedChanged += new System.EventHandler(this.rdo_TrigeerMode_CheckedChanged);
             // 
             // gr_AcquisitionControl
             // 
@@ -411,37 +464,37 @@
             // 
             // txt_Log
             // 
-            this.txt_Log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.txt_Log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txt_Log.Location = new System.Drawing.Point(16, 317);
             this.txt_Log.Margin = new System.Windows.Forms.Padding(2);
             this.txt_Log.Name = "txt_Log";
-            this.txt_Log.Size = new System.Drawing.Size(579, 353);
+            this.txt_Log.Size = new System.Drawing.Size(691, 353);
             this.txt_Log.TabIndex = 0;
             this.txt_Log.Text = "";
             // 
             // pb_CamImage
             // 
-            this.pb_CamImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.pb_CamImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pb_CamImage.BackColor = System.Drawing.SystemColors.ControlDark;
             this.pb_CamImage.Location = new System.Drawing.Point(3, 34);
             this.pb_CamImage.Margin = new System.Windows.Forms.Padding(2);
             this.pb_CamImage.Name = "pb_CamImage";
-            this.pb_CamImage.Size = new System.Drawing.Size(650, 647);
+            this.pb_CamImage.Size = new System.Drawing.Size(540, 647);
             this.pb_CamImage.TabIndex = 1;
             this.pb_CamImage.TabStop = false;
             // 
             // lbl_ImageStatus
             // 
-            this.lbl_ImageStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.lbl_ImageStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbl_ImageStatus.Location = new System.Drawing.Point(3, 0);
             this.lbl_ImageStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lbl_ImageStatus.Name = "lbl_ImageStatus";
-            this.lbl_ImageStatus.Size = new System.Drawing.Size(650, 32);
+            this.lbl_ImageStatus.Size = new System.Drawing.Size(540, 32);
             this.lbl_ImageStatus.TabIndex = 0;
             this.lbl_ImageStatus.Text = "Text";
             this.lbl_ImageStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -453,6 +506,38 @@
             // tmr_GrabStatus
             // 
             this.tmr_GrabStatus.Tick += new System.EventHandler(this.tmr_GrabStatus_Tick);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(137, 32);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(63, 15);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Offset X";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(135, 62);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(63, 15);
+            this.label6.TabIndex = 0;
+            this.label6.Text = "Offset Y";
+            // 
+            // txt_FOV_Offset_X
+            // 
+            this.txt_FOV_Offset_X.Location = new System.Drawing.Point(206, 28);
+            this.txt_FOV_Offset_X.Name = "txt_FOV_Offset_X";
+            this.txt_FOV_Offset_X.Size = new System.Drawing.Size(69, 23);
+            this.txt_FOV_Offset_X.TabIndex = 2;
+            // 
+            // txt_FOV_Offset_Y
+            // 
+            this.txt_FOV_Offset_Y.Location = new System.Drawing.Point(206, 62);
+            this.txt_FOV_Offset_Y.Name = "txt_FOV_Offset_Y";
+            this.txt_FOV_Offset_Y.Size = new System.Drawing.Size(69, 23);
+            this.txt_FOV_Offset_Y.TabIndex = 2;
             // 
             // MainForm
             // 
@@ -494,11 +579,11 @@
         private System.Windows.Forms.GroupBox gr_AcquisitionControl;
         private System.Windows.Forms.RichTextBox txt_Log;
         private System.Windows.Forms.GroupBox gr_TriggerMode;
-        private System.Windows.Forms.RadioButton rdo_TrigeerMode_FreeRun;
+        private System.Windows.Forms.RadioButton rdo_TrigeerMode_Cam_FreeRun;
         private System.Windows.Forms.CheckBox cb_EnableCameraFrameCallBack;
         private System.Windows.Forms.Button btn_SwTrigger;
-        private System.Windows.Forms.RadioButton rdo_TrigeerMode_External;
-        private System.Windows.Forms.RadioButton rdo_TrigeerMode_Software;
+        private System.Windows.Forms.RadioButton rdo_TrigeerMode_Cam_External;
+        private System.Windows.Forms.RadioButton rdo_TrigeerMode_Cam_Software;
         private System.Windows.Forms.GroupBox gr_Init;
         private System.Windows.Forms.Button btnInit;
         private System.Windows.Forms.Button btnFinal;
@@ -521,6 +606,13 @@
         private System.Windows.Forms.RadioButton rdo_Grab_OFF;
         private System.Windows.Forms.RadioButton rdo_Grab_ON;
         private System.Windows.Forms.Timer tmr_GrabStatus;
+        private System.Windows.Forms.RadioButton rdo_TrigeerMode_Grabber_External;
+        private System.Windows.Forms.RadioButton rdo_TrigeerMode_Grabber_Software;
+        private System.Windows.Forms.RadioButton rdo_TrigeerMode_Grabber_FreeRun;
+        private System.Windows.Forms.TextBox txt_FOV_Offset_Y;
+        private System.Windows.Forms.TextBox txt_FOV_Offset_X;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
     }
 }
 

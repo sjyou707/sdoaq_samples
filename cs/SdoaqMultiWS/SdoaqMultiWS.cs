@@ -254,21 +254,22 @@ namespace SdoaqMultiWS
 
 		private void SdoaqMultiWS_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			// Run SDOAQ_Finalize method asynchronously, preventing the main UI thread from being blocked.
-			// When the form close button is clicked while image acquisition is in progress in C# application, the SDOAQ finalization is delayed.
-			Task.Run(() => { MySdoaq.SDOAQ_Finalize(); });
+            MySdoaq.LogReceived -= Sdoaq_LogDataReceived;
+            MySdoaq.Initialized -= Sdoaq_Initialized;
 
-			MySdoaq.LogReceived -= Sdoaq_LogDataReceived;
-			MySdoaq.Initialized -= Sdoaq_Initialized;
+            foreach (var sdoaqObj in _sdoaqObjList.Values)
+            {
+                sdoaqObj.AcquisitionStop();
+            }
 
-			_logBuffer = null;
+            MySdoaq.DisposeStaticResouce();
 
-			// Loop through all objects in _sdoaqObjList and call Dispose method
-			foreach (var sdoaqObj in _sdoaqObjList.Values)
-			{
-				sdoaqObj.Dispose();
-			}			
-		}
+            _logBuffer = null;
+            
+            // Run SDOAQ_Finalize method asynchronously, preventing the main UI thread from being blocked.
+            // When the form close button is clicked while image acquisition is in progress in C# application, the SDOAQ finalization is delayed.
+            Task.Run(() => { MySdoaq.SDOAQ_Finalize(); });
+        }
 
 		private void SdoaqMultiWS_Resize(object sender, EventArgs e)
         {

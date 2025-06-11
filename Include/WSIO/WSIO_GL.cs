@@ -271,7 +271,7 @@ namespace SDOWSIO
 						uint nums_image_data,
 						int mode,
 						float unit_microns,
-						tPara_Display25D[] p_para
+						ref tPara_Display25D p_para
 						);
 
 
