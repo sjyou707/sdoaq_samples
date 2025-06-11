@@ -326,6 +326,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "SdoaqAutoFocus";
             this.Text = "SDOAQ Auto-focus Sample";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SdoaqAutoFocus_FormClosed);
             this.Load += new System.EventHandler(this.SdoaqAutoFocus_Load);
             this.gpb_Controls.ResumeLayout(false);
             this.gpb_Controls.PerformLayout();

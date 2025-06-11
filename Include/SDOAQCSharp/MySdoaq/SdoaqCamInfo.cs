@@ -18,10 +18,10 @@ namespace SDOAQCSharp
         public int PixelHeight => AcqParam.cameraRoiHeight;
         public int Edofrecsize => 5;
 
-        public SDOAQ.SDOAQ_API.AcquisitionFixedParameters AcqParam { get; set; }
+        public SDOAQ.SDOAQ_API.AcquisitionFixedParametersEx AcqParam { get; set; }
         public SdoaqCamInfo()
         {
-            AcqParam = new SDOAQ.SDOAQ_API.AcquisitionFixedParameters();
+            AcqParam = new SDOAQ.SDOAQ_API.AcquisitionFixedParametersEx();
         }
 
         public string GetCamRoi()

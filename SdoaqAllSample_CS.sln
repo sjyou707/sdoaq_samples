@@ -13,6 +13,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqAutoFocus", "cs\SdoaqA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqEdof", "cs\SdoaqEdof\SdoaqEdof.csproj", "{F210B7EB-2C48-4022-88BB-9740CEA71CC3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqMultiCameraFrameCallback", "cs\SdoaqMultiCameraFrameCallback\SdoaqMultiCameraFrameCallback.csproj", "{322AB3B8-F840-42A8-92AB-A9EFD117C673}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqMultiLighting", "cs\SdoaqMultiLighting\SdoaqMultiLighting.csproj", "{8E468647-61AB-4866-BA56-B9C8D5E8952F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SdoaqMultiFocus", "cs\SdoaqMultiFocus\SdoaqMultiFocus.csproj", "{3C448B3A-884B-4588-9258-3CBF7DA462D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +45,18 @@ Global
 		{F210B7EB-2C48-4022-88BB-9740CEA71CC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F210B7EB-2C48-4022-88BB-9740CEA71CC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F210B7EB-2C48-4022-88BB-9740CEA71CC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{322AB3B8-F840-42A8-92AB-A9EFD117C673}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{322AB3B8-F840-42A8-92AB-A9EFD117C673}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{322AB3B8-F840-42A8-92AB-A9EFD117C673}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{322AB3B8-F840-42A8-92AB-A9EFD117C673}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E468647-61AB-4866-BA56-B9C8D5E8952F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E468647-61AB-4866-BA56-B9C8D5E8952F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E468647-61AB-4866-BA56-B9C8D5E8952F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E468647-61AB-4866-BA56-B9C8D5E8952F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C448B3A-884B-4588-9258-3CBF7DA462D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C448B3A-884B-4588-9258-3CBF7DA462D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C448B3A-884B-4588-9258-3CBF7DA462D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C448B3A-884B-4588-9258-3CBF7DA462D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

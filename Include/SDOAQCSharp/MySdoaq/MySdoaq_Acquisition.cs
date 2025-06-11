@@ -30,6 +30,9 @@ namespace SDOAQCSharp
                 case emPlayerMode.FocusStack:
                     AcquisitionStop_FocusStack();
                     break;
+                case emPlayerMode.Mf:
+                    AcquisitionStop_Mf();
+                    break;
             }
             return true;
         }
@@ -60,7 +63,7 @@ namespace SDOAQCSharp
 
             SelectMultiWS(CamIndex);
 
-            var rv = SDOAQ_API.SDOAQ_PlaySnap(CallBack_SDOAQ_Snap, focusList, focusList.Length, snapParams);
+            var rv = SDOAQ_API.SDOAQ_PlaySnapEx(CallBack_SDOAQ_Snap, focusList, focusList.Length, snapParams);
 
             return rv != SDOAQ_API.eErrorCode.ecNoError;
         }
@@ -73,29 +76,22 @@ namespace SDOAQCSharp
                 WriteLog(Logger.emLogLevel.Warning, $"Acquisition_FocusStackAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
-
-            var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-            {
-                CamInfo.AcqParam
-            };
-
+            
             var focusList = FocusList.GetStepList();
 
-            var rv = await Task.Run(() => Acq_FocusStack(acqParamList, focusList, true));
+            var rv = await Task.Run(() => Acq_FocusStack(CamInfo.AcqParam, focusList, true));
             
             return rv;
         }
 
-        private bool Acq_FocusStack(SDOAQ_API.AcquisitionFixedParameters[] acqParamList, int[] focusList, bool bShowLog)
+        private bool Acq_FocusStack(SDOAQ_API.AcquisitionFixedParametersEx acqParam, int[] focusList, bool bShowLog)
         {
             byte[][] imageBuffer = null;
             imageBuffer = new byte[focusList.Length][];
 
             var focusImagePointerList = new IntPtr[focusList.Length];
             var focusImageBufferSizeList = new ulong[focusList.Length];
-
-            ref var acqParam = ref acqParamList[0];
-
+            
             int sizeOfImage = acqParam.cameraRoiHeight * acqParam.cameraRoiWidth * CamInfo.ColorByte;
 
             for (int focus = 0; focus < focusList.Length; focus++)
@@ -114,8 +110,9 @@ namespace SDOAQCSharp
             long tickStart = Environment.TickCount;
 
             SelectMultiWS(CamIndex);
-            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotFocusStack(
-                acqParamList,
+            acqParam.callbackUserData = new IntPtr(Environment.TickCount);
+            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotFocusStackEx(
+                ref acqParam,
                 focusList, focusList.Length,
                 focusImagePointerList, focusImageBufferSizeList);
 
@@ -163,16 +160,11 @@ namespace SDOAQCSharp
                 _evtContinuosAcq_FocusStack.Set(true);
                 return true;
             }
-
-            var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-            {
-                CamInfo.AcqParam
-            };
+            
+            var acqParam = CamInfo.AcqParam;
 
             var focusList = FocusList.GetStepList();
-
-            var acqParam = acqParamList[0];
-
+            
             var ringBufferSize = PlayerRingBufferSize;
             var imageBufferSize = (uint)CamInfo.ImgSize;
             var resultImageSizes = new List<ulong>();
@@ -187,7 +179,8 @@ namespace SDOAQCSharp
             _playerFoucsStepCount = focusList.Length;
 
             SelectMultiWS(CamIndex);
-            var rv = SDOAQ_API.SDOAQ_PlayFocusStack(acqParamList, CallBack_SDOAQ_PlayFocusStack,
+            acqParam.callbackUserData = new IntPtr(Environment.TickCount);
+            var rv = SDOAQ_API.SDOAQ_PlayFocusStackEx(ref acqParam, CallBack_SDOAQ_PlayFocusStack,
                 focusList, focusList.Length,
                 ringBufferSize,
                 _ringBuffer.Buffer,
@@ -229,46 +222,40 @@ namespace SDOAQCSharp
                 WriteLog(Logger.emLogLevel.Warning, $"Acquisition_AfAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
-
-            var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-            {
-                CamInfo.AcqParam
-            };
-
+            
             var focusList = FocusList.GetStepList();
 
-            var rv = await Task.Run(() => Acq_Af(acqParamList, focusList, true));
+            var rv = await Task.Run(() => Acq_Af(CamInfo.AcqParam, focusList, true));
 
             return rv;
         }
         
-        private bool Acq_Af(SDOAQ_API.AcquisitionFixedParameters[] acqParamList, int[] focusList, bool bShowLog)
+        private bool Acq_Af(SDOAQ_API.AcquisitionFixedParametersEx acqParam, int[] focusList, bool bShowLog)
         {
-            var acqParam = acqParamList[0];
-
-            var imageBufferSize = (uint)CamInfo.ImgSize;
-            var imageBuffer = new byte[imageBufferSize];
-            var bestFocusStep = new double[1] { 0 };
-            var score = new double[1] { 0 };
-
+            uint imageBufferSize = (uint)CamInfo.ImgSize;
+            byte[] imageBuffer = new byte[imageBufferSize];
+            double bestFocusStep = 0;
+            double score = 0;
+            double matchedFocusStep = 0;
             long tickStart = Environment.TickCount;
 
             SelectMultiWS(CamIndex);
-            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotAF(
-                acqParamList,
+            acqParam.callbackUserData = new IntPtr(tickStart);
+            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotAFEx(
+                ref acqParam,
                 focusList, focusList.Length,
                 imageBuffer, imageBufferSize,
-                bestFocusStep, score);
+                ref bestFocusStep, ref score, ref matchedFocusStep);
 
             long elapsedTime = Environment.TickCount - tickStart;
 
             if (bShowLog)
             {
-                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotAF(), rv = {rvSdoaq}, Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
+                WriteLog(Logger.emLogLevel.Info, $"SingleShotAF(), rv = {rvSdoaq}, BestFocus = {bestFocusStep}, Score = {score}, MatchedFocusStep = {matchedFocusStep} Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
             }
             else if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
             {
-                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotAF(), rv = {rvSdoaq}");
+                WriteLog(Logger.emLogLevel.Info, $"SingleShotAF(), rv = {rvSdoaq}, BestFocus = {bestFocusStep}, Score = {score}, MatchedFocusStep = {matchedFocusStep}");
             }
                 
 
@@ -278,9 +265,9 @@ namespace SDOAQCSharp
             }
 
             var imgInfoList = new List<SdoaqImageInfo>
-                {
-                    new SdoaqImageInfo($"AF", acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte, imageBuffer)
-                };
+            {
+                new SdoaqImageInfo($"AF", acqParam.cameraRoiWidth, acqParam.cameraRoiHeight, CamInfo.ColorByte, imageBuffer)
+            };
 
             CallBackMsgLoop.Invoke((emCallBackMessage.Af, new object[] { imgInfoList }));
             return true;
@@ -302,7 +289,7 @@ namespace SDOAQCSharp
                 return true;
             }
 
-            var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
+            var acqParamList = new SDOAQ_API.AcquisitionFixedParametersEx[]
             {
                 CamInfo.AcqParam
             };
@@ -325,7 +312,8 @@ namespace SDOAQCSharp
             _playerFoucsStepCount = focusList.Length;
 
             SelectMultiWS(CamIndex);
-            var rv = SDOAQ_API.SDOAQ_PlayAF(acqParamList, CallBack_SDOAQ_PlayAf, 
+            acqParam.callbackUserData = new IntPtr(Environment.TickCount);
+            var rv = SDOAQ_API.SDOAQ_PlayAFEx(acqParamList, CallBack_SDOAQ_PlayAf, 
                 focusList, focusList.Length,
                 ringBufferSize, 
                 _ringBuffer.Buffer, 
@@ -367,23 +355,16 @@ namespace SDOAQCSharp
                 WriteLog(Logger.emLogLevel.Warning, $"Acquisition_EdofAsync(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
-
-            var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-            {
-                CamInfo.AcqParam
-            };
-
+            
             var focusList = FocusList.GetStepList();
 
-            var rv = await Task.Run(() => Acq_Edof(acqParamList, focusList, edofImageList, true));
+            var rv = await Task.Run(() => Acq_Edof(CamInfo.AcqParam, focusList, edofImageList, true));
 
             return rv;
         }
 
-        private bool Acq_Edof(SDOAQ_API.AcquisitionFixedParameters[] acqParamList, int[] focusList, EdofImageList edofImageList, bool bShowLog)
+        private bool Acq_Edof(SDOAQ_API.AcquisitionFixedParametersEx acqParam, int[] focusList, EdofImageList edofImageList, bool bShowLog)
         {
-            var acqParam = acqParamList[0];
-
             var pixelSize = CamInfo.PixelSize;
             var imgSize = CamInfo.ImgSize;
             var dataSize = CamInfo.DataSize;
@@ -403,9 +384,9 @@ namespace SDOAQCSharp
             long tickStart = Environment.TickCount;
 
             SelectMultiWS(CamIndex);
-
-            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotEdof(
-                acqParamList,
+            acqParam.callbackUserData = new IntPtr(tickStart);
+            var rvSdoaq = SDOAQ_API.SDOAQ_SingleShotEdofEx(
+                ref acqParam,
                 focusList, focusList.Length,
                 bufferStepMapImage, sizeStepMapBuffer,
                 bufferEdofImage, sizeEdofImageBuffer,
@@ -417,11 +398,11 @@ namespace SDOAQCSharp
 
             if (bShowLog)
             {
-                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotEdof(), rv = {rvSdoaq} Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
+                WriteLog(Logger.emLogLevel.Info, $"SingleShotEdof(), rv = {rvSdoaq} Acquisition Time = {elapsedTime} ms ({((double)focusList.Length / elapsedTime * 1000):F3} fps)");
             }
             else if (rvSdoaq != SDOAQ_API.eErrorCode.ecNoError)
             {
-                WriteLog(Logger.emLogLevel.Info, $"[Info] SingleShotEdof(), rv = {rvSdoaq}");
+                WriteLog(Logger.emLogLevel.Info, $"SingleShotEdof(), rv = {rvSdoaq}");
             }
                 
 
@@ -489,15 +470,10 @@ namespace SDOAQCSharp
                 _evtContinuosAcq_Edof.Set(true);
                 return true;
             }
-
-            var acqParamList = new SDOAQ_API.AcquisitionFixedParameters[]
-            {
-                CamInfo.AcqParam
-            };
-
+            
             var focusList = FocusList.GetStepList();
 
-            var acqParam = acqParamList[0];
+            var acqParam = CamInfo.AcqParam;
 
             var pixelSize = CamInfo.PixelSize;
             var imgSize = CamInfo.ImgSize;
@@ -530,11 +506,12 @@ namespace SDOAQCSharp
 
             SelectMultiWS(CamIndex);
 
+            acqParam.callbackUserData = new IntPtr(Environment.TickCount);
 
-			// FOR EXAMPLE
-			//int[] fixed_focusLise = { 100, 200, 300 };
+            // FOR EXAMPLE
+            //int[] fixed_focusLise = { 100, 200, 300 };
 
-			var rv = SDOAQ_API.SDOAQ_PlayEdof(acqParamList, CallBack_SDOAQ_PlayEdof,
+            var rv = SDOAQ_API.SDOAQ_PlayEdofEx(ref acqParam, CallBack_SDOAQ_PlayEdof,
 				focusList, focusList.Length,
 				//fixed_focusLise, fixed_focusLise.Length,
 				ringBufferSize,
@@ -569,5 +546,77 @@ namespace SDOAQCSharp
         }
         #endregion
 
+        #region MultiFocus
+        public bool AcquisitionContinuous_Mf(string funcScript)
+        {
+            if (IsInitialize == false || IsRunPlayer)
+            {
+                WriteLog(Logger.emLogLevel.Warning, $"AcquisitionContinuous_Mf(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
+                return false;
+            }
+            
+            var focusList = FocusList.GetStepList();
+
+            var acqParam = CamInfo.AcqParam;
+
+            var ringBufferSize = PlayerRingBufferSize;
+            var imageBufferSize = (uint)CamInfo.ImgSize;
+            var resultImageSizes = new List<ulong>();
+
+            var imgCount = ringBufferSize * focusList.Count();
+            for (int i = 0; i < imgCount; i++)
+            {
+                resultImageSizes.Add(imageBufferSize);
+            }
+
+            _ringBuffer.Set_Buffer(resultImageSizes.ToArray());
+            _playerFoucsStepCount = focusList.Length;
+
+            SelectMultiWS(CamIndex);
+            acqParam.callbackUserData = new IntPtr(Environment.TickCount);
+
+            var rv = SDOAQ_API.SDOAQ_PlayMFEx(ref acqParam, CallBack_SDOAQ_PlayMf,
+               focusList, focusList.Length, 
+               funcScript,
+               ringBufferSize,
+               _ringBuffer.Buffer,
+               _ringBuffer.Sizes);
+            
+
+            if (rv == SDOAQ_API.eErrorCode.ecNoError)
+            {
+                PlayerMode = emPlayerMode.Mf;
+                IsRunPlayer = true;
+                return true;
+            }
+
+            WriteLog(Logger.emLogLevel.API, $"SDOAQ_PlayMF(), Error = {rv}");
+            return false;
+        }
+
+        public void AcquisitionStop_Mf()
+        {
+            if (IsRunPlayer && PlayerMode == emPlayerMode.Mf)
+            {
+                SDOAQ_API.SDOAQ_StopMF();
+
+                IsRunPlayer = false;
+                PlayerMode = emPlayerMode.None;
+            }
+        }
+
+        public bool UpdateScriptPlayMf(string script)
+        {
+            WriteLog(Logger.emLogLevel.API, $"SDOAQ_UpdatePlayMF() {Environment.NewLine}{script}");
+
+            var rv = SDOAQ_API.SDOAQ_UpdatePlayMF(script);
+
+            if (rv != SDOAQ_API.eErrorCode.ecNoError)
+            {
+                WriteLog(Logger.emLogLevel.API, $"SDOAQ_UpdatePlayMF() Fail! rv = {rv}");
+            }
+            return rv == SDOAQ_API.eErrorCode.ecNoError;
+        }
+        #endregion
     }
 }

@@ -5,9 +5,9 @@ using System.Text;
 using SDOAQ;
 using SDOAQCSharp.Tool;
 
-namespace SdoaqCameraFrameCallback
+namespace SDOAQCSharp
 {
-    public class MyCamera : IDisposable
+    public partial class MyCamera : IDisposable
     {
         public enum RequestMsg
         {
@@ -16,7 +16,6 @@ namespace SdoaqCameraFrameCallback
 
         public enum CallBackMessage
         {
-            Initialize,
             Frame,
         }
 
@@ -41,6 +40,8 @@ namespace SdoaqCameraFrameCallback
             public const string BalanceRatio = "BalanceRatio";
         }
 
+        private MyQueue<(CallBackMessage msg, object[] objs)> _callBackMsgQueue = new MyQueue<(CallBackMessage msg, object[] objs)>();
+
         public MyQueue<(CallBackMessage msg, object[] objs)>.MsgLoopCallBack CallBackMsgLoop
         {
             get
@@ -52,71 +53,51 @@ namespace SdoaqCameraFrameCallback
                 _callBackMsgQueue.CallBackMsgLoop = value;
             }
         }
-        public Logger MyLogger { get; private set; } = new Logger();
-        public bool IsInitialize { get; private set; } = false;
+       
         public uint RecivedFrameCount { get; private set; } = 0;
 
-        private MyQueue<(CallBackMessage msg, object[] objs)> _callBackMsgQueue = new MyQueue<(CallBackMessage msg, object[] objs)>();
+        public readonly int CamIndex;
 
         private MyManualResetEvent<(SDOAQ_API.eErrorCode errorCode, StringBuilder pErrorMessage)> _evtInitDone = new MyManualResetEvent<(SDOAQ_API.eErrorCode errorCode, StringBuilder pErrorMessage)>(false);
 
-        private static SDOAQ_API.SDOAQ_FrameCallback SDOAQ_FrameCallback;
-        private static SDOAQ_API.SDOAQ_LogCallback SDOAQ_LogCallback;
-        private static SDOAQ_API.SDOAQ_ErrorCallback SDOAQ_ErrorCallback;
-        private static SDOAQ_API.SDOAQ_InitDoneCallback SDOAQ_InitDoneCallback;
+        private bool _disposedValue = false;
 
-        private static MyCamera _myCamera = null;
-        private static bool _flagFirst = true;
-
-        public MyCamera()
+        
+        public MyCamera(int index)
         {
-            if (_flagFirst)
+            CamIndex = index;
+            if (s_isFirstInitialize)
             {
-                _flagFirst = false;
-                _myCamera = this;
-
-                SDOAQ_LogCallback = LogCallback;
-                SDOAQ_ErrorCallback = ErrorCallback;
-                SDOAQ_InitDoneCallback = InitDoneCallback;
-
-                SDOAQ_FrameCallback = FrameCallback;
+                Add_CallbackFunction();
+                s_isFirstInitialize = false;
             }
         }
 
-        public string GetVersion()
+        ~MyCamera()
         {
-            return $"{SDOAQ_API.SDOAQ_GetMajorVersion()}.{SDOAQ_API.SDOAQ_GetMinorVersion()}.{SDOAQ_API.SDOAQ_GetPatchVersion()}";
+            Dispose();
         }
 
-        public SDOAQ_API.eErrorCode Initialize(bool bSync = false)
+        #region IDisposable Support
+        protected virtual void Dispose(bool disposing)
         {
-            IsInitialize = false;
-            RecivedFrameCount = 0;
-            if (bSync)
+            if (!_disposedValue)
             {
-                _evtInitDone.Reset();
+                if (disposing)
+                {
+                    ;
+                }
+
+                _disposedValue = true;
             }
-
-            var rv = SDOAQ_API.SDOAQ_Initialize(null, null, SDOAQ_InitDoneCallback);
-
-            if (bSync)
-            {
-                _evtInitDone.WaitOne();
-                rv = _evtInitDone.ReturnValue.errorCode;
-            }
-            return rv;
         }
 
-        public SDOAQ_API.eErrorCode Finalize()
+        public void Dispose()
         {
-            IsInitialize = false;
-            return SDOAQ_API.SDOAQ_Finalize();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
-
-        public void EanbleCameraFrameCallBack(bool bEnable)
-        {
-            SDOAQ_API.SDOAQ_SetFrameCallback(bEnable ? SDOAQ_FrameCallback : null);
-        }
+        #endregion
 
         #region Set/Get Parameter
         public SDOAQ_API.eErrorCode SetTriggerMode(SDOAQ_API.eCameraTriggerMode triggerMode)
@@ -125,6 +106,9 @@ namespace SdoaqCameraFrameCallback
             {
                 return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
+
+            SelectMultiWS(CamIndex);
+
             return SDOAQ_API.SDOAQ_SetCameraTriggerMode(triggerMode);
         }
 
@@ -135,55 +119,75 @@ namespace SdoaqCameraFrameCallback
                 return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
 
+            SelectMultiWS(CamIndex);
+
             return SDOAQ_API.SDOAQ_ExecCameraSoftwareTrigger();
         }
 
-        public SDOAQ_API.eErrorCode SetFOV(int width, int height)
+        public SDOAQ_API.eErrorCode SetFOV(int width, int height, int offset_X = 0, int offset_Y = 0, int bining = 1)
         {
             if (IsInitialize == false)
             {
                 return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
 
-			//return SDOAQ_API.SDOAQ_SetCameraParameter(width, height, 1);
-			return SDOAQ_API.SDOAQ_SetCameraRoiParameter(width, height, 0, 0, 1);
+            SelectMultiWS(CamIndex);
+
+            return SDOAQ_API.SDOAQ_SetCameraRoiParameter(width, height, offset_X, offset_Y, bining);
 		}
 
-        public SDOAQ_API.eErrorCode GetFOV(out int width, out int height)
+        public SDOAQ_API.eErrorCode GetFOV(out int width, out int height, out int offset_X, out int offset_Y, out int bining)
         {
             width = 0;
             height = 0;
+            offset_X = 0;
+            offset_Y = 0;
+            bining = 1;
+
             if (IsInitialize == false)
             {
                 return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
 
-            int[] cam_width = new int[1];
-            int[] cam_height = new int[1];
-            int[] cam_binning = new int[1];
+            int cam_width = 0;
+            int cam_height = 0;
+            int cam_offset_X = 0;
+            int cam_offset_Y = 0;
+            int cam_binning = 0;
 
-            var rv = SDOAQ_API.SDOAQ_GetCameraParameter(cam_width, cam_height, cam_binning);
+            SelectMultiWS(CamIndex);
 
-            width = cam_width[0];
-            height = cam_height[0];
+            var rv = SDOAQ_API.SDOAQ_GetCameraRoiParameter(ref cam_width, ref cam_height, ref cam_offset_X, ref cam_offset_Y, ref cam_binning);
+
+            width = cam_width;
+            height = cam_height;
+            offset_X = cam_offset_X;
+            offset_Y = cam_offset_Y;
+            bining = cam_binning;
+
             return rv;
         }
 
         public SDOAQ_API.eErrorCode SetExposureTime(int exposureTime)
         {
+            SelectMultiWS(CamIndex);
+
             return SDOAQ_API.SDOAQ_SetIntParameterValue(SDOAQ_API.eParameterId.piCameraExposureTime, exposureTime);
         }
 
         public SDOAQ_API.eErrorCode GetExposureTime(out int exposureTime)
         {
-            exposureTime = 0;
-            int[] tmp = new int[1];
-            var rv = SDOAQ_API.SDOAQ_GetIntParameterValue(SDOAQ_API.eParameterId.piCameraExposureTime, tmp);
+            SelectMultiWS(CamIndex);
 
-            if (rv == SDOAQ_API.eErrorCode.ecNoError)
+            exposureTime = 0;
+
+            if (IsInitialize == false)
             {
-                exposureTime = tmp[0];
+                return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
+            
+            var rv = SDOAQ_API.SDOAQ_GetIntParameterValue(SDOAQ_API.eParameterId.piCameraExposureTime, ref exposureTime);
+            
             return rv;
         }
 
@@ -194,6 +198,7 @@ namespace SdoaqCameraFrameCallback
             {
                 return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
+            SelectMultiWS(CamIndex);
             return SDOAQ_API.SDOAQ_SetCameraGrabbingStatus(grabState);
         }
 
@@ -204,23 +209,38 @@ namespace SdoaqCameraFrameCallback
             {
                 return SDOAQ_API.eErrorCode.ecNotInitialized;
             }
+            SelectMultiWS(CamIndex);
             return SDOAQ_API.SDOAQ_GetCameraGrabbingStatus(out grabState);
         }
 
         public SDOAQ_API.eErrorCode SetGain(double gain)
         {
+            SelectMultiWS(CamIndex);
             return SDOAQ_API.SDOAQ_SetCameraParameterDouble(ParameterName.Gain, gain);
         }
 
         public SDOAQ_API.eErrorCode GetGain(out double gain)
         {
             gain = 0;
+            if (IsInitialize == false)
+            {
+                return SDOAQ_API.eErrorCode.ecNotInitialized;
+            }
+
+            SelectMultiWS(CamIndex);
             var rv = SDOAQ_API.SDOAQ_GetCameraParameterDouble(ParameterName.Gain, out gain, SDOAQ_API.eCameraParameterType.cptValue);
             return rv;
         }
 
         public SDOAQ_API.eErrorCode SetWhiteBalance(double red, double green, double blue)
         {
+            if (IsInitialize == false)
+            {
+                return SDOAQ_API.eErrorCode.ecNotInitialized;
+            }
+
+            SelectMultiWS(CamIndex);
+
             SDOAQ_API.eErrorCode rv = SDOAQ_API.eErrorCode.ecNoError;
             if (SDOAQ_API.eErrorCode.ecNoError != (rv = SDOAQ_API.SDOAQ_SetCameraParameterString(ParameterName.BalanceRatioSelector, ParameterName.BalanceRatioSelector_Red)))
             {
@@ -257,85 +277,24 @@ namespace SdoaqCameraFrameCallback
 
         public SDOAQ_API.eErrorCode SetReverseX(bool bReverse)
         {
+            SelectMultiWS(CamIndex);
+
             return SDOAQ_API.SDOAQ_SetCameraParameterBool(ParameterName.ReverseX, bReverse);
         }
 
         public SDOAQ_API.eErrorCode SetReverseY(bool bReverse)
         {
+            SelectMultiWS(CamIndex);
+
             return SDOAQ_API.SDOAQ_SetCameraParameterBool(ParameterName.ReverseY, bReverse);
         }
         #endregion
+
         #endregion
-
-        #region IDispose
-        public void Dispose()
+        
+        public void AppendLog(Logger.emLogLevel logLevel, string format, params object[] args)
         {
-            EanbleCameraFrameCallBack(false);
-            _callBackMsgQueue.Dispose();
-            MyLogger.Dispose();
-            Finalize();
+            MyCamera.WriteLog(logLevel, $"[Cam{CamIndex + 1}] {string.Format(format, args)}");
         }
-        #endregion
-
-        #region callBackFuntion
-        private static void LogCallback(SDOAQ_API.eLogSeverity severity, StringBuilder pMessage)
-        {
-            _myCamera.MyLogger.WriteLog($"[LOG][{severity}]{pMessage.ToString()}");
-        }
-
-        private static void ErrorCallback(SDOAQ_API.eErrorCode errorCode, StringBuilder pErrorMessage)
-        {
-            _myCamera.MyLogger.WriteLog($"[ERROR]Error Code = {errorCode}, {pErrorMessage.ToString()}");
-        }
-
-
-        private static void InitDoneCallback(SDOAQ_API.eErrorCode errorCode, StringBuilder pErrorMessage)
-        {
-            if (_myCamera._evtInitDone.IsWaitSet)
-            {
-                _myCamera._evtInitDone.Set((errorCode, pErrorMessage));
-            }
-
-            bool bInitDone = errorCode == SDOAQ_API.eErrorCode.ecNoError;
-            if (bInitDone)
-            {
-                SDOAQ_API.SDOAQ_RegisterLowLevelAuthorization();
-
-                _myCamera.IsInitialize = true;
-                _myCamera.MyLogger.WriteLog($"[INIT]Initialize Done");
-
-                //_myCamera.SetTriggerMode(eCameraTriggerMode.ctmSoftware);
-            }
-            else
-            {
-                _myCamera.MyLogger.WriteLog($"[INIT]Initialize Error, Error Code = {errorCode}, {pErrorMessage.ToString()}");
-            }
-
-            _myCamera.CallBackMsgLoop.Invoke((CallBackMessage.Initialize, new object[] { bInitDone }));
-        }
-
-        private static void FrameCallback(SDOAQ_API.eErrorCode errorCode, IntPtr pBuffer, int bufferSize, ref SDOAQ_API.FrameDescriptor frameDescriptor)
-        {
-            if (errorCode != SDOAQ_API.eErrorCode.ecNoError)
-            {
-                return;
-            }
-
-            if (pBuffer == null || bufferSize == 0)
-            {
-                return;
-            }
-
-            byte[] data = new byte[bufferSize];
-
-            Marshal.Copy(pBuffer, data, 0, bufferSize);
-
-            ++_myCamera.RecivedFrameCount;
-            var imgInfo = new SdoaqImageInfo(frameDescriptor.pixelsWidth, frameDescriptor.pixelsHeight, frameDescriptor.bytesLine, frameDescriptor.bytesPixel, data);
-
-            _myCamera.CallBackMsgLoop?.Invoke((CallBackMessage.Frame, new object[] { imgInfo }));
-        }
-        #endregion
-
     }
 }

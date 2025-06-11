@@ -249,8 +249,11 @@ namespace SDOWSIO
 			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_SetFunctionRectData(IntPtr viewer_hwnd, WSUTIVRESOURCE resource_id, int position_left, int position_top, int position_right, int position_bottom);
 
-			//----------------------------------------------------------------------------
-			[DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+            [DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
+            public static extern WSIORV WSUT_IV_GetFunctionRectData(IntPtr viewer_hwnd, WSUTIVRESOURCE resource_id, out int position_left, out int position_top, out int position_right, out int position_bottom);
+
+            //----------------------------------------------------------------------------
+            [DllImport(WSIO_DLL, CallingConvention = CallingConvention.Cdecl)]
 			public static extern WSIORV WSUT_IV_SetFunctionLineData(IntPtr viewer_hwnd, WSUTIVRESOURCE resource_id, int begin_point_x, int begin_point_y, int end_point_x, int end_point_y);
 
 			//----------------------------------------------------------------------------
