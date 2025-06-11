@@ -1329,7 +1329,7 @@ void CSDOAQ_Dlg::OnSdoaqSingleShotEdof()
 			ImageViewer(0, "EDoF", m_nContiEdof);
 		}
 
-		FloatViewer(pStepMapImageBuffer && stepMapBufferSize, 1, "StepMAP", m_nContiEdof, SET, pStepMapImageBuffer);
+		FloatViewer(pStepMapImageBuffer && stepMapBufferSize, 1, "StepMAP (not provided when using CUDA)", m_nContiEdof, SET, pStepMapImageBuffer);
 		//FloatViewer(pQualityMapBuffer && qualityMapBufferSize, 2, "QualityMAP", m_nContiEdof, SET, pQualityMapBuffer);
 		FloatViewer(pHeightMapBuffer && heightMapBufferSize, 2, "HeightMAP", m_nContiEdof, SET, pHeightMapBuffer);
 		Viewer3D(pPointCloudBuffer && pointCloudBufferSize, SET, pPointCloudBuffer, pEdofImageBuffer);
@@ -1485,7 +1485,7 @@ LRESULT CSDOAQ_Dlg::OnReceiveEdof(WPARAM wErrorCode, LPARAM lLastFilledRingBuffe
 
 		++m_nContiEdof;
 		ImageViewer(0, "EDoF", m_nContiEdof, SET, SET.rb.ppBuf[base_order + 0]);
-		FloatViewer(true, 1, "StepMAP", m_nContiEdof, SET, SET.rb.ppBuf[base_order + 1]);
+		FloatViewer(true, 1, "StepMAP (not provided when using CUDA)", m_nContiEdof, SET, SET.rb.ppBuf[base_order + 1]);
 		//FloatViewer(true, 2, "QualityMAP", m_nContiEdof, SET, SET.rb.ppBuf[base_order + 2]);
 		FloatViewer(true, 2, "HeightMAP", m_nContiEdof, SET, SET.rb.ppBuf[base_order + 3]);
 		Viewer3D(true, SET, SET.rb.ppBuf[base_order + 4], SET.rb.ppBuf[base_order + 0]);

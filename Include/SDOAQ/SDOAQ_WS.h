@@ -167,6 +167,12 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.7.10 2025.05.16  YoungJu Lee		- Supported Basler camera boA5320-150cc
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.8.0  2025.05.23  YoungJu Lee		- Added support for image processing using CUDA to enhance performance and efficiency
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.8.1  2025.05.30  YoungJu Lee		- Added SD EDoF-Beta algorithm (SDOAQ_AM70_DLL_EDOF_BETA)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.8.2  2025.06.09  YoungJu Lee		- Added algorithm interface (SDOAQ_EDOF.h)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -610,7 +616,8 @@ extern "C"
 		/// EDoF Algorithm method. Select an algorithm to generate EDoF image, including the built-in sdedof algorithm. 
 		/// To add a 3rd party algorithm, pre-definition is required.
 		/// </summary>
-		pi_allgorithm_method_edof = 67,			// I - R/W
+		pi_edof_algorithm_method = 67,			// I - R/W
+		/*deprecated*/pi_allgorithm_method_edof = pi_edof_algorithm_method,
 
 		/// <summary>
 		/// {1.0, 0.5, 0.25}
@@ -826,7 +833,9 @@ extern "C"
 	#define SDOAQ_AM65E_DLL_EDOF_WITH_AF			65
 	#define SDOAQ_AM60_DLL_EDOF_DEMO_CMP			60
 	#define SDOAQ_AM61_DLL_EDOF_HELICONFOCUS		61
-
+	#define SDOAQ_AM67_DLL_EDOF_CUDA				67
+	#define SDOAQ_AM68_DLL_EDOF_CUDA_DEMO_CMP		68
+	#define SDOAQ_AM70_DLL_EDOF_BETA				70
 
 	// gets information about parameter
 	// The correct value is read after the SDOAQ_Initialize API completes.
