@@ -127,6 +127,7 @@
     <None Include="res\SdoaqEdof.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\SD.ico" />
     <Image Include="res\SdoaqEdof.ico" />
   </ItemGroup>
   <ItemGroup>

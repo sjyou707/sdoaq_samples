@@ -175,9 +175,12 @@ using System.Text;
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.8.0  2025.05.23  YoungJu Lee		- Added support for image processing using CUDA to enhance performance and efficiency
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
-	 2.8.1  2025.05.30  YoungJu Lee		- Added SD EDoF-Beta algorithm (SDOAQ_AM70_DLL_EDOF_BETA)
+	 2.8.1  2025.05.30  YoungJu Lee		- Added EDoF-Beta algorithm (SDOAQ_AM70_DLL_EDOF_BETA)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.8.2  2025.06.09  YoungJu Lee		- Added algorithm interface (SDOAQ_EDOF.h)
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.8.3  2025.06.12  YoungJu Lee		- Added z250609 algorithm (SDOAQ_AM71_DLL_z250609)
+										- Updated internal dependency Library (must use WSIO v3.33 or later)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
@@ -873,6 +876,7 @@ namespace SDOAQ
 		public const int SDOAQ_AM67_DLL_EDOF_CUDA = 67;
 		public const int SDOAQ_AM68_DLL_EDOF_CUDA_DEMO_CMP = 68;
 		public const int SDOAQ_AM70_DLL_EDOF_BETA = 70;
+		public const int SDOAQ_AM71_DLL_z250609 = 71;
 
 		// gets information about parameter
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]

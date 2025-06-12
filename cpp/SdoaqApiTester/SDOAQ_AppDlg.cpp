@@ -224,7 +224,7 @@ void CSDOAQ_Dlg::BuildParameterID_Combobox(void)
 			ADD_PI(_T("Channel 8 Intensity"), piIntensityGeneralChannel_8);
 		}
 		// edof algorithm
-		ADD_PI(_T("allgorithm_method_edof"), pi_allgorithm_method_edof);
+		ADD_PI(_T("edof_algorithm_method"), pi_edof_algorithm_method);
 		ADD_PI(_T("edof_calc_resize_ratio"), pi_edof_calc_resize_ratio);
 		ADD_PI(_T("edof_calc_pixelwise_kernel_size"), pi_edof_calc_pixelwise_kernel_size);
 		ADD_PI(_T("edof_calc_pixelwise_iteration"), pi_edof_calc_pixelwise_iteration);

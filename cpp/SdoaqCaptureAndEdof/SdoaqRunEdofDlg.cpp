@@ -227,6 +227,7 @@ LRESULT CSdoaqEdofDlg::OnInitDone(WPARAM wErrorCode, LPARAM lpMessage)
 		OnSdoaqSetEdofThreshold();
 		OnSdoaqSetEdofScaleStep();
 		::SDOAQ_SetIntParameterValue(pi_edof_is_scale_correction_enabled, 1);
+		::SDOAQ_SetIntParameterValue(pi_edof_algorithm_method, 56);
 	}
 	else
 	{

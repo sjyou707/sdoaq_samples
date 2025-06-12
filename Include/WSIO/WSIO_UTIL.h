@@ -455,6 +455,20 @@ WSIODLL_API	WSIORV			WSUT_IV_AttachRawImgData_F3(
 	);
 
 //----------------------------------------------------------------------------
+WSIODLL_API	WSIORV			WSUT_IV_AttachRawImgData_Z(
+	WSIOVOID				viewer_hwnd,
+	WSIOUINT				width,
+	WSIOUINT				height,
+	WSIOUINT				line_bytes,
+	WSIOUINT				pixel_bytes,
+	WSIOVOID				data_surface,
+	WSIOUINT				data_surface_size,
+	WSIOCSTR				path_name_str,
+	WSIOVOID				data_z,
+	WSIOUINT				data_z_size
+);
+
+//----------------------------------------------------------------------------
 WSIODLL_API	WSIORV			WSUT_IV_SetPixelWidth(
 			WSIOVOID				viewer_hwnd,
 			WSIODOUBLE				pixel_width_mm
