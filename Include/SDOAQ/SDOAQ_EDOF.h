@@ -1,8 +1,9 @@
 /* SDOAQ_EDOF.h
 
-	SD Optics depth from focus algorithm
-	extension for C style usage
-	Copyright (c) 2019-2025 SD Optics,Inc. All rights reserved.
+	Comments : This file exports all types and functions required to directly access the SDO EDoF algorithm.
+	Date     : 2025/06/09
+	Author   : YoungJu Lee
+	Copyright (c) 2019 SD Optics,Inc. All rights reserved.
 */
 
 #pragma once
@@ -39,7 +40,7 @@ extern "C"
 
 	struct SDOAQ_EDOF_FocalStackParams
 	{
-		SDOAQ_EDOF_FocusMeasure focus_measure; // default = SDEDOF_FocusMeasure::MODIFIED_LAPLACIAN
+		SDOAQ_EDOF_FocusMeasure focus_measure; // default = SDOAQ_EDOF_FocusMeasure::MODIFIED_LAPLACIAN
 
 		// input image parameters
 		// memory size for one image = image_width * image_height * num_channel * byte_per_channel (bytes)

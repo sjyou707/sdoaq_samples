@@ -467,6 +467,7 @@ WSIODLL_API	WSIORV			WSUT_IV_AttachRawImgData_Z(
 	WSIOVOID				data_z,
 	WSIOUINT				data_z_size
 );
+WSIO_CS_API	WSIORV WSUT_IV_AttachRawImgData_Z_cs(WSIOVOID viewer_hwnd, WSIOUINT width, WSIOUINT height, WSIOUINT line_bytes, WSIOUINT pixel_bytes, WSIOVOID data_surface, WSIOUINT data_surface_size, WSIOCSTR path_name_str, WSIOVOID data_z, WSIOUINT data_z_size);
 
 //----------------------------------------------------------------------------
 WSIODLL_API	WSIORV			WSUT_IV_SetPixelWidth(
@@ -514,6 +515,7 @@ WSIODLL_API WSIORV			WSUT_MultiStringFromLineScript(
 			WSIOUINT*				ptr_number_of_value_buffer,
 			WSIOUINT				size_of_value_buffer
 );
+WSIO_CS_API WSIORV WSUT_MultiStringFromLineScript_cs(WSIOCSTR data_or_path_str, WSIOCSTR token_str, WSIOPSTR* ptr_value_buffers, WSIOUINT* ptr_number_of_value_buffer, WSIOUINT size_of_value_buffer);
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV			WSUT_IntFromLineScript(
@@ -569,7 +571,9 @@ WSIODLL_API WSIORV			WSUT_GetBmpAttributes(
 
 //----------------------------------------------------------------------------
 WSIODLL_API WSIORV WSUT_GetRainbowBGR(float v255, unsigned char* pbgr);
+WSIO_CS_API WSIORV WSUT_GetRainbowBGR_cs(float v255, unsigned char* pbgr);
 WSIODLL_API WSIORV WSUT_GenerateRainbowColorMap(float* pFloat, int stride, size_t pixels, unsigned char* pbgr_map, float lowest, float highest);
+WSIO_CS_API WSIORV WSUT_GenerateRainbowColorMap_cs(float* pFloat, int stride, size_t pixels, unsigned char* pbgr_map, float lowest, float highest);
 
 //============================================================================
 // LICENSE

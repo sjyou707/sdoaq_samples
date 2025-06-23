@@ -10,9 +10,7 @@
 enum EUserMessage
 {
 	EUM_LOG = 0xA000, // LPARAM is a pointer of CString
-	EUM_ERROR, // LPARAM is a pointer of CString
 	EUM_INITDONE,
-	EUM_RECEIVE_EDOF,
 };
 
 // CSdoaqEdofDlg dialog
@@ -46,7 +44,6 @@ public:
 	afx_msg void OnClose();
 
 	afx_msg LRESULT OnInitDone(WPARAM wErrorCode, LPARAM lpMessage);
-	afx_msg LRESULT OnReceiveEdof(WPARAM wErrorCode, LPARAM lLastFilledRingBufferEntry);
 
 	afx_msg void OnSdoaqSetCalibrationFile();
 	afx_msg void OnSdoaqSetROI();
@@ -116,6 +113,12 @@ public:
 	std::vector<int> m_vFocusSet;
 	int m_nRingBufferSize = 3;
 	int m_nContiEdof = 0;
+
+	double m_resize_ratio = 0.5f;
+	int m_pixelwise_kernelSize = 5;
+	int m_pixelwise_iteration = 4;
+	double m_depth_quality_threshold = 1.0f;
+	int m_scale_ref_step = 160;
 
 	void ImageViewer(const char* title = NULL, int title_no = 0, const tTestSet& SET = tTestSet(), void* data = NULL);
 	void ImageViewer(const char* title, int title_no, int width, int height, int colorbytes, void* data = NULL);

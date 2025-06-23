@@ -37,11 +37,11 @@ namespace SDOAQCSharp
             return true;
         }
 
-        public bool Acquisition_Sanp(string directoryPath)
+        public bool Acquisition_Snap(string directoryPath)
         {
             if (IsInitialize == false || IsRunPlayer == false)
             {
-                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_Sanp(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
+                WriteLog(Logger.emLogLevel.Warning, $"Acquisition_Snap(), Run False. IsInitialize = {IsInitialize}, PlayerMode = {PlayerMode}");
                 return false;
             }
 

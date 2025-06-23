@@ -176,6 +176,10 @@
 	 2.8.3  2025.06.12  YoungJu Lee		- Added z250609 algorithm (SDOAQ_AM71_DLL_z250609)
 										- Updated internal dependency Library (must use WSIO v3.33 or later)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.8.4  2025.06.18  YoungJu Lee		- Updated the parameter setting APIs related to the Euresys Coaxlink grabber
+										- Added support for Vieworks camera VC-50MX-C30 and VC-65MX-C31
+										- Added per-algorithm parameter IDs with support for availability checks
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -623,6 +627,26 @@ extern "C"
 		/*deprecated*/pi_allgorithm_method_edof = pi_edof_algorithm_method,
 
 		/// <summary>
+		/// Determines whether SDOAQ_AM56_DLL_EDOF_ZMAP algorithm is available.
+		/// </summary>
+		pi_edof_algorithm_basic_process = 95,	// I - R
+
+		/// <summary>
+		/// Determines whether SDOAQ_AM67_DLL_EDOF_CUDA algorithm is available.
+		/// </summary>
+		pi_edof_algorithm_cuda_process = 96,	// I - R
+		
+		/// <summary>
+		/// Determines whether SDOAQ_AM71_DLL_z250609 algorithm is available.
+		/// </summary>
+		pi_edof_algorithm_z250609 = 97,			// I - R
+		
+		/// <summary>
+		/// Determines whether Helicon Focus is installed on the host enviroment.
+		/// </summary>
+		pi_edof_algorithm_heliconfocus = 98,	// I - R
+
+		/// <summary>
 		/// {1.0, 0.5, 0.25}
 		/// Gets current active resize ratio of the EDoF calculation. 
 		/// old - This parameter is readonly because it
@@ -787,7 +811,7 @@ extern "C"
 		/// <summary>By specifying a log level, only log messages with a higher severity level than the specified log level are provided.</summary>
 		piLogLevel = 92,						// I - R/W	 (log severity)
 
-		//piNextParameterValue = 94, //250421
+		//piNextParameterValue = 99, //250618
 
 		/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 		piInvalidParameter = 100
@@ -832,14 +856,14 @@ extern "C"
 		fmMax
 	};
 
-	#define SDOAQ_AM56_DLL_EDOF_ZMAP				56
-	#define SDOAQ_AM65E_DLL_EDOF_WITH_AF			65
-	#define SDOAQ_AM60_DLL_EDOF_DEMO_CMP			60
-	#define SDOAQ_AM61_DLL_EDOF_HELICONFOCUS		61
-	#define SDOAQ_AM67_DLL_EDOF_CUDA				67
-	#define SDOAQ_AM68_DLL_EDOF_CUDA_DEMO_CMP		68
-	#define SDOAQ_AM70_DLL_EDOF_BETA				70
-	#define SDOAQ_AM71_DLL_z250609					71
+	#define SDOAQ_AM56_DLL_EDOF_ZMAP				56 // default, standard algorithm. The computation is based on CPU
+	#define SDOAQ_AM65E_DLL_EDOF_WITH_AF			65 // multi-result, basic edof + auto focus
+	#define SDOAQ_AM60_DLL_EDOF_DEMO_CMP			60 // multi-result, basic edof + single middle focus
+	#define SDOAQ_AM61_DLL_EDOF_HELICONFOCUS		61 // third-party HelliconFocus algorithm
+	#define SDOAQ_AM67_DLL_EDOF_CUDA				67 // runs on NVIDIA graphic card(CUDA)
+	#define SDOAQ_AM68_DLL_EDOF_CUDA_DEMO_CMP		68 // multi-result, cuda edof + single middle focus
+	#define SDOAQ_AM70_DLL_EDOF_BETA				70 // experimental version
+	#define SDOAQ_AM71_DLL_z250609					71 // private release
 
 	// gets information about parameter
 	// The correct value is read after the SDOAQ_Initialize API completes.

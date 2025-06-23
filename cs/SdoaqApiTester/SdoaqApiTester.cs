@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -308,7 +307,7 @@ namespace SdoaqApiTester
 		{
 			string snapPath = System.IO.Path.Combine(@"C:\SDOAQ\Snap", $"{DateTime.Now:yyyy.MMM.dd.HHmmss}");
 
-			GetSdoaqObj().Acquisition_Sanp(snapPath);
+			GetSdoaqObj().Acquisition_Snap(snapPath);
 		}
 		#endregion
 

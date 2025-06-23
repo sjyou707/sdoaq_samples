@@ -273,8 +273,8 @@ namespace SDOAQCSharp
 
                     sdoaqObj.SetRoi_AF(DFLT_AF_ROI);
                     sdoaqObj.SetFocus(DFLT_FOCUS_LIST);
-                    sdoaqObj.SetSnapFocus(DFLT_FOCUS_LIST);
-                }
+                    sdoaqObj.SetSnapFocus(DFLT_FOCUS_LIST);					
+				}
 
                 SelectMultiWS(0);
             }

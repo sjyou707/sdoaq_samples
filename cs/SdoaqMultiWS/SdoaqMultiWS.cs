@@ -371,7 +371,7 @@ namespace SdoaqMultiWS
         {
             string snapPath = System.IO.Path.Combine(@"C:\SDOAQ\Snap", $"{DateTime.Now:yyyy.MMM.dd.HHmmss}");
 
-            GetSdoaqObj().Acquisition_Sanp(snapPath);
+            GetSdoaqObj().Acquisition_Snap(snapPath);
         }
 
         private void rdo_SelWS_CheckedChanged(object sender, EventArgs e)

@@ -162,10 +162,10 @@ namespace SdoaqEdof
             }
         }
 
-        private void btn_SetIteraion_Click(object sender, EventArgs e)
+        private void btn_SetIteration_Click(object sender, EventArgs e)
         {
             bool isSet = false;
-            if (Int32.TryParse(txt_Iteraion.Text, out int value))
+            if (Int32.TryParse(txt_Iteration.Text, out int value))
             {
                 if (value >= 0 && value <= 16)
                 {
@@ -247,6 +247,6 @@ namespace SdoaqEdof
             openFile.Filter = "csv files (*.csv)|*.csv|All files (*.*)|*.*";
         }
 
-        
-    }
+		
+	}
 }

@@ -18,6 +18,8 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 	 2.7.4  2024.07.24	YoungJu Lee		- Trigger mode is subdivided into camera mode and grabber mode
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.8.4  2025.06.18	YoungJu Lee		- Updated the parameter setting APIs related to the Euresys Coaxlink grabber
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 #pragma once
@@ -108,6 +110,7 @@ extern "C"
 	__declspec(dllexport) eErrorCode SDOAQ_ExecGrabberSoftwareTrigger(void);
 
 	// for CoaXPress, Basler USB, Basler GigE
+	// for Euresys Coaxlink grabber. 'sz_register' is a path string in the format section/register. (ex: "device/xx", "remote/xx", "interface/xx", "stream/xx") The default section is "Remote".
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameterString(const char* sz_register, const char* sz_value);
 	__declspec(dllexport) eErrorCode SDOAQ_GetCameraParameterString(const char* sz_register, char* buffer_ptr, int buffer_size);
 	__declspec(dllexport) eErrorCode SDOAQ_SetCameraParameterInteger(const char* sz_register, long long value);

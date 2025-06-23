@@ -182,6 +182,10 @@ using System.Text;
 	 2.8.3  2025.06.12  YoungJu Lee		- Added z250609 algorithm (SDOAQ_AM71_DLL_z250609)
 										- Updated internal dependency Library (must use WSIO v3.33 or later)
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
+	 2.8.4  2025.06.18  YoungJu Lee		- Updated the parameter setting APIs related to the Euresys Coaxlink grabber
+										- Added support for Vieworks camera VC-50MX-C30 and VC-65MX-C31
+										- Added per-algorithm parameter IDs with support for availability checks
+	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
 
@@ -660,8 +664,25 @@ namespace SDOAQ
 			/*deprecated*/pi_allgorithm_method_edof = pi_edof_algorithm_method,
 
 			/// <summary>
+			/// Determines whether SDOAQ_AM56_DLL_EDOF_ZMAP algorithm is available.
+			/// </summary>
+			pi_edof_algorithm_basic_process = 95,   // I - R
+			/// <summary>
+			/// Determines whether SDOAQ_AM67_DLL_EDOF_CUDA algorithm is available.
+			/// </summary>
+			pi_edof_algorithm_cuda_process = 96,    // I - R
+			/// <summary>
+			/// Determines whether SDOAQ_AM71_DLL_z250609 algorithm is available.
+			/// </summary>
+			pi_edof_algorithm_z250609 = 97,          // I - R
+			/// <summary>
+			/// Determines whether Helicon Focus is installed on the host enviroment.
+			/// </summary>
+			pi_edof_algorithm_heliconfocus = 98,     // I - R
+
+			/// <summary>
 			/// {1.0, 0.5, 0.25}
-			/// Gets current active resize ratio of the EDoF calculation. 
+			/// Gets current active resize ratio of the EDoF calculation.
 			/// old - This parameter is readonly because it
 			/// must only be set with sEdofCalculationFixedParameters because it affects image buffer sizes.
 			/// modified - It can be writable because it does not affect buffer size.
@@ -824,10 +845,27 @@ namespace SDOAQ
 			/// <summary>By specifying a log level, only log messages with a higher severity level than the specified log level are provided.</summary>
 			piLogLevel = 92,                    // I - R/W	 (log severity)
 
-			//piNextParameterValue = 94, //250421
+			//piNextParameterValue = 99, //250618
 
 			/// <summary>Unsupported parameter was requested. Also used as "end" marker internally.</summary>
 			piInvalidParameter = 100
+		};
+				
+		public enum eCameraColor
+		{
+			ccColor = 0,
+			ccMono = 1
+		};
+
+		public enum eSaveFormat
+		{
+			sfNone = 0,
+			sfBmp = 1,
+			sfCzi = 2,
+			sfZip = 3,
+			sfTiff = 4,
+			sfJpg = 5,
+			sfMax
 		};
 
 		public enum eReflexCorrectionMethod
@@ -851,32 +889,15 @@ namespace SDOAQ
 			//fmCustomized2 // reserved, not yet implemented
 			fmMax
 		};
-		
-		public enum eCameraColor
-		{
-			ccColor = 0,
-			ccMono = 1
-		};
 
-		public enum eSaveFormat
-		{
-			sfNone = 0,
-			sfBmp = 1,
-			sfCzi = 2,
-			sfZip = 3,
-			sfTiff = 4,
-			sfJpg = 5,
-			sfMax
-		};
-
-		public const int SDOAQ_AM56_DLL_EDOF_ZMAP = 56;
-		public const int SDOAQ_AM65E_DLL_EDOF_WITH_AF = 65;
-		public const int SDOAQ_AM60_DLL_EDOF_DEMO_CMP = 60;
-		public const int SDOAQ_AM61_DLL_EDOF_HELICONFOCUS = 61;
-		public const int SDOAQ_AM67_DLL_EDOF_CUDA = 67;
-		public const int SDOAQ_AM68_DLL_EDOF_CUDA_DEMO_CMP = 68;
-		public const int SDOAQ_AM70_DLL_EDOF_BETA = 70;
-		public const int SDOAQ_AM71_DLL_z250609 = 71;
+		public const int SDOAQ_AM56_DLL_EDOF_ZMAP = 56;         // default, standard algorithm. The computation is based on CPU
+		public const int SDOAQ_AM65E_DLL_EDOF_WITH_AF = 65;     // multi-result, basic edof + auto focus
+		public const int SDOAQ_AM60_DLL_EDOF_DEMO_CMP = 60;     // multi-result, basic edof + single middle focus
+		public const int SDOAQ_AM61_DLL_EDOF_HELICONFOCUS = 61; // third-party HellconFocus algorithm
+		public const int SDOAQ_AM67_DLL_EDOF_CUDA = 67;         // runs on NVIDIA graphic card(CUDA)
+		public const int SDOAQ_AM68_DLL_EDOF_CUDA_DEMO_CMP = 68;// multi-result, cuda edof + single middle focus
+		public const int SDOAQ_AM70_DLL_EDOF_BETA = 70;         // experimental version
+		public const int SDOAQ_AM71_DLL_z250609 = 71;           // private release
 
 		// gets information about parameter
 		[DllImport(SDOAQ_DLL, CallingConvention = CallingConvention.Cdecl)]

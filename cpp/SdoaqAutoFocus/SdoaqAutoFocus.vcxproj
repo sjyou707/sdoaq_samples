@@ -127,6 +127,7 @@
     <None Include="res\SdoaqAutoFocus.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\SD.ico" />
     <Image Include="res\SdoaqAutoFocus.ico" />
   </ItemGroup>
   <ItemGroup>

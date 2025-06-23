@@ -153,12 +153,14 @@ WSIODLL_API WSIORV			WSGL_SetActivation(
 			WSGLKEY			ekey,
 			int				activation
 );
+WSIO_CS_API WSIORV WSGL_SetActivation_cs(WSGLHANDLE hd3v, WSGLKEY ekey, int activation);
 
 WSIODLL_API WSIORV			WSGL_GetActivation(
 			WSGLHANDLE		hd3v,
 			WSGLKEY			ekey,
 			int*			p_activation
 );
+WSIO_CS_API WSIORV WSGL_GetActivation_cs(WSGLHANDLE hd3v, WSGLKEY ekey, int* p_activation);
 
 WSIODLL_API WSIORV			WSGL_SetDisplayAttributes(
 			WSGLHANDLE		hd3v,
@@ -177,6 +179,7 @@ WSIODLL_API WSIORV			WSGL_SetMode(
 			const int*		p_mode_list,
 			int				mode_nums
 );
+WSIO_CS_API WSIORV WSGL_SetMode_cs(WSGLHANDLE hd3v, WSGLKEY mode_group, WSGLKEY mode, const int* p_mode_list, int mode_nums);
 
 WSIODLL_API WSIORV			WSGL_RegisterModeCallback(
 			WSGLHANDLE		hd3v,
@@ -184,6 +187,7 @@ WSIODLL_API WSIORV			WSGL_RegisterModeCallback(
 			WSIOVOID		hwnd,
 			unsigned		msg
 );
+WSIO_CS_API WSIORV WSGL_RegisterModeCallback_cs(WSGLHANDLE hd3v, WSGLKEY mode_group, WSIOVOID hwnd, unsigned msg);
 
 WSIODLL_API WSIORV			WSGL_RotationType(
 			WSGLHANDLE		hd3v,
@@ -257,6 +261,7 @@ WSIODLL_API WSIORV			WSGL_SetMeasureDataUnit(
 			WSGLHANDLE		hd3v,
 			float			unit_microns
 			);
+WSIO_CS_API WSIORV WSGL_SetMeasureDataUnit_cs(WSGLHANDLE hd3v, float unit_microns);
 
 WSIODLL_API WSIORV			WSGL_ClearAllMeasureData(
 			WSGLHANDLE		hd3v,

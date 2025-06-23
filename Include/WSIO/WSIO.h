@@ -9,6 +9,24 @@
 	--------------------------------------------------------------------------------------------------------------------------------------------------------
 */
 
+// The following 14 functions are not exposed in a C-style manner.
+// To provide C-style versions, additional functions have been included.
+// The names of these additional functions are derived from the original function names, with the suffix "_cs" appended.
+//		{ WSIF_GetItem_MalsDepthTableType , WSIF_GetItem_MalsDepthTableType_cs }
+//		{ WSIF_ReqItem_MalsStepAdjust_MM , WSIF_ReqItem_MalsStepAdjust_MM_cs }
+//		{ WSIF_SendMalsFrameData , WSIF_SendMalsFrameData_cs }
+//		{ WSIF_RegiCbf_MalsFrameData , WSIF_RegiCbf_MalsFrameData_cs }
+//		{ WSIF_EnableReceiveMalsFrameData , WSIF_EnableReceiveMalsFrameData_cs }
+//		{ WSUT_IV_AttachRawImgData_Z , WSUT_IV_AttachRawImgData_Z_cs }
+//		{ WSUT_MultiStringFromLineScript , WSUT_MultiStringFromLineScript_cs }
+//		{ WSUT_GetRainbowBGR , WSUT_GetRainbowBGR_cs }
+//		{ WSUT_GenerateRainbowColorMap , WSUT_GenerateRainbowColorMap_cs }
+//		{ WSGL_SetActivation , WSGL_SetActivation_cs }
+//		{ WSGL_GetActivation , WSGL_GetActivation_cs }
+//		{ WSGL_SetMode , WSGL_SetMode_cs }
+//		{ WSGL_RegisterModeCallback , WSGL_RegisterModeCallback_cs }
+//		{ WSGL_SetMeasureDataUnit , WSGL_SetMeasureDataUnit_cs }
+
 #pragma once
 
 //====================================================================================================================================
@@ -19,8 +37,10 @@
 //----------------------------------------------------------------------------
 #if defined(WSIODLL_EXPORTS)
 #define WSIODLL_API	__declspec(dllexport)	// for DLL source
+#define WSIO_CS_API	extern "C" __declspec(dllexport)
 #else
 #define WSIODLL_API extern //	__declspec(dllimport)	// for USER source
+#define WSIO_CS_API extern "C" __declspec(dllimport)
 #endif
 
 //============================================================================
