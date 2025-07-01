@@ -103,6 +103,8 @@ BOOL CSdoaqEdofDlg::OnInitDialog()
 		g_LogLine(_T("WSUT_IV_CreateImageViewer() returns error(%d)."), rv_wsio);
 	}
 
+	g_LogLine(_T("wsio dll version is \"%s\""), (CString)::WSIO_GetVersion(FALSE));
+
 	SetDlgItemText(IDC_EDIT_ROI, _T("0,0,2040,1086"));
 	SetDlgItemText(IDC_EDIT_FOCUS_SET, _T("0-319-35"));
 	SetDlgItemText(IDC_EDIT_EDOF_RESIZE_RATIO, _T("0.5"));
