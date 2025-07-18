@@ -8,10 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using SDOAQNet;
+using SDOAQNet.Component;
+using SDOAQNet.Tool;
 using SDOAQ;
-using SDOAQCSharp.Tool;
-using SDOAQCSharp;
-using SDOAQCSharp.Component;
 
 namespace SdoaqEdof
 {
@@ -19,22 +19,24 @@ namespace SdoaqEdof
     {
         private StringBuilder _logBuffer = new StringBuilder();
         private object _lockLog = new object();
-        private Dictionary<int, MySdoaq> _sdoaqObjList = null;
+        private Dictionary<int, SdoaqController> _sdoaqObjList = null;
 
         private SdoaqImageViewr _imgViewer;
 
         public SdoaqEDoF()
         {
             InitializeComponent();
+            cmb_EdofResizeRatio.SelectedItem = "0.5";
 
             _imgViewer = new SdoaqImageViewr(false);
+            _imgViewer.VisiBleImageListBox = false;
             _imgViewer.Dock = DockStyle.Fill;
 
             pnl_Viewer.Controls.Add(_imgViewer);
-            _sdoaqObjList = MySdoaq.LoadScript();
+            _sdoaqObjList = SdoaqController.LoadScript();
             _imgViewer.Set_SdoaqObj(GetSdoaqObj());
 
-            MySdoaq.LogReceived += Sdoaq_LogDataReceived;
+            SdoaqController.LogReceived += Sdoaq_LogDataReceived;
         }
 
         private void SdoaqEDoF_Load(object sender, EventArgs e)
@@ -46,21 +48,21 @@ namespace SdoaqEdof
 
         private void SdoaqEDoF_FormClosed(object sender, FormClosedEventArgs e)
         {
-            MySdoaq.LogReceived -= Sdoaq_LogDataReceived;
+            SdoaqController.LogReceived -= Sdoaq_LogDataReceived;
 
             GetSdoaqObj()?.AcquisitionStop();
 
-            MySdoaq.DisposeStaticResouce();
+            SdoaqController.DisposeStaticResouce();
 
-            Task.Run(() => { MySdoaq.SDOAQ_Finalize(); });
+            Task.Run(() => { SdoaqController.SDOAQ_Finalize(); });
         }
 
         private void Frm_Load()
         {
-            MySdoaq.SDOAQ_Initialize();
+            SdoaqController.SDOAQ_Initialize(false);
         }
 
-        private MySdoaq GetSdoaqObj()
+        private SdoaqController GetSdoaqObj()
         {
             return _sdoaqObjList[0];
         }
@@ -96,7 +98,7 @@ namespace SdoaqEdof
 
         private void btn_SingleShotEDoF_Click(object sender, EventArgs e)
         {
-            var edofImageOption = new MySdoaq.EdofImageList()
+            var edofImageOption = new SdoaqController.EdofImageList()
             {
                 EnableEdofImg = true,
                 EnableStepMapImg = true,
@@ -109,7 +111,7 @@ namespace SdoaqEdof
 
         private void btn_PlayEDoF_Click(object sender, EventArgs e)
         {
-            var edofImageOption = new MySdoaq.EdofImageList()
+            var edofImageOption = new SdoaqController.EdofImageList()
             {
                 EnableEdofImg = true,
                 EnableStepMapImg = true,
